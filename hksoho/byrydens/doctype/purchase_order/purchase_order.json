@@ -1,0 +1,198 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:po_number",
+ "creation": "2025-07-07 11:24:21.129626",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "po_number",
+  "buyer",
+  "supplier",
+  "customer",
+  "origin_country",
+  "origin_port",
+  "destination_port",
+  "purchaser",
+  "coordinator",
+  "order_type",
+  "purpose",
+  "column_break_zrvm",
+  "po_status",
+  "delivery_status",
+  "payment_terms",
+  "delivery_terms",
+  "equipment",
+  "requested_forwarder",
+  "booking_status",
+  "qc_status",
+  "bom_list_status",
+  "po_items_tab",
+  "temporary_po_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "PO Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "buyer",
+   "fieldtype": "Link",
+   "label": "Buyer",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Buyer\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "origin_country",
+   "fieldtype": "Link",
+   "label": "Origin Country",
+   "link_filters": "[]",
+   "options": "Country"
+  },
+  {
+   "fieldname": "origin_port",
+   "fieldtype": "Data",
+   "label": "Origin Port"
+  },
+  {
+   "fieldname": "destination_port",
+   "fieldtype": "Data",
+   "label": "Destination Port"
+  },
+  {
+   "fieldname": "purchaser",
+   "fieldtype": "Link",
+   "label": "Purchaser",
+   "options": "User"
+  },
+  {
+   "fieldname": "coordinator",
+   "fieldtype": "Link",
+   "label": "Coordinator",
+   "options": "User"
+  },
+  {
+   "fieldname": "order_type",
+   "fieldtype": "Data",
+   "label": "Order Type"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "Purpose"
+  },
+  {
+   "fieldname": "column_break_zrvm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "po_status",
+   "fieldtype": "Select",
+   "label": "PO Status",
+   "options": "Pending\nConfirmed"
+  },
+  {
+   "fieldname": "delivery_status",
+   "fieldtype": "Select",
+   "label": "Delivery Status",
+   "options": "Pending\nConfirmed"
+  },
+  {
+   "fieldname": "payment_terms",
+   "fieldtype": "Data",
+   "label": "Payment Terms"
+  },
+  {
+   "fieldname": "delivery_terms",
+   "fieldtype": "Data",
+   "label": "Delivery Terms"
+  },
+  {
+   "fieldname": "equipment",
+   "fieldtype": "Data",
+   "label": "Equipment"
+  },
+  {
+   "fieldname": "requested_forwarder",
+   "fieldtype": "Link",
+   "label": "Requested Forwarder",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "booking_status",
+   "fieldtype": "Select",
+   "label": "Booking Status"
+  },
+  {
+   "default": "0",
+   "fieldname": "qc_status",
+   "fieldtype": "Check",
+   "label": "QC Status"
+  },
+  {
+   "fieldname": "bom_list_status",
+   "fieldtype": "Select",
+   "label": "BOM List Status",
+   "options": "Pending\nConfirmed"
+  },
+  {
+   "fieldname": "po_items_tab",
+   "fieldtype": "Tab Break",
+   "label": "Order Items"
+  },
+  {
+   "fieldname": "temporary_po_items",
+   "fieldtype": "Table",
+   "label": "Temporary PO Items",
+   "options": "Temporary PO Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-15 10:39:18.726092",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Purchase Order",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "po_number, supplier",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "po_number"
+}

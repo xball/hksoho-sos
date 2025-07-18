@@ -1,0 +1,191 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-07-11 03:04:58.170944",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "purchase_order",
+  "line",
+  "article_number",
+  "article_name",
+  "article_photo",
+  "confirmed_ship_week",
+  "column_break_otjq",
+  "requested_qty",
+  "confirmed_qty",
+  "booked_qty",
+  "qc_accepted_qty",
+  "qc_rejected_qty",
+  "delivery_quantity",
+  "remaining_quantity",
+  "section_break_odpq",
+  "updated_ship_week",
+  "cbm",
+  "gross_weight",
+  "column_break_lipu",
+  "unit_purchase_price",
+  "unit_selling_price",
+  "purchase_amount",
+  "selling_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "line",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Line",
+   "non_negative": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "article_number",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Article Number",
+   "options": "Product"
+  },
+  {
+   "fieldname": "article_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Article Name"
+  },
+  {
+   "fieldname": "article_photo",
+   "fieldtype": "Attach Image",
+   "label": "Article photo"
+  },
+  {
+   "fieldname": "requested_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Requested Qty"
+  },
+  {
+   "fieldname": "confirmed_ship_week",
+   "fieldtype": "Data",
+   "label": "Confirmed Ship Week",
+   "placeholder": "YYYY-WW"
+  },
+  {
+   "fieldname": "confirmed_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Confirmed Qty"
+  },
+  {
+   "fieldname": "booked_qty",
+   "fieldtype": "Int",
+   "label": "Booked Qty"
+  },
+  {
+   "fieldname": "qc_accepted_qty",
+   "fieldtype": "Int",
+   "label": "QC Accepted Qty"
+  },
+  {
+   "fieldname": "qc_rejected_qty",
+   "fieldtype": "Int",
+   "label": "QC Rejected Qty"
+  },
+  {
+   "fieldname": "column_break_otjq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "updated_ship_week",
+   "fieldtype": "Data",
+   "label": "Updated Ship Week",
+   "placeholder": "YYYY-WW"
+  },
+  {
+   "fieldname": "delivery_quantity",
+   "fieldtype": "Int",
+   "label": "Delivery Quantity"
+  },
+  {
+   "fieldname": "remaining_quantity",
+   "fieldtype": "Int",
+   "label": "Remaining Quantity"
+  },
+  {
+   "fieldname": "cbm",
+   "fieldtype": "Float",
+   "label": "CBM  (m\u00b3)"
+  },
+  {
+   "fieldname": "gross_weight",
+   "fieldtype": "Float",
+   "label": "Gross Weight (kg)"
+  },
+  {
+   "fieldname": "unit_purchase_price",
+   "fieldtype": "Float",
+   "label": "Unit Purchase Price "
+  },
+  {
+   "fieldname": "unit_selling_price",
+   "fieldtype": "Float",
+   "label": "Unit Selling Price"
+  },
+  {
+   "fieldname": "purchase_amount",
+   "fieldtype": "Float",
+   "label": "Purchase Amount"
+  },
+  {
+   "fieldname": "selling_amount",
+   "fieldtype": "Float",
+   "label": "Selling Amount"
+  },
+  {
+   "fieldname": "section_break_odpq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_lipu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Purchase Order",
+   "options": "Purchase Order",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "image_field": "article_photo",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-15 14:22:40.678614",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Purchase Order Item",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "line,article_number,article_name",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "line"
+}

@@ -1,0 +1,522 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:partner_id",
+ "creation": "2025-06-17 18:16:33.510542",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "general_tab",
+  "partner_id",
+  "partner_name",
+  "partner_code",
+  "column_break_mpfh",
+  "partner_type",
+  "po_number_prefix",
+  "section_break_grma",
+  "status",
+  "since",
+  "hidden",
+  "section_break_woox",
+  "delivery_mode",
+  "delivery_term",
+  "payment_term",
+  "currency",
+  "quality_control",
+  "column_break_gzhv",
+  "default_agent_id",
+  "default_buyer_id",
+  "default_dc",
+  "default_forwarder",
+  "address_tab",
+  "address",
+  "loading_place",
+  "section_break_vwro",
+  "invoice_address",
+  "city",
+  "stateregion",
+  "postal_code",
+  "country",
+  "default_port_section",
+  "default_port",
+  "alternate_port",
+  "alternate_load_country",
+  "contact_tab",
+  "table_rpcg",
+  "invoice_and_bill_tab",
+  "official_name",
+  "vat_reg_no",
+  "org_no",
+  "org_no_issued_by",
+  "bank_name",
+  "bank_address",
+  "swift_code",
+  "column_break_obim",
+  "account_number",
+  "iban",
+  "secondary_account_number",
+  "secondary_iban",
+  "importers_code",
+  "logo",
+  "section_break_tjxy",
+  "phone_number",
+  "fax_number",
+  "ceo",
+  "contact_person",
+  "mobile_phone",
+  "website",
+  "email_address",
+  "invoicing_email",
+  "other_tab",
+  "partner_category",
+  "fsc_status",
+  "fsc_number",
+  "fsc_expiry_date",
+  "bsci_member",
+  "bsci_number",
+  "bsci_expiry_date",
+  "sales_contact",
+  "sales_commission_share_",
+  "number_of_employees",
+  "number_of_assembling_lines",
+  "capacity_of_assembling_lines",
+  "booking_tolerance_"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_tab",
+   "fieldtype": "Tab Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "partner_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Partner ID",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "partner_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Partner Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "partner_code",
+   "fieldtype": "Data",
+   "label": "Partner Code"
+  },
+  {
+   "fieldname": "column_break_mpfh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "partner_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Partner Type",
+   "options": "Agent/Buyer\nBuyer\nCustomer\nSupplier\nTransporter",
+   "reqd": 1
+  },
+  {
+   "fieldname": "po_number_prefix",
+   "fieldtype": "Data",
+   "label": "PO Number Prefix"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "section_break_grma",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Active\nInactive\nEvaluating\nBlacklist"
+  },
+  {
+   "fieldname": "since",
+   "fieldtype": "Date",
+   "label": "Since"
+  },
+  {
+   "default": "0",
+   "fieldname": "hidden",
+   "fieldtype": "Check",
+   "label": "Hidden"
+  },
+  {
+   "fieldname": "section_break_woox",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "delivery_mode",
+   "fieldtype": "Select",
+   "label": "Delivery Mode",
+   "options": "BY BOAT\nBY TRUCK"
+  },
+  {
+   "fieldname": "delivery_term",
+   "fieldtype": "Link",
+   "label": "Delivery Term",
+   "options": "Delivery Term"
+  },
+  {
+   "fieldname": "address_tab",
+   "fieldtype": "Tab Break",
+   "label": "Address"
+  },
+  {
+   "fieldname": "payment_term",
+   "fieldtype": "Select",
+   "label": "Payment Term",
+   "options": "10 Tage -2% Skonto ab Rdt. (X)\n10 Tage 2%, 30 Tage netto (Z1)\n10 Tage 3%, 30 Tage netto (Z2)\n10 dagar netto (1)\n10 dgr /. 3 % (B)\n100 dagar netto (11)\n120 dgr netto (10)\n14 Tage -3% Skonto ab Rdt (Q)\n14 Tage 2%, 30 Tage netto (Z)\n14 dagar netto (K)\n14 days ./. 2% (O)\n14 tag. netto (C)\n15 Tage 4%, 30 Tage netto (G)\n15 dagar (15)\n20 dagar netto (20)\n20 dagar netto,lev fri m\u00e5nad (L2)\n20 days net (7)\n21 days ./. 2 % (H)\n21 days ./.1% (I)\n30 Tage -3% Skonto ab Rdt (J)\n30 Tage -5% Skonto ab Rdt (31)\n30 Tage netto (D)\n30 Tagen des Folgemonats (L)\n30 dagar netto (3)\n30 dagar netto (T)\n30 days after full set of doc (M)\n30 days net (9)\n30 dgr netto, lev fri m\u00e5nad (L1)\n30dgr efter skeppningsdokument (30)\n40 dagar netto (40)\n45 dagar netto (4)\n45 dgr ./. 3 % (A)\n60 Tage netto (96)\n60 dagar netto (6)\n60 days net (95)\n75 dagar netto (50)\n90 Tage netto (Y)\n90 dag ./. 5 % (U)\n90 dagar (90)\n90 dagar netto (V)\n90 days net (91)\nCAD (2)\nDue date end of next month (L3)\nEfterkrav (E)\nF\u00f6rskottsbetalning (F)\nKontant netto (N)\nKortbetalning e-handel (KO)\nMot dok ca 15 dgr e skepp (8)\nPayment in advance (R)\nPostf\u00f6rskott (P)\nT/T (5)"
+  },
+  {
+   "fieldname": "quality_control",
+   "fieldtype": "Select",
+   "label": "Quality Control",
+   "options": "N/A\nNot Requested\nAlways Requested"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "loading_place",
+   "fieldtype": "Small Text",
+   "label": "Loading Place"
+  },
+  {
+   "fieldname": "section_break_vwro",
+   "fieldtype": "Section Break",
+   "label": "Invoice Address"
+  },
+  {
+   "fieldname": "invoice_address",
+   "fieldtype": "Small Text",
+   "label": "Invoice Address"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "stateregion",
+   "fieldtype": "Data",
+   "label": "State/Region"
+  },
+  {
+   "fieldname": "postal_code",
+   "fieldtype": "Data",
+   "label": "Postal Code"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "contact_tab",
+   "fieldtype": "Tab Break",
+   "label": "Contact"
+  },
+  {
+   "fieldname": "table_rpcg",
+   "fieldtype": "Table",
+   "options": "User Item"
+  },
+  {
+   "fieldname": "invoice_and_bill_tab",
+   "fieldtype": "Tab Break",
+   "label": "Bank and Invoice"
+  },
+  {
+   "fieldname": "official_name",
+   "fieldtype": "Data",
+   "label": "Official Name"
+  },
+  {
+   "fieldname": "vat_reg_no",
+   "fieldtype": "Data",
+   "label": "VAT Reg No"
+  },
+  {
+   "fieldname": "org_no",
+   "fieldtype": "Data",
+   "label": "Org No"
+  },
+  {
+   "fieldname": "org_no_issued_by",
+   "fieldtype": "Data",
+   "label": "Org No Issued By"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "label": "Bank Name"
+  },
+  {
+   "fieldname": "bank_address",
+   "fieldtype": "Data",
+   "label": "Bank Address"
+  },
+  {
+   "fieldname": "swift_code",
+   "fieldtype": "Data",
+   "label": "Swift Code"
+  },
+  {
+   "fieldname": "account_number",
+   "fieldtype": "Data",
+   "label": "Account Number"
+  },
+  {
+   "fieldname": "iban",
+   "fieldtype": "Data",
+   "label": "IBAN"
+  },
+  {
+   "fieldname": "column_break_obim",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "secondary_account_number",
+   "fieldtype": "Data",
+   "label": "Secondary Account Number"
+  },
+  {
+   "fieldname": "secondary_iban",
+   "fieldtype": "Data",
+   "label": "Secondary IBAN"
+  },
+  {
+   "fieldname": "importers_code",
+   "fieldtype": "Data",
+   "label": "Importer's Code"
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo"
+  },
+  {
+   "fieldname": "section_break_tjxy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Phone",
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "fax_number",
+   "fieldtype": "Phone",
+   "label": "Fax Number"
+  },
+  {
+   "fieldname": "ceo",
+   "fieldtype": "Data",
+   "label": "CEO"
+  },
+  {
+   "fieldname": "contact_person",
+   "fieldtype": "Data",
+   "label": "Contact Person"
+  },
+  {
+   "fieldname": "mobile_phone",
+   "fieldtype": "Data",
+   "label": "Mobile Phone"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
+  },
+  {
+   "fieldname": "email_address",
+   "fieldtype": "Data",
+   "label": "Email Address"
+  },
+  {
+   "fieldname": "invoicing_email",
+   "fieldtype": "Data",
+   "label": "Invoicing Email"
+  },
+  {
+   "fieldname": "partner_category",
+   "fieldtype": "Select",
+   "label": "Partner Category",
+   "options": "A\nB\nC"
+  },
+  {
+   "fieldname": "fsc_status",
+   "fieldtype": "Select",
+   "label": "FSC Status",
+   "options": "Yes\nNo\nN/A"
+  },
+  {
+   "fieldname": "fsc_number",
+   "fieldtype": "Data",
+   "label": "FSC Number"
+  },
+  {
+   "fieldname": "fsc_expiry_date",
+   "fieldtype": "Date",
+   "label": "FSC Expiry Date"
+  },
+  {
+   "fieldname": "bsci_member",
+   "fieldtype": "Select",
+   "label": "BSCI Member",
+   "options": "Yes\nNo\nN/A"
+  },
+  {
+   "fieldname": "other_tab",
+   "fieldtype": "Tab Break",
+   "label": "Other"
+  },
+  {
+   "fieldname": "default_port_section",
+   "fieldtype": "Section Break",
+   "label": "Default Port"
+  },
+  {
+   "fieldname": "default_port",
+   "fieldtype": "Data",
+   "label": "Default Port"
+  },
+  {
+   "fieldname": "bsci_number",
+   "fieldtype": "Data",
+   "label": "BSCI Number"
+  },
+  {
+   "fieldname": "bsci_expiry_date",
+   "fieldtype": "Date",
+   "label": "BSCI Expiry Date"
+  },
+  {
+   "fieldname": "sales_contact",
+   "fieldtype": "Link",
+   "label": "Sales Contact",
+   "options": "User"
+  },
+  {
+   "fieldname": "sales_commission_share_",
+   "fieldtype": "Float",
+   "label": "Sales Commission Share (%)"
+  },
+  {
+   "fieldname": "number_of_employees",
+   "fieldtype": "Int",
+   "label": "Number of Employees"
+  },
+  {
+   "fieldname": "number_of_assembling_lines",
+   "fieldtype": "Int",
+   "label": "Number of Assembling Lines"
+  },
+  {
+   "fieldname": "capacity_of_assembling_lines",
+   "fieldtype": "Select",
+   "label": "Capacity of Assembling Lines",
+   "options": "Red\nGreen\nYellow"
+  },
+  {
+   "fieldname": "booking_tolerance_",
+   "fieldtype": "Float",
+   "label": "Booking Tolerance (%)"
+  },
+  {
+   "fieldname": "alternate_port",
+   "fieldtype": "Data",
+   "label": "Alternate Port"
+  },
+  {
+   "fieldname": "alternate_load_country",
+   "fieldtype": "Link",
+   "label": "Alternate Load Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "column_break_gzhv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_agent_id",
+   "fieldtype": "Link",
+   "label": "Default Agent ID",
+   "link_filters": "{\n    \"partner_type\": [\"in\", [\"Agent/Buyer\"]]\n}",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "default_buyer_id",
+   "fieldtype": "Link",
+   "label": "Default Buyer ID",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "default_dc",
+   "fieldtype": "Select",
+   "label": "Default DC",
+   "options": "01: Gnosj\u00f6\n34381: IKEA IMS \u00c4LMHULT 34382: IKEA IMS KOBE"
+  },
+  {
+   "fieldname": "default_forwarder",
+   "fieldtype": "Link",
+   "label": "Default Forwarder",
+   "link_filters": "{\"partner_type\":\"Transporter\"}\n",
+   "options": "Partner"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-14 18:30:08.784031",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Partner",
+ "naming_rule": "By fieldname",
+ "owner": "paul@hksoho.net",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "partner_id,partner_name",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "partner_id",
+ "track_changes": 1
+}

@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-11 05:36:01.622791",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category",
+  "item_number",
+  "description",
+  "result",
+  "need_reinspection",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Carton\nConstruction\nProduct\nShade"
+  },
+  {
+   "fieldname": "item_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Number"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "result",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Result",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Notes"
+  },
+  {
+   "default": "0",
+   "fieldname": "need_reinspection",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Need reinspection"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-07-16 08:55:20.914809",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Inspection Result",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
