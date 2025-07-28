@@ -169,7 +169,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-15 10:39:18.726092",
+ "modified": "2025-07-22 09:41:25.374493",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",
@@ -194,5 +194,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "po_number"
+ "title_field": "po_number",
+ "track_changes": 1
 }

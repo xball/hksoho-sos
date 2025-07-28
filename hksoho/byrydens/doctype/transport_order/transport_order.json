@@ -1,0 +1,181 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-07-22 14:20:16.686683",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "to_number",
+  "shipper",
+  "forwarder",
+  "equipment",
+  "booking_date",
+  "booked_etd",
+  "column_break_dkki",
+  "booking_number",
+  "tracking_number",
+  "container_number",
+  "seal_number",
+  "loading",
+  "country_of_origin",
+  "add_vessel_now",
+  "vessel_section",
+  "carrier",
+  "voyage",
+  "load_port",
+  "pol",
+  "to_items_tab",
+  "items",
+  "total_value"
+ ],
+ "fields": [
+  {
+   "fieldname": "to_number",
+   "fieldtype": "Data",
+   "label": "TO Number"
+  },
+  {
+   "fieldname": "shipper",
+   "fieldtype": "Link",
+   "label": "Shipper",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "forwarder",
+   "fieldtype": "Link",
+   "label": "Forwarder",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Transporter\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "equipment",
+   "fieldtype": "Select",
+   "label": "Equipment",
+   "options": "\n20FT Container\n40FT Container\n40HC Container\n40RF Container\n45FT Container\n45HC Container\nLCL - Less-than Container Load\n20GP Container\n40GP Container\n45GP Container"
+  },
+  {
+   "default": "Today",
+   "fieldname": "booking_date",
+   "fieldtype": "Date",
+   "label": "Booking Date"
+  },
+  {
+   "fieldname": "booked_etd",
+   "fieldtype": "Date",
+   "label": "Booked ETD"
+  },
+  {
+   "fieldname": "booking_number",
+   "fieldtype": "Data",
+   "label": "Booking Number"
+  },
+  {
+   "fieldname": "tracking_number",
+   "fieldtype": "Data",
+   "label": "Tracking Number"
+  },
+  {
+   "fieldname": "container_number",
+   "fieldtype": "Data",
+   "label": "Container Number"
+  },
+  {
+   "fieldname": "seal_number",
+   "fieldtype": "Data",
+   "label": "Seal Number"
+  },
+  {
+   "fieldname": "loading",
+   "fieldtype": "Select",
+   "label": "Loading",
+   "options": "\nCY/CY\nCFS/CY\nCY/CFS\nCFS/CFS"
+  },
+  {
+   "fieldname": "country_of_origin",
+   "fieldtype": "Link",
+   "label": "Country of Origin",
+   "options": "Country"
+  },
+  {
+   "fieldname": "column_break_dkki",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "add_vessel_now",
+   "fieldtype": "Check",
+   "label": "Add Vessel Now"
+  },
+  {
+   "fieldname": "vessel_section",
+   "fieldtype": "Section Break",
+   "label": "Vessel Section"
+  },
+  {
+   "fieldname": "carrier",
+   "fieldtype": "Data",
+   "label": "Carrier"
+  },
+  {
+   "fieldname": "voyage",
+   "fieldtype": "Data",
+   "label": "Voyage"
+  },
+  {
+   "fieldname": "load_port",
+   "fieldtype": "Data",
+   "label": "Load Port"
+  },
+  {
+   "fieldname": "pol",
+   "fieldtype": "Data",
+   "label": "POL"
+  },
+  {
+   "fieldname": "to_items_tab",
+   "fieldtype": "Tab Break",
+   "label": "TO Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Transport Order Line"
+  },
+  {
+   "fieldname": "total_value",
+   "fieldtype": "Float",
+   "label": "Total Value",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-25 11:19:16.896786",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Transport Order",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
