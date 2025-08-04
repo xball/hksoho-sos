@@ -1,0 +1,31 @@
+@media (min-width: 1200px) {
+    body .container, body .container-sm, body .container-md, body .container-lg, body .container-xl, body .container-fluid {
+        width: 95%;
+        max-width: 95%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    body .layout-main-section-wrapper {
+        width: 95%;
+        max-width: 95%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    body .layout-side-section, body .sidebar {
+        margin-left: 20px; /* 提高特異性，無需 !important */
+        padding-left: 10px;
+    }
+    
+    /* .navbar-brand img, .brand-logo 
+    {
+        width: 150px !important; 
+        height: auto !important; 
+        max-width: none !important; 
+    } */
+    
+}
+
+.frappe-control.data-table {
+    overflow-x: auto;
+    white-space: nowrap;
+}

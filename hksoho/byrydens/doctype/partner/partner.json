@@ -491,7 +491,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-14 18:30:08.784031",
+ "modified": "2025-08-04 09:03:36.137033",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partner",
@@ -509,6 +509,15 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1
   }
  ],
  "row_format": "Dynamic",

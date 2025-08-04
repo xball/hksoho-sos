@@ -20,7 +20,8 @@ app_license = "mit"
 # 		"has_permission": "hksoho.api.permission.has_app_permission"
 # 	}
 # ]
-
+# 確保 CSS 檔案被包含在應用程式的資源中
+app_include_css = ["/assets/hksoho/css/custom.css"]  # 將 your_app_name 替換為您的應用程式名稱
 # Includes in <head>
 # ------------------
 
