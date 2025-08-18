@@ -1,16 +1,17 @@
 {
  "actions": [],
- "autoname": "autoincrement",
+ "autoname": "format:TO-{YY}{MM}-{####}",
  "creation": "2025-07-22 14:20:16.686683",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "to_number",
+  "mode",
   "shipper",
   "forwarder",
   "equipment",
   "booking_date",
   "booked_etd",
+  "add_vessel_now",
   "column_break_dkki",
   "booking_number",
   "tracking_number",
@@ -18,41 +19,56 @@
   "seal_number",
   "loading",
   "country_of_origin",
-  "add_vessel_now",
   "vessel_section",
+  "vessel",
   "carrier",
   "voyage",
   "load_port",
-  "pol",
+  "load_code",
+  "column_break_lfad",
+  "dest_port",
+  "dest_code",
+  "cfs_close",
+  "etd_date",
+  "eta_date",
+  "section_break_opko",
+  "dest_port_free_days",
+  "freight_costs",
+  "delivery_terms",
+  "delivery_terms_place",
+  "column_break_aavr",
+  "priority",
+  "process_model",
+  "short_comment",
   "to_items_tab",
   "items",
   "total_value"
  ],
  "fields": [
   {
-   "fieldname": "to_number",
-   "fieldtype": "Data",
-   "label": "TO Number"
-  },
-  {
+   "default": "964",
    "fieldname": "shipper",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Shipper",
    "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
-   "options": "Partner"
+   "options": "Partner",
+   "reqd": 1
   },
   {
    "fieldname": "forwarder",
    "fieldtype": "Link",
    "label": "Forwarder",
    "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Transporter\"]]",
-   "options": "Partner"
+   "options": "Partner",
+   "reqd": 1
   },
   {
    "fieldname": "equipment",
    "fieldtype": "Select",
    "label": "Equipment",
-   "options": "\n20FT Container\n40FT Container\n40HC Container\n40RF Container\n45FT Container\n45HC Container\nLCL - Less-than Container Load\n20GP Container\n40GP Container\n45GP Container"
+   "options": "\n20FT Container\n40FT Container\n40HC Container\n40RF Container\n45FT Container\n45HC Container\nLCL - Less-than Container Load\n20GP Container\n40GP Container\n45GP Container",
+   "reqd": 1
   },
   {
    "default": "Today",
@@ -73,7 +89,8 @@
   {
    "fieldname": "tracking_number",
    "fieldtype": "Data",
-   "label": "Tracking Number"
+   "label": "Tracking Number",
+   "reqd": 1
   },
   {
    "fieldname": "container_number",
@@ -108,29 +125,22 @@
    "label": "Add Vessel Now"
   },
   {
-   "fieldname": "vessel_section",
-   "fieldtype": "Section Break",
-   "label": "Vessel Section"
-  },
-  {
    "fieldname": "carrier",
    "fieldtype": "Data",
-   "label": "Carrier"
+   "label": "Carrier",
+   "read_only": 1
   },
   {
    "fieldname": "voyage",
    "fieldtype": "Data",
-   "label": "Voyage"
+   "label": "Voyage",
+   "read_only": 1
   },
   {
    "fieldname": "load_port",
    "fieldtype": "Data",
-   "label": "Load Port"
-  },
-  {
-   "fieldname": "pol",
-   "fieldtype": "Data",
-   "label": "POL"
+   "label": "Load Port",
+   "read_only": 1
   },
   {
    "fieldname": "to_items_tab",
@@ -148,16 +158,125 @@
    "fieldtype": "Float",
    "label": "Total Value",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_opko",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "dest_port_free_days",
+   "fieldtype": "Int",
+   "label": "Dest Port Free Days"
+  },
+  {
+   "fieldname": "freight_costs",
+   "fieldtype": "Currency",
+   "label": "Freight Costs"
+  },
+  {
+   "default": "FOB - Free On Board",
+   "fieldname": "delivery_terms",
+   "fieldtype": "Select",
+   "label": "Delivery Terms",
+   "options": "CFR - Cost and Freight\nCIF - Cost, Insurance and Freight\nCIP - Carriage and Insurance Paid\nCPT - Carriage Paid\nDAF - Delivered At Frontier\nDAP - Delivered At Place\nDAT - Delivered at Terminal\nDDP - Delivered Duty Paid\nDDU - Delivered Duty Unpaid\nDEQ - Delivered Ex Quay (Duty Paid)\nDES - Delivered Ex Ship\nEXW - Ex Works\nFAS - Free Alongside Ship\nFCA - Free Carrier\nFOB - Free On Board"
+  },
+  {
+   "fieldname": "delivery_terms_place",
+   "fieldtype": "Data",
+   "label": "Delivery Terms Place"
+  },
+  {
+   "fieldname": "column_break_aavr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "A",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "A\nB\nC"
+  },
+  {
+   "default": "Generic Ocean Freight",
+   "fieldname": "process_model",
+   "fieldtype": "Select",
+   "label": "Process Model",
+   "options": "Generic Ocean Freight\nGeneric Truck Freight"
+  },
+  {
+   "fieldname": "short_comment",
+   "fieldtype": "Small Text",
+   "label": "Short Comment"
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "Sea\nLand\nAir\nSea+Air",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "vessel",
+   "fieldtype": "Link",
+   "label": "Vessel",
+   "options": "Vessels Time Table",
+   "placeholder": "Please click \"(Select)\" to choose Vessel"
+  },
+  {
+   "fieldname": "dest_port",
+   "fieldtype": "Data",
+   "label": "Dest Port",
+   "read_only": 1
+  },
+  {
+   "fieldname": "dest_code",
+   "fieldtype": "Data",
+   "label": "Dest Code",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cfs_close",
+   "fieldtype": "Date",
+   "label": "CFS Close",
+   "read_only": 1
+  },
+  {
+   "fieldname": "etd_date",
+   "fieldtype": "Date",
+   "label": "ETD Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "eta_date",
+   "fieldtype": "Date",
+   "label": "ETA Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lfad",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "load_code",
+   "fieldtype": "Data",
+   "label": "Load Code",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vessel_section",
+   "fieldtype": "Section Break",
+   "label": "Vessel Section"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-25 11:19:16.896786",
+ "modified": "2025-08-13 16:46:37.999652",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

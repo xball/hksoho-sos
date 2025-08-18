@@ -4,6 +4,7 @@
  "allow_rename": 1,
  "autoname": "field:partner_id",
  "creation": "2025-06-17 18:16:33.510542",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -491,7 +492,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-04 09:03:36.137033",
+ "modified": "2025-08-12 05:51:39.812221",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partner",
@@ -526,6 +527,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "partner_id",
+ "title_field": "partner_name",
  "track_changes": 1
 }

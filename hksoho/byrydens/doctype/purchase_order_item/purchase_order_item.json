@@ -161,7 +161,7 @@
  "image_field": "article_photo",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-15 14:22:40.678614",
+ "modified": "2025-08-06 07:43:34.252488",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item",
@@ -179,6 +179,15 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1
   }
  ],
  "row_format": "Dynamic",

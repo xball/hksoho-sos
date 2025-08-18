@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-08-12 09:57:05.105598",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "vessel",
+  "voyage",
+  "carrier",
+  "loading_port",
+  "destination_port",
+  "column_break_igye",
+  "cfs_close",
+  "etd_date",
+  "eta_date",
+  "dest_port_free_days"
+ ],
+ "fields": [
+  {
+   "fieldname": "vessel",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vessel",
+   "options": "Vessels",
+   "reqd": 1
+  },
+  {
+   "fieldname": "voyage",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Voyage",
+   "placeholder": "Enter voyage number (without 'V' or 'V.')"
+  },
+  {
+   "fieldname": "carrier",
+   "fieldtype": "Select",
+   "label": "Carrier",
+   "options": "Alianca\nAPL\nChina Shipping\nCMA CGM\nContship\nCosco\nDANZAS\nDHL\nDHL AIRWAYS\nDSV\nEMC\nEvergreen\nHanjin\nHapag Lloyd\nHATSU\nHMM\nHyundai\nK-Line\nMaersk\nMOL\nMSC\nNYK\nOne\nOOCL\nP&O NEDLLOYD\nSchenker\nSCI\nSenator\nT.S. LINES\nYML\nZIM Lines"
+  },
+  {
+   "fieldname": "loading_port",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Loading Port",
+   "options": "Load-Dest Port"
+  },
+  {
+   "fieldname": "destination_port",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Destination Port",
+   "options": "Load-Dest Port"
+  },
+  {
+   "fieldname": "column_break_igye",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cfs_close",
+   "fieldtype": "Date",
+   "label": "CFS Close"
+  },
+  {
+   "fieldname": "etd_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ETD Date"
+  },
+  {
+   "fieldname": "eta_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ETA Date"
+  },
+  {
+   "fieldname": "dest_port_free_days",
+   "fieldtype": "Int",
+   "label": "Dest Port Free Days"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-13 07:02:17.671432",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Vessels Time Table",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "vessel,voyage,loading_port,destination_port",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "vessel"
+}
