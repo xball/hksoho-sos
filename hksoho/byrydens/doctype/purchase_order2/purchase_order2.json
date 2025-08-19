@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "field:po_number",
- "creation": "2025-07-07 11:24:21.129626",
+ "creation": "2025-08-18 15:41:57.017977",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -41,9 +41,8 @@
   "booking_mode",
   "booking_requested_days_before_po_shipdate_ocean_transport_only",
   "consolidation_days_before_po_shipdate_ocean_transport_only_copy",
+  "transport_days_days_before_po_shipdate_ocean_transport_only",
   "column_break_vewu",
-  "ransport_days_days_before_po_shipdate_ocean_transport_only",
-  "purchasing_group",
   "purchaser",
   "responsible",
   "coordinator",
@@ -55,7 +54,9 @@
   "short_description",
   "remarks",
   "po_items_tab",
-  "temporary_po_items"
+  "po_items",
+  "address_tab",
+  "delivery_address"
  ],
  "fields": [
   {
@@ -65,6 +66,27 @@
    "label": "PO Number",
    "reqd": 1,
    "unique": 1
+  },
+  {
+   "fieldname": "order_type",
+   "fieldtype": "Select",
+   "label": "Order Type",
+   "options": "Standard\nSample\nNew Item\nSpareparts"
+  },
+  {
+   "fieldname": "po_placed",
+   "fieldtype": "Date",
+   "label": "PO Placed"
+  },
+  {
+   "fieldname": "po_shipdate",
+   "fieldtype": "Date",
+   "label": "PO ShipDate"
+  },
+  {
+   "fieldname": "requested_dc_eta",
+   "fieldtype": "Date",
+   "label": "Requested DC ETA"
   },
   {
    "fieldname": "buyer",
@@ -89,6 +111,13 @@
    "options": "Partner"
   },
   {
+   "default": "Gnosj\u00f6",
+   "fieldname": "dc_warehousestore",
+   "fieldtype": "Select",
+   "label": "DC (Warehouse/Store)",
+   "options": "Gnosj\u00f6"
+  },
+  {
    "fieldname": "origin_country",
    "fieldtype": "Link",
    "label": "Origin Country",
@@ -104,24 +133,6 @@
    "fieldname": "destination_port",
    "fieldtype": "Data",
    "label": "Destination Port"
-  },
-  {
-   "fieldname": "purchaser",
-   "fieldtype": "Link",
-   "label": "Purchaser",
-   "options": "User"
-  },
-  {
-   "fieldname": "coordinator",
-   "fieldtype": "Link",
-   "label": "Coordinator",
-   "options": "User"
-  },
-  {
-   "fieldname": "order_type",
-   "fieldtype": "Select",
-   "label": "Order Type",
-   "options": "Standard\nSample\nNew Item\nSpareparts"
   },
   {
    "fieldname": "purpose",
@@ -145,12 +156,6 @@
    "options": "Pending\nConfirmed"
   },
   {
-   "fieldname": "payment_terms",
-   "fieldtype": "Select",
-   "label": "Payment Terms",
-   "options": "10 Tage -2% Skonto ab Rdt. (X)\n10 Tage 2%, 30 Tage netto (Z1)\n10 Tage 3%, 30 Tage netto (Z2)\n10 dagar netto (1)\n10 dgr /. 3 % (B)\n100 dagar netto (11)\n120 dgr netto (10)\n14 Tage -3% Skonto ab Rdt (Q)\n14 Tage 2%, 30 Tage netto (Z)\n14 dagar netto (K)\n14 days ./. 2% (O)\n14 tag. netto (C)\n15 Tage 4%, 30 Tage netto (G)\n15 dagar (15)\n20 dagar netto (20)\n20 dagar netto,lev fri m\u00e5nad (L2)\n20 days net (7)\n21 days ./. 2 % (H)\n21 days ./.1% (I)\n30 Tage -3% Skonto ab Rdt (J)\n30 Tage -5% Skonto ab Rdt (31)\n30 Tage netto (D)\n30 Tagen des Folgemonats (L)\n30 dagar netto (3)\n30 dagar netto (T)\n30 days after full set of doc (M)\n30 days net (9)\n30 dgr netto, lev fri m\u00e5nad (L1)\n30dgr efter skeppningsdokument (30)\n40 dagar netto (40)\n45 dagar netto (4)\n45 dgr ./. 3 % (A)\n60 Tage netto (96)\n60 dagar netto (6)\n60 days net (95)\n75 dagar netto (50)\n90 Tage netto (Y)\n90 dag ./. 5 % (U)\n90 dagar (90)\n90 dagar netto (V)\n90 days net (91)\nCAD (2)\nDue date end of next month (L3)\nEfterkrav (E)\nF\u00f6rskottsbetalning (F)\nKontant netto (N)\nKortbetalning e-handel (KO)\nMot dok ca 15 dgr e skepp (8)\nPayment in advance (R)\nPostf\u00f6rskott (P)\nT/T (5)"
-  },
-  {
    "fieldname": "delivery_terms",
    "fieldtype": "Link",
    "label": "Delivery Terms",
@@ -162,59 +167,15 @@
    "label": "Equipment"
   },
   {
-   "fieldname": "requested_forwarder",
-   "fieldtype": "Data",
-   "label": "Requested Forwarder"
-  },
-  {
    "fieldname": "booking_status",
    "fieldtype": "Select",
    "label": "Booking Status"
-  },
-  {
-   "default": "0",
-   "fieldname": "qc_status",
-   "fieldtype": "Check",
-   "label": "QC Status"
   },
   {
    "fieldname": "bom_list_status",
    "fieldtype": "Select",
    "label": "BOM List Status",
    "options": "Pending\nConfirmed"
-  },
-  {
-   "fieldname": "po_items_tab",
-   "fieldtype": "Tab Break",
-   "label": "Order Items"
-  },
-  {
-   "fieldname": "temporary_po_items",
-   "fieldtype": "Table",
-   "label": "Temporary PO Items",
-   "options": "Temporary PO Item"
-  },
-  {
-   "fieldname": "po_placed",
-   "fieldtype": "Date",
-   "label": "PO Placed"
-  },
-  {
-   "fieldname": "po_shipdate",
-   "fieldtype": "Date",
-   "label": "PO ShipDate"
-  },
-  {
-   "fieldname": "requested_dc_eta",
-   "fieldtype": "Date",
-   "label": "Requested DC ETA"
-  },
-  {
-   "default": "Gnosj\u00f6",
-   "fieldname": "dc_warehousestore",
-   "fieldtype": "Select",
-   "label": "DC (Warehouse/Store)",
-   "options": "Gnosj\u00f6"
   },
   {
    "default": "Normal Boat",
@@ -246,6 +207,12 @@
    "label": "Selling Exchange Rate (to USD) "
   },
   {
+   "fieldname": "payment_terms",
+   "fieldtype": "Link",
+   "label": "Payment Terms",
+   "options": "Payment Term"
+  },
+  {
    "fieldname": "delivery_mode",
    "fieldtype": "Select",
    "label": "Delivery Mode",
@@ -265,6 +232,11 @@
    "fieldname": "number_of_equipment",
    "fieldtype": "Int",
    "label": "Number of equipment"
+  },
+  {
+   "fieldname": "requested_forwarder",
+   "fieldtype": "Data",
+   "label": "Requested Forwarder"
   },
   {
    "fieldname": "forwarder",
@@ -290,24 +262,32 @@
    "label": "Consolidation (days before PO Shipdate (ocean transport only))"
   },
   {
-   "fieldname": "ransport_days_days_before_po_shipdate_ocean_transport_only",
-   "fieldtype": "Int",
-   "label": "ransport Days (days before PO Shipdate (ocean transport only))"
-  },
-  {
    "fieldname": "column_break_vewu",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "purchasing_group",
-   "fieldtype": "Date",
-   "label": "Purchasing Group"
+   "fieldname": "purchaser",
+   "fieldtype": "Link",
+   "label": "Purchaser",
+   "options": "User"
   },
   {
    "fieldname": "responsible",
    "fieldtype": "Link",
    "label": "Responsible",
    "options": "User"
+  },
+  {
+   "fieldname": "coordinator",
+   "fieldtype": "Link",
+   "label": "Coordinator",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "qc_status",
+   "fieldtype": "Check",
+   "label": "QC Status"
   },
   {
    "default": "0",
@@ -338,15 +318,42 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
+  },
+  {
+   "fieldname": "po_items_tab",
+   "fieldtype": "Tab Break",
+   "label": "Order Items"
+  },
+  {
+   "fieldname": "po_items",
+   "fieldtype": "Table",
+   "label": "PO Items",
+   "options": "Purchase Order Item2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "address_tab",
+   "fieldtype": "Tab Break",
+   "label": "Address"
+  },
+  {
+   "fieldname": "delivery_address",
+   "fieldtype": "Small Text",
+   "label": "Delivery Address"
+  },
+  {
+   "fieldname": "transport_days_days_before_po_shipdate_ocean_transport_only",
+   "fieldtype": "Int",
+   "label": "Transport Days (days before PO Shipdate (ocean transport only))"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-18 15:41:18.238568",
+ "modified": "2025-08-19 09:48:27.507007",
  "modified_by": "Administrator",
  "module": "byrydens",
- "name": "Purchase Order",
+ "name": "Purchase Order2",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
@@ -359,6 +366,7 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
    "write": 1
   },

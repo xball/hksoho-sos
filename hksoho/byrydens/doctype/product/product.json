@@ -133,7 +133,7 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Category",
-   "options": "0:(no category)\n010:Component cable\n020:Component lampholder\n030:Component assembling\n040:Component tube\n050:Component plate\n060:Component Kashering\n070:Component wood/weigh\n080:Component packing\n096:Freight\n097:Exp.fee\n098:Phone notification\n1:DK Rensar\n10:Tablelamp\n11:Floorlamp\n12:Hanginglamp\n13:Wallamp\n14:Windowlamp\n15:Spotlight\n16:Shade\n17:Bathroom/outdoor\n18:Christmas\n19:Other\n20:Ceilinglamp\n30:Spare part\n31:Lightingsource SE\n32:Transformer/Dimmer\n33:Fitting\n34:Lightingsource imp.\n40:Display\n50:Others\n60:Design case"
+   "options": "0:(no category)\n010:Component cable\n020:Component lampholder\n030:Component assembling\n040:Component tube\n050:Component plate\n060:Component Kashering\n070:Component wood/weigh\n080:Component packing\n096:Freight\n097:Exp.fee\n098:Phone notification\n1:DK Rensar\n10:Tablelamp\n11:Floorlamp\n12:Hanginglamp\n13:Wallamp\n14:Windowlamp\n15:Spotlight\n16:Shade\n17:Bathroom/outdoor\n18:Christmas\n19:Other\n20:Ceilinglamp\n30:Spare part\n31:Lightingsource SE\n32:Transformer/Dimmer\n33:Fitting\n34:Lightingsource imp.\n40:Display\n50:Others\n60:Design case\nS:not found\nD:not found\nF:not found\nG:not found\nJ:not found\nO:not found\nL:not found"
   },
   {
    "fieldname": "section_break_levs",
@@ -417,7 +417,7 @@
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-06 08:55:24.069716",
+ "modified": "2025-08-18 14:13:04.595700",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

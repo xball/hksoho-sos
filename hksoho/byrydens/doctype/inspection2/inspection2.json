@@ -1,0 +1,210 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:INP-{supplier}-{YY}{MM}{###}",
+ "creation": "2025-08-18 15:58:35.720610",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "supplier",
+  "purchase_order",
+  "purchase_order_line",
+  "article_number",
+  "article_name",
+  "order_qty",
+  "inspection_date",
+  "inspector",
+  "number_of_inspection",
+  "inspected_qty",
+  "failed_qty",
+  "result",
+  "need_reinspection",
+  "notes",
+  "template",
+  "inspection_results",
+  "inspection_results_construction",
+  "inspection_results_product",
+  "inspection_results_shade",
+  "line_number",
+  "order_number",
+  "aql_qty",
+  "full_inspection",
+  "supplier_select"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "link_filters": "[[\"Purchase Order2\",\"supplier\",\"=\",\"eval: doc.supplier\"]]",
+   "options": "Purchase Order2"
+  },
+  {
+   "fieldname": "purchase_order_line",
+   "fieldtype": "Link",
+   "label": "Purchase Order Line",
+   "options": "Purchase Order Item2"
+  },
+  {
+   "fieldname": "article_number",
+   "fieldtype": "Data",
+   "label": "Article Number"
+  },
+  {
+   "fieldname": "article_name",
+   "fieldtype": "Data",
+   "label": "Article Name"
+  },
+  {
+   "fieldname": "order_qty",
+   "fieldtype": "Int",
+   "label": "Order Qty"
+  },
+  {
+   "fieldname": "inspection_date",
+   "fieldtype": "Date",
+   "label": "Inspection Date"
+  },
+  {
+   "fieldname": "inspector",
+   "fieldtype": "Link",
+   "label": "Inspector",
+   "options": "User"
+  },
+  {
+   "fieldname": "number_of_inspection",
+   "fieldtype": "Int",
+   "label": "Number of Inspection"
+  },
+  {
+   "fieldname": "inspected_qty",
+   "fieldtype": "Int",
+   "label": "Inspected Qty"
+  },
+  {
+   "fieldname": "failed_qty",
+   "fieldtype": "Int",
+   "label": "Failed Qty"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Select",
+   "label": "Result",
+   "options": "Pass\nFail\nN/A"
+  },
+  {
+   "default": "0",
+   "fieldname": "need_reinspection",
+   "fieldtype": "Check",
+   "label": "Need reinspection"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Long Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "Template",
+   "options": "Inspection Template"
+  },
+  {
+   "fieldname": "inspection_results",
+   "fieldtype": "Table",
+   "label": "Inspection results (Carton)",
+   "options": "Inspection Result"
+  },
+  {
+   "fieldname": "inspection_results_construction",
+   "fieldtype": "Table",
+   "label": "Inspection results (Construction)",
+   "options": "Inspection Result"
+  },
+  {
+   "fieldname": "inspection_results_product",
+   "fieldtype": "Table",
+   "label": "Inspection results (Product)",
+   "options": "Inspection Result"
+  },
+  {
+   "fieldname": "inspection_results_shade",
+   "fieldtype": "Table",
+   "label": "Inspection results (Shade)",
+   "options": "Inspection Result"
+  },
+  {
+   "fieldname": "line_number",
+   "fieldtype": "Data",
+   "label": "Line number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "order_number",
+   "fieldtype": "Data",
+   "label": "Order Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "aql_qty",
+   "fieldtype": "Int",
+   "label": "AQL Qty"
+  },
+  {
+   "default": "0",
+   "fieldname": "full_inspection",
+   "fieldtype": "Check",
+   "label": "Full Inspection"
+  },
+  {
+   "fieldname": "supplier_select",
+   "fieldtype": "Select",
+   "label": "Supplier Select"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-18 18:30:09.676679",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Inspection2",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

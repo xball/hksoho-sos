@@ -323,12 +323,12 @@
   },
   {
    "fieldname": "phone_number",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Phone Number"
   },
   {
    "fieldname": "fax_number",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Fax Number"
   },
   {
@@ -492,7 +492,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-12 05:51:39.812221",
+ "modified": "2025-08-18 14:17:21.065877",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partner",
