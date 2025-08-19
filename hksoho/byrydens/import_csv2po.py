@@ -242,15 +242,17 @@ def add_activity_message(doctype_name, doc_name, message, comment_type='Info'):
 # 發送電子郵件通知
 def send_notification(subject, message, recipients=None):
     try:
+        
         if not recipients:
             recipients = [frappe.get_value("User", {"send_system_notification": 1}, "email")]
-        frappe.sendmail(
-            recipients=recipients,
-            subject=subject,
-            message=message,
-            header=[subject, "green" if "[info]" in subject else "red"],
-        )
-        msg = f"已發送電子郵件通知: {subject}"
+            frappe.sendmail(
+                recipients=recipients,
+                subject=subject,
+                message=message,
+                now=True
+            )
+        
+        msg = f"已發送電子郵件通知: {subject} to {recipients}"
         logger.info(msg)
         print(msg)
     except Exception as e:
@@ -312,7 +314,7 @@ def execute():
 
         log_output = log_buffer.getvalue()
         subject = f"[{'error' if error_occurred else 'info'}] Purchase Order Import Result - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        message = f"採購訂單匯入{'失敗' if error_occurred else '成功'}，日誌如下:\n\n{log_output}"
+        message = f"Import PO {'Fail' if error_occurred else 'Success'}，log:\n\n {log_output}"
         if error_occurred:
             message += "\n\n詳細錯誤:\n" + "\n".join(error_messages)
         send_notification(subject, message)
