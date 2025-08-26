@@ -44,7 +44,13 @@
   "alternate_port",
   "alternate_load_country",
   "contact_tab",
-  "table_rpcg",
+  "user_item_table",
+  "section_break_xtrj",
+  "contact_name",
+  "contact_title",
+  "contact_email",
+  "contact_phone",
+  "contact_mobile",
   "invoice_and_bill_tab",
   "official_name",
   "vat_reg_no",
@@ -103,8 +109,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Partner Name",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "partner_code",
@@ -131,9 +136,8 @@
   },
   {
    "fieldname": "currency",
-   "fieldtype": "Link",
-   "label": "Currency",
-   "options": "Currency"
+   "fieldtype": "Data",
+   "label": "Currency"
   },
   {
    "fieldname": "section_break_grma",
@@ -182,9 +186,9 @@
   },
   {
    "fieldname": "payment_term",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Payment Term",
-   "options": "10 Tage -2% Skonto ab Rdt. (X)\n10 Tage 2%, 30 Tage netto (Z1)\n10 Tage 3%, 30 Tage netto (Z2)\n10 dagar netto (1)\n10 dgr /. 3 % (B)\n100 dagar netto (11)\n120 dgr netto (10)\n14 Tage -3% Skonto ab Rdt (Q)\n14 Tage 2%, 30 Tage netto (Z)\n14 dagar netto (K)\n14 days ./. 2% (O)\n14 tag. netto (C)\n15 Tage 4%, 30 Tage netto (G)\n15 dagar (15)\n20 dagar netto (20)\n20 dagar netto,lev fri m\u00e5nad (L2)\n20 days net (7)\n21 days ./. 2 % (H)\n21 days ./.1% (I)\n30 Tage -3% Skonto ab Rdt (J)\n30 Tage -5% Skonto ab Rdt (31)\n30 Tage netto (D)\n30 Tagen des Folgemonats (L)\n30 dagar netto (3)\n30 dagar netto (T)\n30 days after full set of doc (M)\n30 days net (9)\n30 dgr netto, lev fri m\u00e5nad (L1)\n30dgr efter skeppningsdokument (30)\n40 dagar netto (40)\n45 dagar netto (4)\n45 dgr ./. 3 % (A)\n60 Tage netto (96)\n60 dagar netto (6)\n60 days net (95)\n75 dagar netto (50)\n90 Tage netto (Y)\n90 dag ./. 5 % (U)\n90 dagar (90)\n90 dagar netto (V)\n90 days net (91)\nCAD (2)\nDue date end of next month (L3)\nEfterkrav (E)\nF\u00f6rskottsbetalning (F)\nKontant netto (N)\nKortbetalning e-handel (KO)\nMot dok ca 15 dgr e skepp (8)\nPayment in advance (R)\nPostf\u00f6rskott (P)\nT/T (5)"
+   "options": "Payment Term"
   },
   {
    "fieldname": "quality_control",
@@ -229,19 +233,13 @@
   },
   {
    "fieldname": "country",
-   "fieldtype": "Link",
-   "label": "Country",
-   "options": "Country"
+   "fieldtype": "Data",
+   "label": "Country"
   },
   {
    "fieldname": "contact_tab",
    "fieldtype": "Tab Break",
    "label": "Contact"
-  },
-  {
-   "fieldname": "table_rpcg",
-   "fieldtype": "Table",
-   "options": "User Item"
   },
   {
    "fieldname": "invoice_and_bill_tab",
@@ -487,12 +485,46 @@
    "label": "Default Forwarder",
    "link_filters": "{\"partner_type\":\"Transporter\"}\n",
    "options": "Partner"
+  },
+  {
+   "fieldname": "user_item_table",
+   "fieldtype": "Table",
+   "options": "User Item"
+  },
+  {
+   "fieldname": "section_break_xtrj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "contact_name",
+   "fieldtype": "Data",
+   "label": "Contact Name"
+  },
+  {
+   "fieldname": "contact_title",
+   "fieldtype": "Data",
+   "label": "Contact Title"
+  },
+  {
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Contact Email"
+  },
+  {
+   "fieldname": "contact_phone",
+   "fieldtype": "Data",
+   "label": "Contact Phone"
+  },
+  {
+   "fieldname": "contact_mobile",
+   "fieldtype": "Data",
+   "label": "Contact Mobile"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-18 14:17:21.065877",
+ "modified": "2025-08-26 19:44:17.472446",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partner",

@@ -196,7 +196,8 @@ def create_purchase_order(po_data):
             "requested_finish_date": (item["requested_finish_date"]),
             "requested_eta": (item["requested_eta"]),
             "line": item["line"],
-            "supplier_art_number": item["supplier_art_number"]
+            "supplier_art_number": item["supplier_art_number"],
+            "po_number": po_data["po_number"]
         }
 
         if po_exists and item["line"] in existing_items:

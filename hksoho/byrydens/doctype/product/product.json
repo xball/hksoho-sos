@@ -1,9 +1,11 @@
 {
  "actions": [],
+ "allow_events_in_timeline": 1,
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:article_number",
  "creation": "2025-07-07 06:39:14.224248",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -417,7 +419,7 @@
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-18 14:13:04.595700",
+ "modified": "2025-08-26 06:44:23.619370",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",
@@ -444,6 +446,15 @@
    "report": 1,
    "role": "Purchase Manager",
    "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "UAT_Viewer",
+   "share": 1
   }
  ],
  "row_format": "Dynamic",
@@ -451,5 +462,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "article_number"
+ "title_field": "article_number",
+ "track_changes": 1
 }

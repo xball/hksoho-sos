@@ -328,8 +328,7 @@
    "fieldname": "po_items",
    "fieldtype": "Table",
    "label": "PO Items",
-   "options": "Purchase Order Item2",
-   "read_only": 1
+   "options": "Purchase Order Item2"
   },
   {
    "fieldname": "address_tab",
@@ -350,7 +349,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-19 09:48:27.507007",
+ "modified": "2025-08-26 06:28:28.669168",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order2",
@@ -369,15 +368,6 @@
    "select": 1,
    "share": 1,
    "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Purchase Manager",
-   "share": 1
   }
  ],
  "row_format": "Dynamic",

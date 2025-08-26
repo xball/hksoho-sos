@@ -28,7 +28,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-19 08:31:31.642394",
+ "modified": "2025-08-26 19:32:42.998178",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Payment Term",
@@ -49,7 +49,7 @@
   }
  ],
  "row_format": "Dynamic",
- "search_fields": "code,description",
+ "search_fields": "description",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

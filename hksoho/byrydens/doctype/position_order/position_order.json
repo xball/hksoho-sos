@@ -1,0 +1,142 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-19 13:00:10.216713",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "position_number",
+  "supplier",
+  "buyer",
+  "destination",
+  "delivery_to_dc",
+  "supplier_invoice_number",
+  "supplier_invoice_currency",
+  "exchange_rate_to_sek",
+  "column_break_ddxh",
+  "factory_load_date",
+  "cfs_arrive_date",
+  "dc_eta_date",
+  "doc_type",
+  "doc_number",
+  "doc_status",
+  "doc_handover",
+  "section_break_bfxs",
+  "selected_po_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "buyer",
+   "fieldtype": "Link",
+   "label": "Buyer",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Link",
+   "label": "Destination",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "delivery_to_dc",
+   "fieldtype": "Link",
+   "label": "Delivery to DC",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "position_number",
+   "fieldtype": "Int",
+   "label": "Position Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_bfxs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "selected_po_items",
+   "fieldtype": "Table",
+   "label": "Selected PO Items",
+   "options": "Purchase Order Item2"
+  },
+  {
+   "fieldname": "column_break_ddxh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "factory_load_date",
+   "fieldtype": "Date",
+   "label": "Factory Load Date"
+  },
+  {
+   "fieldname": "cfs_arrive_date",
+   "fieldtype": "Date",
+   "label": "CFS Arrive Date"
+  },
+  {
+   "fieldname": "dc_eta_date",
+   "fieldtype": "Date",
+   "label": "DC ETA Date"
+  },
+  {
+   "fieldname": "doc_type",
+   "fieldtype": "Select",
+   "label": "Doc Type",
+   "options": "HBL -House Bill Of Lading"
+  },
+  {
+   "fieldname": "doc_number",
+   "fieldtype": "Data",
+   "label": "Doc Number"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "doc_status",
+   "fieldtype": "Select",
+   "label": "Doc Status",
+   "options": "Pending\nApproved\nLate"
+  },
+  {
+   "fieldname": "doc_handover",
+   "fieldtype": "Date",
+   "label": "Doc Handover"
+  },
+  {
+   "fieldname": "supplier_invoice_number",
+   "fieldtype": "Data",
+   "label": "Supplier Invoice number"
+  },
+  {
+   "fieldname": "supplier_invoice_currency",
+   "fieldtype": "Link",
+   "label": "Supplier Invoice Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "exchange_rate_to_sek",
+   "fieldtype": "Float",
+   "label": "Exchange Rate to SEK"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-19 14:54:28.920268",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Position Order",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

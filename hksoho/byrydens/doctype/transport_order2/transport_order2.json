@@ -1,7 +1,7 @@
 {
  "actions": [],
  "autoname": "format:TO-{YY}{MM}-{####}",
- "creation": "2025-07-22 14:20:16.686683",
+ "creation": "2025-08-20 03:24:50.299998",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -40,13 +40,18 @@
   "priority",
   "process_model",
   "short_comment",
-  "to_items_tab",
-  "items",
-  "total_value",
-  "section_break_jlgo",
+  "position_tab",
   "table_enuc"
  ],
  "fields": [
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "Sea\nLand\nAir\nSea+Air",
+   "reqd": 1,
+   "set_only_once": 1
+  },
   {
    "default": "964",
    "fieldname": "shipper",
@@ -84,6 +89,16 @@
    "label": "Booked ETD"
   },
   {
+   "default": "0",
+   "fieldname": "add_vessel_now",
+   "fieldtype": "Check",
+   "label": "Add Vessel Now"
+  },
+  {
+   "fieldname": "column_break_dkki",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "booking_number",
    "fieldtype": "Data",
    "label": "Booking Number"
@@ -117,14 +132,16 @@
    "options": "Country"
   },
   {
-   "fieldname": "column_break_dkki",
-   "fieldtype": "Column Break"
+   "fieldname": "vessel_section",
+   "fieldtype": "Section Break",
+   "label": "Vessel Section"
   },
   {
-   "default": "0",
-   "fieldname": "add_vessel_now",
-   "fieldtype": "Check",
-   "label": "Add Vessel Now"
+   "fieldname": "vessel",
+   "fieldtype": "Link",
+   "label": "Vessel",
+   "options": "Vessels Time Table",
+   "placeholder": "Please click \"(Select)\" to choose Vessel"
   },
   {
    "fieldname": "carrier",
@@ -145,20 +162,43 @@
    "read_only": 1
   },
   {
-   "fieldname": "to_items_tab",
-   "fieldtype": "Tab Break",
-   "label": "TO Items"
+   "fieldname": "load_code",
+   "fieldtype": "Data",
+   "label": "Load Code",
+   "read_only": 1
   },
   {
-   "fieldname": "items",
-   "fieldtype": "Table",
-   "label": "Items",
-   "options": "Transport Order Line"
+   "fieldname": "column_break_lfad",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "total_value",
-   "fieldtype": "Float",
-   "label": "Total Value",
+   "fieldname": "dest_port",
+   "fieldtype": "Data",
+   "label": "Dest Port",
+   "read_only": 1
+  },
+  {
+   "fieldname": "dest_code",
+   "fieldtype": "Data",
+   "label": "Dest Code",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cfs_close",
+   "fieldtype": "Date",
+   "label": "CFS Close",
+   "read_only": 1
+  },
+  {
+   "fieldname": "etd_date",
+   "fieldtype": "Date",
+   "label": "ETD Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "eta_date",
+   "fieldtype": "Date",
+   "label": "ETA Date",
    "read_only": 1
   },
   {
@@ -211,82 +251,23 @@
    "label": "Short Comment"
   },
   {
-   "fieldname": "mode",
-   "fieldtype": "Select",
-   "label": "Mode",
-   "options": "Sea\nLand\nAir\nSea+Air",
-   "reqd": 1,
-   "set_only_once": 1
-  },
-  {
-   "fieldname": "vessel",
-   "fieldtype": "Link",
-   "label": "Vessel",
-   "options": "Vessels Time Table",
-   "placeholder": "Please click \"(Select)\" to choose Vessel"
-  },
-  {
-   "fieldname": "dest_port",
-   "fieldtype": "Data",
-   "label": "Dest Port",
-   "read_only": 1
-  },
-  {
-   "fieldname": "dest_code",
-   "fieldtype": "Data",
-   "label": "Dest Code",
-   "read_only": 1
-  },
-  {
-   "fieldname": "cfs_close",
-   "fieldtype": "Date",
-   "label": "CFS Close",
-   "read_only": 1
-  },
-  {
-   "fieldname": "etd_date",
-   "fieldtype": "Date",
-   "label": "ETD Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "eta_date",
-   "fieldtype": "Date",
-   "label": "ETA Date",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_lfad",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "load_code",
-   "fieldtype": "Data",
-   "label": "Load Code",
-   "read_only": 1
-  },
-  {
-   "fieldname": "vessel_section",
-   "fieldtype": "Section Break",
-   "label": "Vessel Section"
+   "fieldname": "position_tab",
+   "fieldtype": "Tab Break",
+   "label": "Position"
   },
   {
    "fieldname": "table_enuc",
    "fieldtype": "Table",
    "options": "Position Order"
-  },
-  {
-   "fieldname": "section_break_jlgo",
-   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-26 03:26:13.881868",
+ "modified": "2025-08-26 03:24:29.346417",
  "modified_by": "Administrator",
  "module": "byrydens",
- "name": "Transport Order",
+ "name": "Transport Order2",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [

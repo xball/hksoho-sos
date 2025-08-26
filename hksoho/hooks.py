@@ -25,10 +25,14 @@ app_include_css = ["/assets/hksoho/css/custom.css"]  # 將 your_app_name 替換�
 
 scheduler_events = {
     "hourly": [
-        "hksoho.byrydens.import_csv2po.execute"
+        "hksoho.byrydens.import_csv2po.execute",
+        "hksoho.byrydens.import_csv2partner.execute"
     ]
 }
-
+# Website context hook to change login text
+# def get_website_context(context):
+#     context.login_text = "Login to SOS"
+#     return context
 
 # Includes in <head>
 # ------------------

@@ -6,6 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "po_number",
   "line",
   "article_number",
   "article_name",
@@ -287,6 +288,13 @@
    "fieldtype": "Link",
    "label": "Buyer  Price Unit",
    "options": "Currency"
+  },
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "PO Number",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -294,7 +302,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-19 09:16:59.235885",
+ "modified": "2025-08-19 14:48:22.294370",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item2",

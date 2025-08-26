@@ -23,9 +23,16 @@
         max-width: none !important; 
     } */
     
+    .for-login .page-card-head img {
+        width: 300px !important; /* 調整為您想要的寬度 */
+        height: auto !important; /* 保持比例 */
+        max-height: none !important;
+    }
+
 }
 
 .frappe-control.data-table {
     overflow-x: auto;
     white-space: nowrap;
 }
+
