@@ -12,24 +12,28 @@
   "article_number",
   "article_name",
   "order_qty",
+  "column_break_pueh",
   "inspection_date",
   "inspector",
   "number_of_inspection",
   "inspected_qty",
   "failed_qty",
+  "aql_qty",
+  "full_inspection",
   "result",
-  "need_reinspection",
   "notes",
+  "need_reinspection",
+  "section_break_rezk",
   "template",
   "inspection_results",
   "inspection_results_construction",
   "inspection_results_product",
   "inspection_results_shade",
-  "line_number",
+  "section_break_oate",
+  "supplier_select",
   "order_number",
-  "aql_qty",
-  "full_inspection",
-  "supplier_select"
+  "line_number",
+  "line_select"
  ],
  "fields": [
   {
@@ -107,12 +111,13 @@
   },
   {
    "fieldname": "notes",
-   "fieldtype": "Long Text",
+   "fieldtype": "Small Text",
    "label": "Notes"
   },
   {
    "fieldname": "template",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Template",
    "options": "Inspection Template"
   },
@@ -120,7 +125,8 @@
    "fieldname": "inspection_results",
    "fieldtype": "Table",
    "label": "Inspection results (Carton)",
-   "options": "Inspection Result"
+   "options": "Inspection Result",
+   "set_only_once": 1
   },
   {
    "fieldname": "inspection_results_construction",
@@ -143,12 +149,14 @@
   {
    "fieldname": "line_number",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Line number",
    "read_only": 1
   },
   {
    "fieldname": "order_number",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Order Number",
    "read_only": 1
   },
@@ -166,13 +174,35 @@
   {
    "fieldname": "supplier_select",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Supplier Select"
+  },
+  {
+   "fieldname": "line_select",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Line Select",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_pueh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_rezk",
+   "fieldtype": "Section Break",
+   "label": "Inspection Results"
+  },
+  {
+   "fieldname": "section_break_oate",
+   "fieldtype": "Section Break",
+   "hidden": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-18 18:30:09.676679",
+ "modified": "2025-08-28 18:48:57.380999",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Inspection2",

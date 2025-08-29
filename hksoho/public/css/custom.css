@@ -36,3 +36,9 @@
     white-space: nowrap;
 }
 
+@page {
+    @bottom-right {
+        content: "Page: " counter(page) " / " counter(pages);
+        font-size: 10px;
+    }
+}

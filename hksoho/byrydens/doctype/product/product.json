@@ -26,9 +26,12 @@
   "range",
   "item_status",
   "product_type",
+  "group",
   "column_break_fort",
   "customs_tariff_code",
   "tariff_description",
+  "price",
+  "currency",
   "dimensions_tab",
   "unit_section",
   "net_width_mm",
@@ -42,14 +45,14 @@
   "gross_width_mm_innerunit_box",
   "gross_height_mm_innerunit_box",
   "gross_length_mm_innerunit_box",
-  "gross_cbm_m\u00b3_innerunit_box",
+  "gross_cbm_innerunit_box",
   "gross_weight_kg_innerunit_box",
   "units_in_carton_pieces_per_carton",
   "packaging_dimensions_outer_cartons_section",
   "carton_width_mm_outer_carton",
   "carton_height_mm_outer_carton",
   "carton_length_mm_outer_carton",
-  "carton_cbm_m\u00b3_outer_carton",
+  "carton_cbm_outer_carton",
   "carton_weight_kg_outer_carton",
   "number_of_cartons_colli_per_unit",
   "container_loadability_section",
@@ -77,11 +80,14 @@
  ],
  "fields": [
   {
+   "bold": 1,
    "fieldname": "article_number",
    "fieldtype": "Data",
+   "in_filter": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Article Number",
+   "read_only": 1,
    "reqd": 1,
    "unique": 1
   },
@@ -133,9 +139,12 @@
   },
   {
    "fieldname": "category",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Category",
-   "options": "0:(no category)\n010:Component cable\n020:Component lampholder\n030:Component assembling\n040:Component tube\n050:Component plate\n060:Component Kashering\n070:Component wood/weigh\n080:Component packing\n096:Freight\n097:Exp.fee\n098:Phone notification\n1:DK Rensar\n10:Tablelamp\n11:Floorlamp\n12:Hanginglamp\n13:Wallamp\n14:Windowlamp\n15:Spotlight\n16:Shade\n17:Bathroom/outdoor\n18:Christmas\n19:Other\n20:Ceilinglamp\n30:Spare part\n31:Lightingsource SE\n32:Transformer/Dimmer\n33:Fitting\n34:Lightingsource imp.\n40:Display\n50:Others\n60:Design case\nS:not found\nD:not found\nF:not found\nG:not found\nJ:not found\nO:not found\nL:not found"
+   "options": "Product Group"
   },
   {
    "fieldname": "section_break_levs",
@@ -145,7 +154,7 @@
    "fieldname": "classification",
    "fieldtype": "Select",
    "label": "Classification",
-   "options": "5: BEST\n4: BETTER - H\n3: BETTER - M\n2: BETTER - L\n1: GOOD"
+   "options": "BEST\nBETTER - H\nBETTER - M\nBETTER - L\nGOOD"
   },
   {
    "default": "0",
@@ -236,11 +245,6 @@
    "label": "Gross Length (mm, Inner/Unit Box)"
   },
   {
-   "fieldname": "gross_cbm_m\u00b3_innerunit_box",
-   "fieldtype": "Float",
-   "label": "Gross CBM (m\u00b3, Inner/Unit Box)"
-  },
-  {
    "fieldname": "gross_weight_kg_innerunit_box",
    "fieldtype": "Float",
    "label": "Gross Weight (kg, Inner/Unit Box)"
@@ -270,11 +274,6 @@
    "fieldname": "carton_length_mm_outer_carton",
    "fieldtype": "Float",
    "label": "Carton Length (mm, Outer Carton)"
-  },
-  {
-   "fieldname": "carton_cbm_m\u00b3_outer_carton",
-   "fieldtype": "Float",
-   "label": "Carton CBM (m\u00b3, Outer Carton)"
   },
   {
    "fieldname": "carton_weight_kg_outer_carton",
@@ -388,7 +387,7 @@
    "fieldname": "packaging",
    "fieldtype": "Select",
    "label": "Packaging",
-   "options": "By Ry black box\nWhite box w/labels\nDropship\nPlasticbag w/header\nBrown box\nShrink package\nPET box\nBlister\nWhite box w/print"
+   "options": "\nBy Ry black box\nWhite box w/labels\nDropship\nPlastic bag w/header\nBrown box\nShrink package\nPET box\nBlister\nWhite box w/print"
   },
   {
    "fieldname": "attachments_tab",
@@ -413,13 +412,39 @@
   {
    "fieldname": "column_break_fort",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "group",
+   "fieldtype": "Link",
+   "label": "Group",
+   "options": "Product Group"
+  },
+  {
+   "fieldname": "gross_cbm_innerunit_box",
+   "fieldtype": "Float",
+   "label": "Gross CBM (m\u00b3, Inner/Unit Box)"
+  },
+  {
+   "fieldname": "carton_cbm_outer_carton",
+   "fieldtype": "Float",
+   "label": "Carton CBM (m\u00b3, Outer Carton)"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Float",
+   "label": "Price"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "Currency"
   }
  ],
  "grid_page_length": 50,
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-26 06:44:23.619370",
+ "modified": "2025-08-28 12:59:00.145214",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

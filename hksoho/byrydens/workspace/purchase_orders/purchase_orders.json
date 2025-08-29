@@ -1,0 +1,38 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"tOHy-CzUkd\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Purchase Orders</span>\",\"col\":12}},{\"id\":\"5p4ji7vi3Q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Orders\",\"col\":3}}]",
+ "creation": "2025-08-29 04:28:56.421180",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "quality-3",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Purchase Orders",
+ "links": [],
+ "modified": "2025-08-29 05:02:14.256345",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Purchase Orders",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 3.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Purchase Orders",
+   "link_to": "Purchase Order2",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Purchase Orders"
+}
