@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "field:po_number",
  "creation": "2025-08-18 15:41:57.017977",
  "doctype": "DocType",
@@ -33,6 +32,8 @@
   "selling_exchange_rate_to_usd",
   "payment_terms",
   "delivery_mode",
+  "qc_status",
+  "qc_requested",
   "section_break_vupi",
   "requested_equipment",
   "number_of_equipment",
@@ -46,7 +47,6 @@
   "purchaser",
   "responsible",
   "coordinator",
-  "qc_status",
   "confirmation_blocked",
   "bom_list_required",
   "bom_list_received",
@@ -285,12 +285,6 @@
   },
   {
    "default": "0",
-   "fieldname": "qc_status",
-   "fieldtype": "Check",
-   "label": "QC Status"
-  },
-  {
-   "default": "0",
    "fieldname": "confirmation_blocked",
    "fieldtype": "Check",
    "label": "Confirmation Blocked"
@@ -344,12 +338,24 @@
    "fieldname": "transport_days_days_before_po_shipdate_ocean_transport_only",
    "fieldtype": "Int",
    "label": "Transport Days (days before PO Shipdate (ocean transport only))"
+  },
+  {
+   "fieldname": "qc_status",
+   "fieldtype": "Select",
+   "label": "QC Status",
+   "options": "\nPending\nPass\nFailure\nRe-inspection"
+  },
+  {
+   "default": "0",
+   "fieldname": "qc_requested",
+   "fieldtype": "Check",
+   "label": "QC Requested"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-28 17:13:30.482072",
+ "modified": "2025-09-01 14:14:43.024073",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order2",
@@ -370,8 +376,6 @@
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -382,9 +386,14 @@
    "write": 1
   },
   {
+   "email": 1,
    "export": 1,
+   "print": 1,
    "read": 1,
-   "role": "Guest"
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1,
+   "write": 1
   }
  ],
  "row_format": "Dynamic",

@@ -162,7 +162,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-08-29 05:02:14.149718",
+ "modified": "2025-08-29 08:23:50.577399",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partners",
@@ -176,7 +176,7 @@
  "sequence_id": 1.0,
  "shortcuts": [
   {
-   "doc_view": "",
+   "doc_view": "Report Builder",
    "label": "Partner",
    "link_to": "Partner",
    "stats_filter": "[]",

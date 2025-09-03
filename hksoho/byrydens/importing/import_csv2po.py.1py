@@ -148,8 +148,8 @@ def create_purchase_order(po_data):
     partner = validate_link_field("Partner", "name", supplier_code)
     qc_required = 0
     # copy the fields to PO by default
-    if not partner:
-        qc_required = 1 if partner.quality_control == "Always Requested" else 0
+    # if not partner:
+    #     qc_required = 1 if partner.quality_control == "Always Requested" else 0
 
     # 載入或創建 PO
     if po_exists:
@@ -179,7 +179,7 @@ def create_purchase_order(po_data):
     po.responsible = responsible
     po.order_type = order_type
     po.purpose = po_data["purpose"]
-    po.dc_required = qc_required
+    # po.dc_required = qc_required
 
     # 處理子表
     existing_items = {item.line: item for item in po.po_items if item.line} if po_exists else {}
@@ -308,7 +308,7 @@ def execute():
                         error_messages.append(msg)
                 try:
                     dest_path = os.path.join(PROCEED_DIR, os.path.basename(file_path))
-                    shutil.move(file_path, dest_path)
+                    # shutil.move(file_path, dest_path)
                     msg = f"檔案已移動到: {dest_path}"
                     logger.info(msg)
                     print(msg)
@@ -324,4 +324,4 @@ def execute():
         message = f"Import PO {'Fail' if error_occurred else 'Success'}，log:\n\n {log_output}"
         if error_occurred:
             message += "\n\n詳細錯誤:\n" + "\n".join(error_messages)
-        send_notification(subject, message)
+        # send_notification(subject, message)

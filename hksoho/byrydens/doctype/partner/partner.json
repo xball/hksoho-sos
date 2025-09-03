@@ -115,6 +115,7 @@
   {
    "fieldname": "partner_code",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Partner Code"
   },
   {
@@ -133,6 +134,7 @@
   {
    "fieldname": "po_number_prefix",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "PO Number Prefix"
   },
   {
@@ -525,7 +527,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-28 12:57:09.491257",
+ "modified": "2025-08-30 19:26:02.304712",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partner",

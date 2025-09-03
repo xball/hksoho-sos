@@ -48,6 +48,7 @@
   "qc_accepted_qty",
   "qc_rejected_qty",
   "number_of_inspection",
+  "qc_update_status",
   "shippment_section",
   "delivery_quantity",
   "remaining_quantity"
@@ -295,6 +296,13 @@
    "in_list_view": 1,
    "label": "PO Number",
    "read_only": 1
+  },
+  {
+   "default": "NA",
+   "fieldname": "qc_update_status",
+   "fieldtype": "Select",
+   "label": "QC Update Status",
+   "options": "NA\nOn-going\nPass\nFailure"
   }
  ],
  "grid_page_length": 50,
@@ -302,7 +310,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-19 14:48:22.294370",
+ "modified": "2025-09-01 09:11:33.174521",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item2",

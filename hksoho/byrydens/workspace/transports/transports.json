@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"1Rt8PYqefo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Transports</span>\",\"col\":12}},{\"id\":\"js4VxzUL-c\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transport Order2\",\"col\":3}}]",
+ "content": "[{\"id\":\"1Rt8PYqefo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Transports</span>\",\"col\":12}},{\"id\":\"js4VxzUL-c\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transport Order\",\"col\":3}}]",
  "creation": "2025-08-29 04:57:23.855484",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Transports",
  "links": [],
- "modified": "2025-08-29 05:14:39.050962",
+ "modified": "2025-08-29 08:24:21.115304",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transports",
@@ -27,9 +27,9 @@
  "shortcuts": [
   {
    "color": "Grey",
-   "doc_view": "List",
-   "label": "Transport Order2",
-   "link_to": "Transport Order2",
+   "doc_view": "Report Builder",
+   "label": "Transport Order",
+   "link_to": "Transport Order",
    "stats_filter": "[]",
    "type": "DocType"
   }
