@@ -22,12 +22,12 @@ def get_inspection_items(template_name):
 
 @frappe.whitelist()
 def get_po_items(po_name):
-    """回傳指定 Purchase Order2 的所有明細"""
+    """回傳指定 Purchase Order 的所有明細"""
     if not po_name:
         frappe.throw("請提供有效的採購訂單編號")
     
     items = frappe.get_all(
-        "Purchase Order Item2",
+        "Purchase Order Item",
         filters={"parent": po_name},
         fields=["name", "line",  "requested_qty", "article_number", "confirmed_qty"],
         order_by="line asc"
@@ -48,12 +48,12 @@ def get_po_items_qcstatus(po_name):
     if not po_name:
         frappe.throw(_("請提供有效的採購訂單編號"))
     items = frappe.get_all(
-        "Purchase Order Item2",
+        "Purchase Order Item",
         filters={"parent": po_name, "qc_update_status": ["!=", "Pass"]},
         fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty"],
         order_by="line asc"
     )
-    if not items and not frappe.has_permission("Purchase Order2", "read", po_name):
+    if not items and not frappe.has_permission("Purchase Order", "read", po_name):
         frappe.throw(
             _("You do not have enough permissions to access this resource. Please contact your manager to get access."),
             frappe.PermissionError
@@ -63,12 +63,12 @@ def get_po_items_qcstatus(po_name):
 @frappe.whitelist()
 def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     """
-    將選中的 Purchase Order Item2 添加到 Inspection Event 的 po_items 表（Inspection Line），
+    將選中的 Purchase Order Item 添加到 Inspection Event 的 po_items 表（Inspection Line），
     使用 po_number 和 po_item.line 檢查重複，跳過已存在項目並提示。
     
     Args:
         inspection_event_name (str): Inspection Event 的名稱
-        selected_items (str or list): 選中的 Purchase Order Item2 的 name 列表
+        selected_items (str or list): 選中的 Purchase Order Item 的 name 列表
     Returns:
         dict: 包含操作狀態和訊息
     """
@@ -95,7 +95,7 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
 
     # 獲取選中的項目數據
     items = frappe.get_all(
-        "Purchase Order Item2",
+        "Purchase Order Item",
         filters={"name": ["in", selected_items]},
         fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty", "parent"]
     )
@@ -107,7 +107,7 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     existing_items = set()
     for row in inspection_event.po_items:
         if row.po_number and row.po_item:
-            po_item = frappe.get_doc("Purchase Order Item2", row.po_item)
+            po_item = frappe.get_doc("Purchase Order Item", row.po_item)
             if po_item.line is not None:
                 existing_items.add((row.po_number, po_item.line))
 
@@ -116,14 +116,14 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     # 假設第一個項目的 supplier 適用於所有項目（因為它們來自同一個 PO）
     supplier = None
     if items:
-        po = frappe.get_doc("Purchase Order2", items[0].parent)
+        po = frappe.get_doc("Purchase Order", items[0].parent)
         supplier = po.supplier if po.supplier else None
 
     # 將項目添加到 po_items 表，跳過已存在的項目
     for item in items:
         if (item.parent, item.line) not in existing_items:
             inspection_event.append("po_items", {
-                "po_item": item.name,  # Link 到 Purchase Order Item2
+                "po_item": item.name,  # Link 到 Purchase Order Item
                 "po_number": item.parent,  # 設置 PO 號碼
                 "article_number": item.article_number,  # Link 到 Product
                 "article_name": item.article_name,  # 設置 Article Name

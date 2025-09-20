@@ -10,7 +10,7 @@ frappe.ui.form.on('Inspection Event', {
             frappe.call({
                 method: 'frappe.client.get_list',
                 args: {
-                    doctype: 'Purchase Order2',
+                    doctype: 'Purchase Order',
                     filters: {
                         workflow_state: 'Ready to QC'
                     },
@@ -137,12 +137,12 @@ frappe.ui.form.on('Inspection Event', {
                                             <table class="table table-bordered">
                                                 <thead>
                                                     <tr>
-                                                        <th>选择</th>
-                                                        <th>行号</th>
-                                                        <th>请求数量</th>
-                                                        <th>产品编号</th>
-                                                        <th>产品名称</th>
-                                                        <th>确认数量</th>
+                                                        <th>Select</th>
+                                                        <th>Line</th>
+                                                        <th>Requested QTY</th>
+                                                        <th>Article #</th>
+                                                        <th>Article Name</th>
+                                                        <th>Confirmed QTY</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>

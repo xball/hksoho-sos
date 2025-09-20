@@ -24,7 +24,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "PO Number",
-   "options": "Purchase Order"
+   "options": "Purchase Order",
+   "read_only": 1
   },
   {
    "columns": 1,
@@ -91,14 +92,15 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "PO Line",
-   "options": "Purchase Order Item"
+   "options": "Purchase Order Item",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-25 10:46:21.096475",
+ "modified": "2025-09-04 17:07:46.927468",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order Line",

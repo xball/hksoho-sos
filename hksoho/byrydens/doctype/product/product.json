@@ -11,21 +11,16 @@
  "field_order": [
   "article_number",
   "article_name",
-  "family",
-  "short_name",
   "size_description",
   "designer",
+  "qc_required",
   "column_break_egep",
   "primary_image",
   "barcode",
-  "carton_barcode",
   "section_break_levs",
   "category",
   "classification",
-  "supplier_can_inspect",
   "range",
-  "item_status",
-  "product_type",
   "group",
   "column_break_fort",
   "customs_tariff_code",
@@ -41,13 +36,6 @@
   "net_cbm_m\u00b3",
   "net_weight_kg",
   "net_diameter_mm_optional",
-  "packaging_dimensions_innerunit_box_section",
-  "gross_width_mm_innerunit_box",
-  "gross_height_mm_innerunit_box",
-  "gross_length_mm_innerunit_box",
-  "gross_cbm_innerunit_box",
-  "gross_weight_kg_innerunit_box",
-  "units_in_carton_pieces_per_carton",
   "packaging_dimensions_outer_cartons_section",
   "carton_width_mm_outer_carton",
   "carton_height_mm_outer_carton",
@@ -55,24 +43,23 @@
   "carton_cbm_outer_carton",
   "carton_weight_kg_outer_carton",
   "number_of_cartons_colli_per_unit",
+  "column_break_kfpd",
+  "gross_width_mm_innerunit_box",
+  "gross_height_mm_innerunit_box",
+  "gross_length_mm_innerunit_box",
+  "gross_cbm_innerunit_box",
+  "gross_weight_kg_innerunit_box",
+  "units_in_carton_pieces_per_carton",
   "container_loadability_section",
   "20ft_gp",
   "40ft_gp",
-  "40hc",
-  "45hc",
   "attributes_tab",
   "general_section",
   "minimum_order_quantity",
   "production_leadtime_days",
-  "qc_required",
   "color_code",
-  "material",
-  "model_code",
-  "pantone_color_code",
   "sample_article_number",
   "packaging_section",
-  "master_carton",
-  "carton_number",
   "multipack",
   "packaging",
   "attachments_tab",
@@ -99,16 +86,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "family",
-   "fieldtype": "Int",
-   "label": "Family"
-  },
-  {
-   "fieldname": "short_name",
-   "fieldtype": "Data",
-   "label": "Short Name"
-  },
-  {
    "fieldname": "size_description",
    "fieldtype": "Data",
    "label": "Size Description"
@@ -133,11 +110,6 @@
    "label": "Barcode"
   },
   {
-   "fieldname": "carton_barcode",
-   "fieldtype": "Barcode",
-   "label": "Carton Barcode"
-  },
-  {
    "fieldname": "category",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -157,28 +129,10 @@
    "options": "BEST\nBETTER - H\nBETTER - M\nBETTER - L\nGOOD"
   },
   {
-   "default": "0",
-   "fieldname": "supplier_can_inspect",
-   "fieldtype": "Check",
-   "label": "Supplier Can Inspect"
-  },
-  {
    "fieldname": "range",
    "fieldtype": "Select",
    "label": "Range",
    "options": "1 - Ryd\u00e9ns\n2 - Ryd\u00e9ns (no re-buy)\n3 - Components\n4 - Semi-manufactures\n5 - Customer items\n6 - Mono Light Lab\nC1 - Cottex\nC2 - Cottex (no re-buy)\nC5 - Cottex customer Items"
-  },
-  {
-   "fieldname": "item_status",
-   "fieldtype": "Select",
-   "label": "Item Status",
-   "options": "[Unknown]\nCore\nNew\nDiscontinued\nSell-through\nActivity"
-  },
-  {
-   "fieldname": "product_type",
-   "fieldtype": "Select",
-   "label": "Product Type",
-   "options": "\nAgent\nSpare Part\nTrading"
   },
   {
    "fieldname": "dimensions_tab",
@@ -225,11 +179,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "packaging_dimensions_innerunit_box_section",
-   "fieldtype": "Section Break",
-   "label": "Packaging Dimensions (Inner/Unit Box)"
-  },
-  {
    "fieldname": "gross_width_mm_innerunit_box",
    "fieldtype": "Float",
    "label": "Gross Width (mm, Inner/Unit Box)"
@@ -258,7 +207,7 @@
   {
    "fieldname": "packaging_dimensions_outer_cartons_section",
    "fieldtype": "Section Break",
-   "label": "Packaging Dimensions (Outer Carton(s))"
+   "label": "Packaging Dimensions"
   },
   {
    "fieldname": "carton_width_mm_outer_carton",
@@ -301,16 +250,6 @@
    "label": "40FT GP"
   },
   {
-   "fieldname": "40hc",
-   "fieldtype": "Int",
-   "label": "40HC"
-  },
-  {
-   "fieldname": "45hc",
-   "fieldtype": "Int",
-   "label": "45HC"
-  },
-  {
    "fieldname": "attributes_tab",
    "fieldtype": "Tab Break",
    "label": "Attributes"
@@ -340,22 +279,7 @@
    "fieldname": "color_code",
    "fieldtype": "Select",
    "label": "Color Code",
-   "options": "0500: pink\n0501: light pink\n0502: dark pink\n0503: pale pink\n0504: Cyklamen\n0505: Cerise\n0507: antique pink\n0606: powder pink\n1000: red\n1001: light red\n1002: dark red\n1003: wine red\n1007: sand red\n1500: Orange\n1501: orange\n1502: Spicy orange\n2000: yellow\n2501: green\n2502: light green\n2503: dark green\n2504: limegreen\n2505: grass green\n2506: Petrol\n2507: olive green\n2508: Menthol\n3000: blue\n3001: light blue\n3002: dark blue\n3003: marine blue\n3004: turquoise\n3005: blue-gray\n3006: Jeans\n3007: Ocean\n3008: blue striped\n3500: lilac\n3501: dark purple\n3502: Purple\n3503: syringa\n4000: black\n4001: shiny black\n4002: matt black\n4003: salt & pepper\n4007: sandblack\n4500: gray\n4501: light gray\n4502: dark gray\n4503: graphite\n4504: graphite\n4505: smoke gray\n4507: Granite\n4508: concrete\n5000: Whitewash\n5001: shiny white\n5002: matt white\n5003: Offwhite\n5004: Frost\n5005: bone white\n5006: Whitewash\n5007: sandwhite\n5500: brown\n5501: light brown\n5502: dark brown\n5503: Amber\n5504: Beige\n5505: Sand, Machinist"
-  },
-  {
-   "fieldname": "material",
-   "fieldtype": "Data",
-   "label": "Material"
-  },
-  {
-   "fieldname": "model_code",
-   "fieldtype": "Data",
-   "label": "Model Code"
-  },
-  {
-   "fieldname": "pantone_color_code",
-   "fieldtype": "Data",
-   "label": "Pantone Color Code"
+   "options": "\n0500: pink\n0501: light pink\n0502: dark pink\n0503: pale pink\n0504: Cyklamen\n0505: Cerise\n0507: antique pink\n0606: powder pink\n1000: red\n1001: light red\n1002: dark red\n1003: wine red\n1007: sand red\n1500: Orange\n1501: orange\n1502: Spicy orange\n2000: yellow\n2501: green\n2502: light green\n2503: dark green\n2504: limegreen\n2505: grass green\n2506: Petrol\n2507: olive green\n2508: Menthol\n3000: blue\n3001: light blue\n3002: dark blue\n3003: marine blue\n3004: turquoise\n3005: blue-gray\n3006: Jeans\n3007: Ocean\n3008: blue striped\n3500: lilac\n3501: dark purple\n3502: Purple\n3503: syringa\n4000: black\n4001: shiny black\n4002: matt black\n4003: salt & pepper\n4007: sandblack\n4500: gray\n4501: light gray\n4502: dark gray\n4503: graphite\n4504: graphite\n4505: smoke gray\n4507: Granite\n4508: concrete\n5000: Whitewash\n5001: shiny white\n5002: matt white\n5003: Offwhite\n5004: Frost\n5005: bone white\n5006: Whitewash\n5007: sandwhite\n5500: brown\n5501: light brown\n5502: dark brown\n5503: Amber\n5504: Beige\n5505: Sand, Machinist"
   },
   {
    "fieldname": "sample_article_number",
@@ -366,16 +290,6 @@
    "fieldname": "packaging_section",
    "fieldtype": "Section Break",
    "label": "Packaging"
-  },
-  {
-   "fieldname": "master_carton",
-   "fieldtype": "Data",
-   "label": "Master Carton"
-  },
-  {
-   "fieldname": "carton_number",
-   "fieldtype": "Data",
-   "label": "Carton Number"
   },
   {
    "default": "0",
@@ -438,13 +352,17 @@
    "fieldname": "currency",
    "fieldtype": "Data",
    "label": "Currency"
+  },
+  {
+   "fieldname": "column_break_kfpd",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-28 12:59:00.145214",
+ "modified": "2025-09-05 06:09:06.621706",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

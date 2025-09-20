@@ -10,8 +10,8 @@ from io import StringIO
 from contextlib import redirect_stdout, redirect_stderr
 
 # DocType 定義
-PO_DOCTYPE = "Purchase Order2"
-PO_ITEM_DOCTYPE = "Purchase Order Item2"
+PO_DOCTYPE = "Purchase Order"
+PO_ITEM_DOCTYPE = "Purchase Order Item"
 
 # 從 site_config 獲取路徑，預設值作為備用
 INPUT_DIR = frappe.get_site_config().get("po_import_input_dir", "/home/ftpuser/ftp")

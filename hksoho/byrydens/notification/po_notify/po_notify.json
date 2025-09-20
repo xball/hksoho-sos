@@ -1,0 +1,31 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "creation": "2025-09-05 08:30:39.876537",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Purchase Order",
+ "enabled": 1,
+ "event": "Submit",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "\u89aa\u611b\u7684 {{ doc.owner }}\uff0c\r\n\r\n\u60a8\u7684\u63a1\u8cfc\u8a02\u55ae {{ doc.name }} \u5df2\u65bc {{ doc.modified }} \u88ab\u6279\u51c6\u3002\r\n\u7576\u524d\u72c0\u614b\uff1a{{ doc.workflow_state }}\r\n\r\n\u8acb\u9ede\u64ca\u4ee5\u4e0b\u93c8\u63a5\u67e5\u770b\u8a73\u60c5\uff1a\r\n{{ frappe.utils.get_url_to_form(doc.doctype, doc.name) }}\r\n\r\n\u8b1d\u8b1d\uff0c\r\n{{ frappe.db.get_value(\"User\", frappe.session.user, \"full_name\") }}",
+ "message_type": "Markdown",
+ "modified": "2025-09-05 09:03:31.920374",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "PO notify",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "purchaser",
+   "receiver_by_role": "Purchase Manager"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "IT Admin from SOS",
+ "sender_email": "playingsoft.co@gmail.com",
+ "subject": "PO {{ doc.name }} approved."
+}

@@ -1,56 +1,170 @@
 {
  "actions": [],
  "autoname": "autoincrement",
- "creation": "2025-07-11 03:04:58.170944",
+ "creation": "2025-09-03 15:51:36.185388",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "purchase_order",
+  "po_number",
   "line",
   "article_number",
   "article_name",
-  "article_photo",
-  "confirmed_ship_week",
-  "column_break_otjq",
+  "item_type",
+  "unit_price",
   "requested_qty",
   "confirmed_qty",
   "booked_qty",
-  "qc_accepted_qty",
-  "qc_rejected_qty",
+  "requested_finish_date",
+  "requested_eta",
+  "actual_finishdate",
+  "actual_finishdate_condition",
+  "amount",
+  "column_break_otjq",
+  "requested_shipdate",
+  "requested_shipdate_week",
+  "confirmed_shipdate",
+  "confirmed_ship_week",
+  "supplier_art_number",
+  "customer_order_number",
+  "status",
   "delivery_quantity",
   "remaining_quantity",
+  "qc_accepted_qty",
+  "qc_rejected_qty",
+  "number_of_inspection",
+  "qc_update_status",
   "section_break_odpq",
-  "updated_ship_week",
-  "cbm",
-  "gross_weight",
+  "carton_cbm",
+  "unit_net_kg",
+  "no_of_packages",
+  "ctns_on_pallet",
+  "hs_origin",
   "column_break_lipu",
-  "unit_purchase_price",
-  "unit_selling_price",
-  "purchase_amount",
-  "selling_amount"
+  "pcs_per_cartion",
+  "carton_gross_kg",
+  "article_photo",
+  "short_description"
  ],
  "fields": [
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "PO Number",
+   "read_only": 1
+  },
   {
    "fieldname": "line",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Line",
    "non_negative": 1,
-   "read_only": 1
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "fieldname": "article_number",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Article Number",
-   "options": "Product"
+   "options": "Product",
+   "read_only": 1
   },
   {
    "fieldname": "article_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Article Name"
+   "label": "Article Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_type",
+   "fieldtype": "Select",
+   "label": "Item Type",
+   "options": "Standard\nSample\nNew Item"
+  },
+  {
+   "fieldname": "requested_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Requested Qty",
+   "non_negative": 1,
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "confirmed_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Confirmed Qty",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "requested_finish_date",
+   "fieldtype": "Date",
+   "label": "Requested Finish Date"
+  },
+  {
+   "fieldname": "requested_eta",
+   "fieldtype": "Date",
+   "label": "Requested ETA"
+  },
+  {
+   "fieldname": "actual_finishdate",
+   "fieldtype": "Date",
+   "label": "Actual Finishdate"
+  },
+  {
+   "fieldname": "actual_finishdate_condition",
+   "fieldtype": "Select",
+   "label": "Actual Finishdate Condition",
+   "options": "\nEarlier finish date requested by buyer\nEarlier finish date requested by supplier\nLater finish date requested by buyer\nLater finish date requested by supplier\nLater finish date because of supplier\nEarlier finish date because of supplier\nOn-time\nKeep for China market"
+  },
+  {
+   "fieldname": "column_break_otjq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requested_shipdate",
+   "fieldtype": "Date",
+   "label": "Requested Shipdate"
+  },
+  {
+   "fieldname": "requested_shipdate_week",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Requested Shipdate Week",
+   "placeholder": "YYYY-WW",
+   "read_only": 1
+  },
+  {
+   "fieldname": "confirmed_shipdate",
+   "fieldtype": "Date",
+   "label": "Confirmed Shipdate"
+  },
+  {
+   "fieldname": "confirmed_ship_week",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Confirmed Ship Week",
+   "placeholder": "YYYY-WW",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supplier_art_number",
+   "fieldtype": "Data",
+   "label": "Supplier Art number"
+  },
+  {
+   "fieldname": "customer_order_number",
+   "fieldtype": "Data",
+   "label": "Customer Order number"
+  },
+  {
+   "fieldname": "short_description",
+   "fieldtype": "Small Text",
+   "label": "Short Description"
   },
   {
    "fieldname": "article_photo",
@@ -58,27 +172,55 @@
    "label": "Article photo"
   },
   {
-   "fieldname": "requested_qty",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Requested Qty"
+   "default": "Repeat Item",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Repeat Item\nNew Item"
   },
   {
-   "fieldname": "confirmed_ship_week",
+   "fieldname": "section_break_odpq",
+   "fieldtype": "Section Break",
+   "label": "Package and Dimension"
+  },
+  {
+   "fieldname": "carton_cbm",
+   "fieldtype": "Float",
+   "label": "Carton Cbm"
+  },
+  {
+   "fieldname": "unit_net_kg",
+   "fieldtype": "Float",
+   "label": "Unit Net kg"
+  },
+  {
+   "fieldname": "no_of_packages",
+   "fieldtype": "Int",
+   "label": "No of Packages"
+  },
+  {
+   "fieldname": "ctns_on_pallet",
+   "fieldtype": "Int",
+   "label": "Ctns On Pallet"
+  },
+  {
+   "fieldname": "hs_origin",
    "fieldtype": "Data",
-   "label": "Confirmed Ship Week",
-   "placeholder": "YYYY-WW"
+   "label": "HS Origin"
   },
   {
-   "fieldname": "confirmed_qty",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Confirmed Qty"
+   "fieldname": "column_break_lipu",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "booked_qty",
+   "fieldname": "pcs_per_cartion",
    "fieldtype": "Int",
-   "label": "Booked Qty"
+   "label": "Pcs Per Cartion"
+  },
+  {
+   "fieldname": "carton_gross_kg",
+   "fieldtype": "Float",
+   "label": "Carton Gross Kg"
   },
   {
    "fieldname": "qc_accepted_qty",
@@ -91,105 +233,68 @@
    "label": "QC Rejected Qty"
   },
   {
-   "fieldname": "column_break_otjq",
-   "fieldtype": "Column Break"
+   "default": "0",
+   "fieldname": "number_of_inspection",
+   "fieldtype": "Int",
+   "label": "Number of Inspection",
+   "non_negative": 1,
+   "read_only": 1
   },
   {
-   "fieldname": "updated_ship_week",
+   "default": "NA",
+   "fieldname": "qc_update_status",
    "fieldtype": "Data",
-   "label": "Updated Ship Week",
-   "placeholder": "YYYY-WW"
+   "in_list_view": 1,
+   "label": "QC Update Status",
+   "read_only": 1
   },
   {
    "fieldname": "delivery_quantity",
    "fieldtype": "Int",
-   "label": "Delivery Quantity"
+   "label": "Delivery Qty"
   },
   {
    "fieldname": "remaining_quantity",
    "fieldtype": "Int",
-   "label": "Remaining Quantity"
+   "label": "Remaining Qty"
   },
   {
-   "fieldname": "cbm",
+   "default": "0.0",
+   "fieldname": "unit_price",
    "fieldtype": "Float",
-   "label": "CBM  (m\u00b3)"
-  },
-  {
-   "fieldname": "gross_weight",
-   "fieldtype": "Float",
-   "label": "Gross Weight (kg)"
-  },
-  {
-   "fieldname": "unit_purchase_price",
-   "fieldtype": "Float",
-   "label": "Unit Purchase Price "
-  },
-  {
-   "fieldname": "unit_selling_price",
-   "fieldtype": "Float",
-   "label": "Unit Selling Price"
-  },
-  {
-   "fieldname": "purchase_amount",
-   "fieldtype": "Float",
-   "label": "Purchase Amount"
-  },
-  {
-   "fieldname": "selling_amount",
-   "fieldtype": "Float",
-   "label": "Selling Amount"
-  },
-  {
-   "fieldname": "section_break_odpq",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_lipu",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "purchase_order",
-   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Purchase Order",
-   "options": "Purchase Order",
-   "reqd": 1
+   "label": "Unit Price",
+   "non_negative": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "booked_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Booked Qty",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Amount",
+   "precision": "2",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "image_field": "article_photo",
  "index_web_pages_for_search": 1,
+ "istable": 1,
  "links": [],
- "modified": "2025-08-06 07:43:34.252488",
+ "modified": "2025-09-19 17:21:31.777456",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item",
  "naming_rule": "Autoincrement",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Purchase Manager",
-   "share": 1
-  }
- ],
+ "permissions": [],
  "row_format": "Dynamic",
  "search_fields": "line,article_number,article_name",
  "show_title_field_in_link": 1,

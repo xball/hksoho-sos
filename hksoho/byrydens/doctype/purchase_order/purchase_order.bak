@@ -1,0 +1,150 @@
+import frappe
+from frappe.model.document import Document
+import os
+from datetime import datetime
+
+class PurchaseOrder(Document):
+    def after_save(self):
+        """
+        Hook to export specific fields to a txt file when a Purchase Order is modified.
+        File name is based on a sequence number with prefix 'B', starting from 20000.
+        Stores the last sequence number in last_number.txt.
+        """
+        # Initialize logger
+        logger = frappe.logger("purchase_order_export")
+        logger.info(f"after_save triggered for Purchase Order: {self.name}")
+
+        # Write to debug file for verification
+        debug_file = "/home/ftpuser/topyamid/debug_log.txt"
+        with open(debug_file, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now()}: after_save triggered for PO: {self.name}\n")
+
+        # Define the output directory
+        output_dir = "/home/ftpuser/topyamid"
+        try:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+                logger.info(f"Created directory: {output_dir}")
+                with open(debug_file, "a", encoding="utf-8") as f:
+                    f.write(f"{datetime.now()}: Created directory: {output_dir}\n")
+        except Exception as e:
+            logger.error(f"Failed to create directory {output_dir}: {str(e)}")
+            frappe.log_error(f"Purchase Order export directory creation failed: {str(e)}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Failed to create directory {output_dir}: {str(e)}\n")
+            return
+
+        # Get the next sequence number
+        try:
+            sequence = get_next_sequence_number(output_dir)
+            file_name = f"B{sequence}.txt"
+            file_path = os.path.join(output_dir, file_name)
+            logger.info(f"Generating file: {file_path}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Generating file: {file_path}\n")
+        except Exception as e:
+            logger.error(f"Failed to get sequence number: {str(e)}")
+            frappe.log_error(f"Purchase Order sequence number retrieval failed: {str(e)}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Failed to get sequence number: {str(e)}\n")
+            return
+
+        # Start building the file content
+        content = []
+
+        # Hardcoded line '01' and header details
+        partner_id = self.supplier  # Assuming supplier field links to Partner doctype
+        po_id = self.name
+        po_status = self.po_status  # Assuming po_status is a field in Purchase Order
+        content.append("01")
+        content.append(f"#12205;{partner_id}")
+        content.append(f"#12203;{po_id}")
+        content.append(f"#18780;{po_status}")
+        logger.info(f"Added header details for PO: {po_id}")
+        with open(debug_file, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now()}: Added header details for PO: {po_id}\n")
+
+        # Process PO items
+        try:
+            for item in self.po_items:
+                content.append("11")
+                content.append(f"#12401;{item.article_number}")  # article_number
+                content.append(f"#12414;{item.line}")  # line
+                content.append(f"#12421;{item.article_name}")  # article_name
+                content.append(f"#12451;{item.unit_price}")  # unit_price
+                qty_diff = item.confirmed_qty - (item.requested_qty or 0)  # confirmed_qty - requested_qty
+                content.append(f"#12441;{qty_diff}")
+                ship_date = item.confirmed_shipdate  # confied_shipdate
+                content.append(f"#5513;{ship_date}")
+            logger.info(f"Processed {len(self.po_items)} items for PO: {po_id}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Processed {len(self.po_items)} items for PO: {po_id}\n")
+        except Exception as e:
+            logger.error(f"Failed to process PO items for {po_id}: {str(e)}")
+            frappe.log_error(f"Purchase Order item processing failed: {str(e)}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Failed to process PO items for {po_id}: {str(e)}\n")
+            return
+
+        # Write content to file
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(content))
+            logger.info(f"Successfully wrote file: {file_path}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Successfully wrote file: {file_path}\n")
+        except Exception as e:
+            logger.error(f"Failed to write file {file_path}: {str(e)}")
+            frappe.log_error(f"Purchase Order file write failed: {str(e)}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: Failed to write file {file_path}: {str(e)}\n")
+
+def get_next_sequence_number(output_dir):
+    """
+    Get the next sequence number from last_number.txt, starting from 20000.
+    Increment and save the new sequence number.
+    """
+    logger = frappe.logger("purchase_order_export")
+    debug_file = "/home/ftpuser/topyamid/debug_log.txt"
+    last_number_path = os.path.join(output_dir, "last_number.txt")
+    sequence = 20000  # Default starting number
+
+    # Read the last sequence number if the file exists
+    try:
+        if os.path.exists(last_number_path):
+            with open(last_number_path, "r", encoding="utf-8") as f:
+                try:
+                    sequence = int(f.read().strip()) + 1
+                    logger.info(f"Read sequence number: {sequence - 1}, incremented to: {sequence}")
+                    with open(debug_file, "a", encoding="utf-8") as f:
+                        f.write(f"{datetime.now()}: Read sequence number: {sequence - 1}, incremented to: {sequence}\n")
+                except ValueError:
+                    sequence = 20000  # Fallback to starting number if file is invalid
+                    logger.warning(f"Invalid content in {last_number_path}, using default sequence: {sequence}")
+                    with open(debug_file, "a", encoding="utf-8") as f:
+                        f.write(f"{datetime.now()}: Invalid content in {last_number_path}, using default sequence: {sequence}\n")
+        else:
+            logger.info(f"No last_number.txt found, using default sequence: {sequence}")
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write(f"{datetime.now()}: No last_number.txt found, using default sequence: {sequence}\n")
+    except Exception as e:
+        logger.error(f"Failed to read {last_number_path}: {str(e)}")
+        frappe.log_error(f"Sequence number read failed: {str(e)}")
+        with open(debug_file, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now()}: Failed to read {last_number_path}: {str(e)}\n")
+        return sequence
+
+    # Save the new sequence number
+    try:
+        with open(last_number_path, "w", encoding="utf-8") as f:
+            f.write(str(sequence))
+        logger.info(f"Saved new sequence number: {sequence} to {last_number_path}")
+        with open(debug_file, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now()}: Saved new sequence number: {sequence} to {last_number_path}\n")
+    except Exception as e:
+        logger.error(f"Failed to write {last_number_path}: {str(e)}")
+        frappe.log_error(f"Sequence number write failed: {str(e)}")
+        with open(debug_file, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now()}: Failed to write {last_number_path}: {str(e)}\n")
+
+    return sequence

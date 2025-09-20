@@ -31,6 +31,19 @@ scheduler_events = {
         "hksoho.byrydens.importing.import_csv2currency.execute"
     ]
 }
+
+doc_events = {
+    "Purchase Order": {
+        "after_save": "hksoho.byrydens.doctype.purchase_order.purchase_order.after_save"
+    }
+}
+
+
+
+# app_include_hooks = [
+#     "hksoho.utils.email_utils.setup_email"
+# ]
+
 # Website context hook to change login text
 # def get_website_context(context):
 #     context.login_text = "Login to SOS"

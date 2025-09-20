@@ -12,39 +12,23 @@
   "partner_id",
   "partner_name",
   "partner_code",
-  "column_break_mpfh",
   "partner_type",
-  "po_number_prefix",
-  "section_break_grma",
   "status",
-  "since",
-  "hidden",
-  "section_break_woox",
-  "delivery_mode",
+  "column_break_nwin",
   "delivery_term",
   "payment_term",
   "currency",
   "quality_control",
-  "column_break_gzhv",
-  "default_agent_id",
-  "default_buyer_id",
-  "default_dc",
-  "default_forwarder",
   "address_tab",
   "address",
-  "loading_place",
+  "load_delivery_place",
   "section_break_vwro",
   "invoice_address",
   "city",
   "stateregion",
   "postal_code",
   "country",
-  "default_port_section",
-  "default_port",
-  "alternate_port",
-  "alternate_load_country",
   "contact_tab",
-  "user_item_table",
   "section_break_xtrj",
   "contact_name",
   "contact_title",
@@ -55,40 +39,18 @@
   "official_name",
   "vat_reg_no",
   "org_no",
-  "org_no_issued_by",
-  "bank_name",
-  "bank_address",
-  "swift_code",
   "column_break_obim",
-  "account_number",
-  "iban",
-  "secondary_account_number",
-  "secondary_iban",
   "importers_code",
   "logo",
   "section_break_tjxy",
-  "phone_number",
-  "fax_number",
-  "ceo",
-  "contact_person",
-  "mobile_phone",
-  "website",
   "email_address",
-  "invoicing_email",
   "other_tab",
-  "partner_category",
   "fsc_status",
   "fsc_number",
   "fsc_expiry_date",
   "bsci_member",
   "bsci_number",
-  "bsci_expiry_date",
-  "sales_contact",
-  "sales_commission_share_",
-  "number_of_employees",
-  "number_of_assembling_lines",
-  "capacity_of_assembling_lines",
-  "booking_tolerance_"
+  "bsci_expiry_date"
  ],
  "fields": [
   {
@@ -102,7 +64,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Partner ID",
-   "read_only": 1,
+   "set_only_once": 1,
    "unique": 1
   },
   {
@@ -119,10 +81,6 @@
    "label": "Partner Code"
   },
   {
-   "fieldname": "column_break_mpfh",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "partner_type",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -132,19 +90,9 @@
    "reqd": 1
   },
   {
-   "fieldname": "po_number_prefix",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "PO Number Prefix"
-  },
-  {
    "fieldname": "currency",
    "fieldtype": "Data",
    "label": "Currency"
-  },
-  {
-   "fieldname": "section_break_grma",
-   "fieldtype": "Section Break"
   },
   {
    "default": "Active",
@@ -154,27 +102,6 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Active\nInactive\nEvaluating\nBlacklist"
-  },
-  {
-   "fieldname": "since",
-   "fieldtype": "Date",
-   "label": "Since"
-  },
-  {
-   "default": "0",
-   "fieldname": "hidden",
-   "fieldtype": "Check",
-   "label": "Hidden"
-  },
-  {
-   "fieldname": "section_break_woox",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "delivery_mode",
-   "fieldtype": "Select",
-   "label": "Delivery Mode",
-   "options": "BY BOAT\nBY TRUCK"
   },
   {
    "fieldname": "delivery_term",
@@ -203,11 +130,6 @@
    "fieldname": "address",
    "fieldtype": "Small Text",
    "label": "Address"
-  },
-  {
-   "fieldname": "loading_place",
-   "fieldtype": "Small Text",
-   "label": "Loading Place"
   },
   {
    "fieldname": "section_break_vwro",
@@ -265,48 +187,8 @@
    "label": "Org No"
   },
   {
-   "fieldname": "org_no_issued_by",
-   "fieldtype": "Data",
-   "label": "Org No Issued By"
-  },
-  {
-   "fieldname": "bank_name",
-   "fieldtype": "Data",
-   "label": "Bank Name"
-  },
-  {
-   "fieldname": "bank_address",
-   "fieldtype": "Data",
-   "label": "Bank Address"
-  },
-  {
-   "fieldname": "swift_code",
-   "fieldtype": "Data",
-   "label": "Swift Code"
-  },
-  {
-   "fieldname": "account_number",
-   "fieldtype": "Data",
-   "label": "Account Number"
-  },
-  {
-   "fieldname": "iban",
-   "fieldtype": "Data",
-   "label": "IBAN"
-  },
-  {
    "fieldname": "column_break_obim",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "secondary_account_number",
-   "fieldtype": "Data",
-   "label": "Secondary Account Number"
-  },
-  {
-   "fieldname": "secondary_iban",
-   "fieldtype": "Data",
-   "label": "Secondary IBAN"
   },
   {
    "fieldname": "importers_code",
@@ -323,50 +205,9 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "phone_number",
-   "fieldtype": "Data",
-   "label": "Phone Number"
-  },
-  {
-   "fieldname": "fax_number",
-   "fieldtype": "Data",
-   "label": "Fax Number"
-  },
-  {
-   "fieldname": "ceo",
-   "fieldtype": "Data",
-   "label": "CEO"
-  },
-  {
-   "fieldname": "contact_person",
-   "fieldtype": "Data",
-   "label": "Contact Person"
-  },
-  {
-   "fieldname": "mobile_phone",
-   "fieldtype": "Data",
-   "label": "Mobile Phone"
-  },
-  {
-   "fieldname": "website",
-   "fieldtype": "Data",
-   "label": "Website"
-  },
-  {
    "fieldname": "email_address",
    "fieldtype": "Data",
    "label": "Email Address"
-  },
-  {
-   "fieldname": "invoicing_email",
-   "fieldtype": "Data",
-   "label": "Invoicing Email"
-  },
-  {
-   "fieldname": "partner_category",
-   "fieldtype": "Select",
-   "label": "Partner Category",
-   "options": "A\nB\nC"
   },
   {
    "fieldname": "fsc_status",
@@ -396,16 +237,6 @@
    "label": "Other"
   },
   {
-   "fieldname": "default_port_section",
-   "fieldtype": "Section Break",
-   "label": "Default Port"
-  },
-  {
-   "fieldname": "default_port",
-   "fieldtype": "Data",
-   "label": "Default Port"
-  },
-  {
    "fieldname": "bsci_number",
    "fieldtype": "Data",
    "label": "BSCI Number"
@@ -414,85 +245,6 @@
    "fieldname": "bsci_expiry_date",
    "fieldtype": "Date",
    "label": "BSCI Expiry Date"
-  },
-  {
-   "fieldname": "sales_contact",
-   "fieldtype": "Link",
-   "label": "Sales Contact",
-   "options": "User"
-  },
-  {
-   "fieldname": "sales_commission_share_",
-   "fieldtype": "Float",
-   "label": "Sales Commission Share (%)"
-  },
-  {
-   "fieldname": "number_of_employees",
-   "fieldtype": "Int",
-   "label": "Number of Employees"
-  },
-  {
-   "fieldname": "number_of_assembling_lines",
-   "fieldtype": "Int",
-   "label": "Number of Assembling Lines"
-  },
-  {
-   "fieldname": "capacity_of_assembling_lines",
-   "fieldtype": "Select",
-   "label": "Capacity of Assembling Lines",
-   "options": "Red\nGreen\nYellow"
-  },
-  {
-   "fieldname": "booking_tolerance_",
-   "fieldtype": "Float",
-   "label": "Booking Tolerance (%)"
-  },
-  {
-   "fieldname": "alternate_port",
-   "fieldtype": "Data",
-   "label": "Alternate Port"
-  },
-  {
-   "fieldname": "alternate_load_country",
-   "fieldtype": "Link",
-   "label": "Alternate Load Country",
-   "options": "Country"
-  },
-  {
-   "fieldname": "column_break_gzhv",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "default_agent_id",
-   "fieldtype": "Link",
-   "label": "Default Agent ID",
-   "link_filters": "{\n    \"partner_type\": [\"in\", [\"Agent/Buyer\"]]\n}",
-   "options": "Partner"
-  },
-  {
-   "fieldname": "default_buyer_id",
-   "fieldtype": "Link",
-   "label": "Default Buyer ID",
-   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
-   "options": "Partner"
-  },
-  {
-   "fieldname": "default_dc",
-   "fieldtype": "Select",
-   "label": "Default DC",
-   "options": "01: Gnosj\u00f6\n34381: IKEA IMS \u00c4LMHULT 34382: IKEA IMS KOBE"
-  },
-  {
-   "fieldname": "default_forwarder",
-   "fieldtype": "Link",
-   "label": "Default Forwarder",
-   "link_filters": "{\"partner_type\":\"Transporter\"}\n",
-   "options": "Partner"
-  },
-  {
-   "fieldname": "user_item_table",
-   "fieldtype": "Table",
-   "options": "User Item"
   },
   {
    "fieldname": "section_break_xtrj",
@@ -522,12 +274,21 @@
    "fieldname": "contact_mobile",
    "fieldtype": "Data",
    "label": "Contact Mobile"
+  },
+  {
+   "fieldname": "column_break_nwin",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "load_delivery_place",
+   "fieldtype": "Small Text",
+   "label": "Loading/Delivery Place"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-30 19:26:02.304712",
+ "modified": "2025-09-05 04:31:35.780352",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Partner",

@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:INP-{supplier}-{YY}{MM}{###}",
- "creation": "2025-07-11 05:18:11.339428",
+ "creation": "2025-09-03 16:15:26.703228",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -12,24 +12,27 @@
   "article_number",
   "article_name",
   "order_qty",
+  "column_break_pueh",
   "inspection_date",
   "inspector",
   "number_of_inspection",
   "inspected_qty",
   "failed_qty",
+  "aql_qty",
+  "full_inspection",
   "result",
-  "need_reinspection",
   "notes",
+  "need_reinspection",
+  "section_break_rezk",
   "template",
   "inspection_results",
   "inspection_results_construction",
   "inspection_results_product",
   "inspection_results_shade",
-  "line_number",
-  "order_number",
-  "aql_qty",
-  "full_inspection",
+  "section_break_oate",
   "supplier_select",
+  "order_number",
+  "line_number",
   "line_select"
  ],
  "fields": [
@@ -43,6 +46,8 @@
   {
    "fieldname": "purchase_order",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Purchase Order",
    "link_filters": "[[\"Purchase Order\",\"supplier\",\"=\",\"eval: doc.supplier\"]]",
    "options": "Purchase Order"
@@ -50,23 +55,33 @@
   {
    "fieldname": "purchase_order_line",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Purchase Order Line",
    "options": "Purchase Order Item"
   },
   {
    "fieldname": "article_number",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Article Number"
   },
   {
    "fieldname": "article_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Article Name"
   },
   {
    "fieldname": "order_qty",
    "fieldtype": "Int",
    "label": "Order Qty"
+  },
+  {
+   "fieldname": "column_break_pueh",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "inspection_date",
@@ -95,47 +110,6 @@
    "label": "Failed Qty"
   },
   {
-   "fieldname": "result",
-   "fieldtype": "Select",
-   "label": "Result",
-   "options": "Pass\nFail\nN/A"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Long Text",
-   "label": "Notes"
-  },
-  {
-   "fieldname": "template",
-   "fieldtype": "Link",
-   "label": "Template",
-   "options": "Inspection Template"
-  },
-  {
-   "fieldname": "inspection_results",
-   "fieldtype": "Table",
-   "label": "Inspection results (Carton)",
-   "options": "Inspection Result"
-  },
-  {
-   "default": "0",
-   "fieldname": "need_reinspection",
-   "fieldtype": "Check",
-   "label": "Need reinspection"
-  },
-  {
-   "fieldname": "line_number",
-   "fieldtype": "Data",
-   "label": "Line number",
-   "read_only": 1
-  },
-  {
-   "fieldname": "order_number",
-   "fieldtype": "Data",
-   "label": "Order Number",
-   "read_only": 1
-  },
-  {
    "fieldname": "aql_qty",
    "fieldtype": "Int",
    "label": "AQL Qty"
@@ -147,14 +121,43 @@
    "label": "Full Inspection"
   },
   {
-   "fieldname": "supplier_select",
+   "fieldname": "result",
    "fieldtype": "Select",
-   "label": "Supplier Select"
+   "in_list_view": 1,
+   "label": "Result",
+   "options": "Pass\nFailure\nNA"
   },
   {
-   "fieldname": "line_select",
-   "fieldtype": "Select",
-   "label": "Line Select"
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "default": "0",
+   "fieldname": "need_reinspection",
+   "fieldtype": "Check",
+   "label": "Need reinspection"
+  },
+  {
+   "fieldname": "section_break_rezk",
+   "fieldtype": "Section Break",
+   "label": "Inspection Results"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Template",
+   "options": "Inspection Template",
+   "print_hide": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "inspection_results",
+   "fieldtype": "Table",
+   "label": "Inspection results (Carton)",
+   "options": "Inspection Result",
+   "set_only_once": 1
   },
   {
    "fieldname": "inspection_results_construction",
@@ -173,12 +176,51 @@
    "fieldtype": "Table",
    "label": "Inspection results (Shade)",
    "options": "Inspection Result"
+  },
+  {
+   "fieldname": "section_break_oate",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "supplier_select",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Supplier Select",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "order_number",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Order Number",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "line_number",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Line number",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "line_select",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Line Select",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-06 09:13:48.349486",
+ "modified": "2025-09-19 07:30:21.180892",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Inspection",

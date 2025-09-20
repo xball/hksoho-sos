@@ -42,9 +42,7 @@
   "short_comment",
   "to_items_tab",
   "items",
-  "total_value",
-  "section_break_jlgo",
-  "table_enuc"
+  "total_value"
  ],
  "fields": [
   {
@@ -176,7 +174,6 @@
    "label": "Freight Costs"
   },
   {
-   "default": "FOB - Free On Board",
    "fieldname": "delivery_terms",
    "fieldtype": "Link",
    "label": "Delivery Terms",
@@ -269,21 +266,11 @@
    "fieldname": "vessel_section",
    "fieldtype": "Section Break",
    "label": "Vessel Section"
-  },
-  {
-   "fieldname": "table_enuc",
-   "fieldtype": "Table",
-   "options": "Position Order"
-  },
-  {
-   "fieldname": "section_break_jlgo",
-   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
- "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-26 03:26:13.881868",
+ "modified": "2025-09-04 17:17:52.331615",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",
@@ -301,11 +288,36 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "write": 1
   }
  ],
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "track_changes": 1
+ "track_changes": 1,
+ "track_seen": 1
 }
