@@ -207,4 +207,4 @@ def execute():
         message = f"Import Product Group {'Fail' if error_occurred else 'Success'}，log:\n\n {log_output}"
         if error_occurred:
             message += "\n\n詳細錯誤:\n" + "\n".join(error_messages)
-        send_notification(subject, message)
+        # send_notification(subject, message)

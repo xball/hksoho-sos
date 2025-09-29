@@ -12,16 +12,25 @@ FIELDS_TO_CHECK = ['po_status']
 ITEM_FIELDS_TO_CHECK = ['article_number', 'line', 'article_name', 'unit_price', 'confirmed_qty', 'requested_qty', 'confirmed_shipdate']
 LOGGER_NAME = "purchase_order_export"
 
+def write_debug_log(message):
+    """
+    寫入除錯日誌到指定的 DEBUG_FILE。
+    """
+    try:
+        os.makedirs(os.path.dirname(DEBUG_FILE), exist_ok=True)
+        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now()}: {message}\n")
+    except Exception as e:
+        frappe.log_error(f"Failed to write debug log: {str(e)}")
+
 class PurchaseOrder(Document):
     def before_validate(self):
         """
-        Test if validate event is triggered.
+        在驗證前計算總確認數量、總確認金額、總預訂數量和總預訂金額。
         """
         logger = frappe.logger(LOGGER_NAME)
         try:
-            os.makedirs(os.path.dirname(DEBUG_FILE), exist_ok=True)
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: validate triggered for PO: {self.name}\n")
+            write_debug_log(f"validate triggered for PO: {self.name}")
             logger.info(f"validate triggered for Purchase Order: {self.name}")
             tconf_qty = 0
             tconf_amt = 0.0
@@ -45,235 +54,201 @@ class PurchaseOrder(Document):
             self.total_booked_qty = tbook_qty
             self.total_booked_amount = tbook_amt
             
-            
         except Exception as e:
             frappe.log_error(f"Validate failed for PO: {self.name}, error: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: validate failed for PO: {self.name}, error: {str(e)}\n")
+            write_debug_log(f"validate failed for PO: {self.name}, error: {str(e)}")
 
     def before_save(self):
         """
-        Export specific fields to a txt file when specific fields in a Purchase Order are modified.
-        File name is based on a sequence number with prefix 'B', starting from 20000.
-        Stores the last sequence number in last_number.txt.
+        在儲存前檢查是否需要匯出檔案，根據 sync_back_pyramid 和 latest_file_number 檔案內容決定是否生成新檔案。
+        檔案名稱基於序號，帶有 'B' 前綴，從 20000 開始。
+        將最新序號儲存至 last_number.txt。
         """
         logger = frappe.logger(LOGGER_NAME)
         logger.info(f"before_save triggered for Purchase Order: {self.name}")
         try:
-            os.makedirs(os.path.dirname(DEBUG_FILE), exist_ok=True)
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: before_save triggered for PO: {self.name}\n")
+            write_debug_log(f"before_save triggered for PO: {self.name}")
         except Exception as e:
             frappe.log_error(f"Before_save debug log write failed for PO: {self.name}, error: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: before_save debug log write failed for PO: {self.name}, error: {str(e)}\n")
+            write_debug_log(f"before_save debug log write failed for PO: {self.name}, error: {str(e)}")
             return
 
-        # Check if relevant fields have changed
-        has_changes = False
-        previous_doc = self.get_doc_before_save()
-
-        if previous_doc:
-            # Check main document fields
-            for field in FIELDS_TO_CHECK:
-                current_value = self.get(field) or ''
-                previous_value = previous_doc.get(field) or ''
-                if current_value != previous_value:
-                    has_changes = True
-                    logger.info(f"Field {field} changed from {previous_value} to {current_value}")
-                    with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                        f.write(f"{datetime.now()}: Field {field} changed from {previous_value} to {current_value}\n")
-                    break
-
-            # Check po_items changes
-            if not has_changes:
-                current_items = [
-                    tuple(item.get(field) or '' for field in ITEM_FIELDS_TO_CHECK)
-                    for item in self.po_items
-                ]
-                previous_items = [
-                    tuple(item.get(field) or '' for field in ITEM_FIELDS_TO_CHECK)
-                    for item in previous_doc.po_items
-                ]
-                if current_items != previous_items or len(self.po_items) != len(previous_doc.po_items):
-                    has_changes = True
-                    logger.info(f"po_items changed")
-                    with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                        f.write(f"{datetime.now()}: po_items changed\n")
-        else:
-            # New document or no previous state, treat as changed
-            has_changes = True
-            logger.info(f"New Purchase Order or no previous state, triggering export")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: New Purchase Order or no previous state, triggering export\n")
-
-        if not has_changes:
-            logger.info(f"No relevant changes detected for PO: {self.name}, skipping export")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: No relevant changes detected for PO: {self.name}, skipping export\n")
+        # 檢查 sync_back_pyramid 欄位
+        if not self.get('sync_back_pyramid'):
+            logger.info(f"sync_back_pyramid is False for PO: {self.name}, skipping export")
+            write_debug_log(f"sync_back_pyramid is False for PO: {self.name}, skipping export")
             return
 
-        # Define the output directory
-        try:
-            os.makedirs(OUTPUT_DIR, exist_ok=True)
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Created or verified directory: {OUTPUT_DIR}\n")
-        except Exception as e:
-            logger.error(f"Failed to create directory {OUTPUT_DIR}: {str(e)}")
-            frappe.log_error(f"Purchase Order export directory creation failed: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Failed to create directory {OUTPUT_DIR}: {str(e)}\n")
-            return
-
-        # Get the next sequence number
-        try:
-            sequence = get_next_sequence_number()
-            file_name = f"B{sequence}.txt"
-            file_path = os.path.join(OUTPUT_DIR, file_name)
-            logger.info(f"Generating file: {file_path}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Generating file: {file_path}\n")
-        except Exception as e:
-            logger.error(f"Failed to get sequence number: {str(e)}")
-            frappe.log_error(f"Purchase Order sequence number retrieval failed: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Failed to get sequence number: {str(e)}\n")
-            return
-
-        # Start building the file content
+        # 開始構建檔案內容
         content = []
-
-        # Hardcoded line '01' and header details
         try:
-            partner_id = self.supplier  # Assuming supplier field links to Partner doctype
+            partner_id = self.supplier
             po_id = self.name
-            po_status = self.po_status  # Assuming po_status is a field in Purchase Order
+            po_status = self.po_status
             content.append("01")
             content.append(f"#12205;{partner_id or ''}")
             content.append(f"#12203;{po_id}")
             content.append(f"#18780;{po_status.upper() or ''}")
             logger.info(f"Added header details for PO: {po_id}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Added header details for PO: {po_id}\n")
+            write_debug_log(f"Added header details for PO: {po_id}")
         except Exception as e:
             logger.error(f"Failed to process header for PO: {po_id}: {str(e)}")
             frappe.log_error(f"Purchase Order header processing failed: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Failed to process header for PO: {po_id}: {str(e)}\n")
+            write_debug_log(f"Failed to process header for PO: {po_id}: {str(e)}")
             return
 
-        # Process PO items
+        # 處理採購訂單項目
         try:
             for item in self.po_items:
-                
-          	    # if self.workflow_state == "Ready to QC" and self.qc_required:
                 if self.workflow_state == "Confirmed" and self.qc_requested:
                     item.qc_update_status = "On-going"
                     
                 req_date = item.requested_shipdate 
                 if req_date:
                     try:
-                        # Convert date to YYWWN format (e.g., 2026-02-12 -> 26074)
-                        date_obj = ship_date if isinstance(req_date, date) else datetime.strptime(str(req_date), "%Y-%m-%d").date()
-                        year = str(date_obj.year) # Last 2 digits of year
-                        week = date_obj.isocalendar()[1]
+                        date_obj = req_date if isinstance(req_date, date) else datetime.strptime(str(req_date), "%Y-%m-%d").date()
+                        year = str(date_obj.year)[-2:]
+                        week = str(date_obj.isocalendar()[1]).zfill(2)
                         req_date = f"{year}-{week}"
                         item.requested_shipdate_week = req_date
                     except ValueError as e:
-                        logger.warning(f"Invalid confirmed_shipdate format for item {article_number}: {req_date}, error: {str(e)}")
-                        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                            f.write(f"{datetime.now()}: Invalid confirmed_shipdate format for item {article_number}: {req_date}, error: {str(e)}\n")
+                        logger.warning(f"Invalid requested_shipdate format for item {item.article_number}: {req_date}, error: {str(e)}")
+                        write_debug_log(f"Invalid requested_shipdate format for item {item.article_number}: {req_date}, error: {str(e)}")
                         req_date = ''
                 
-                req_date = item.confirmed_shipdate 
-                if req_date:
+                conf_date = item.confirmed_shipdate 
+                if conf_date:
                     try:
-                        # Convert date to YYWWN format (e.g., 2026-02-12 -> 26074)
-                        date_obj = ship_date if isinstance(req_date, date) else datetime.strptime(str(req_date), "%Y-%m-%d").date()
-                        year = str(date_obj.year) # Last 2 digits of year
-                        week = date_obj.isocalendar()[1]
-                        req_date = f"{year}-{week}"
-                        item.confirmed_ship_week = req_date
+                        date_obj = conf_date if isinstance(conf_date, date) else datetime.strptime(str(conf_date), "%Y-%m-%d").date()
+                        year = str(date_obj.year)[-2:]
+                        week = str(date_obj.isocalendar()[1]).zfill(2)
+                        conf_date = f"{year}-{week}"
+                        item.confirmed_ship_week = conf_date
                     except ValueError as e:
-                        logger.warning(f"Invalid confirmed_shipdate format for item {article_number}: {req_date}, error: {str(e)}")
-                        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                            f.write(f"{datetime.now()}: Invalid confirmed_shipdate format for item {article_number}: {req_date}, error: {str(e)}\n")
-                        req_date = ''             
+                        logger.warning(f"Invalid confirmed_shipdate format for item {item.article_number}: {conf_date}, error: {str(e)}")
+                        write_debug_log(f"Invalid confirmed_shipdate format for item {item.article_number}: {conf_date}, error: {str(e)}")
+                        conf_date = ''             
                            
                 content.append("11")
                 article_number = item.article_number or item.item_code or ''
                 content.append(f"#12401;{article_number}")
-                content.append(f"#12414;{item.line or  '' }")
+                content.append(f"#12414;{item.line or ''}")
                 content.append(f"#12421;{item.article_name or item.item_name or ''}")
-                unit_price = item.unit_price or 0.0  # Use unit_price only
+                unit_price = item.unit_price or 0.0
                 content.append(f"#12451;{unit_price}")
                 logger.info(f"Item {article_number}: unit_price={unit_price}")
-                with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                    f.write(f"{datetime.now()}: Item {article_number}: unit_price={unit_price}\n")
-                qty_diff = (item.confirmed_qty ) - (item.requested_qty )
+                write_debug_log(f"Item {article_number}: unit_price={unit_price}")
+                qty_diff = (item.confirmed_qty or 0) - (item.requested_qty or 0)
                 content.append(f"#12441;{qty_diff}")
                 ship_date = item.confirmed_shipdate 
                 if ship_date:
                     try:
-                        # Convert date to YYWWN format (e.g., 2026-02-12 -> 26074)
                         date_obj = ship_date if isinstance(ship_date, date) else datetime.strptime(str(ship_date), "%Y-%m-%d").date()
-                        year = str(date_obj.year)[-2:]  # Last 2 digits of year
-                        week = str(date_obj.isocalendar()[1]).zfill(2)  # Week number, padded to 2 digits
-                        weekday = str(date_obj.isoweekday())  # 1=Monday, 4=Thursday
+                        year = str(date_obj.year)[-2:]
+                        week = str(date_obj.isocalendar()[1]).zfill(2)
+                        weekday = str(date_obj.isoweekday())
                         ship_date = f"{year}{week}{weekday}"
                     except ValueError as e:
                         logger.warning(f"Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}")
-                        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                            f.write(f"{datetime.now()}: Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}\n")
+                        write_debug_log(f"Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}")
                         ship_date = ''
-                content.append(f"#5513;{ship_date or ''} ")
+                content.append(f"#5513;{ship_date or ''}")
             logger.info(f"Processed {len(self.po_items)} items for PO: {po_id}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Processed {len(self.po_items)} items for PO: {po_id}\n")
-                
-                
-
+            write_debug_log(f"Processed {len(self.po_items)} items for PO: {po_id}")
         except Exception as e:
             logger.error(f"Failed to process PO items for {po_id}: {str(e)}")
             frappe.log_error(f"Purchase Order item processing failed: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Failed to process PO items for {po_id}: {str(e)}\n")
+            write_debug_log(f"Failed to process PO items for {po_id}: {str(e)}")
             return
 
-        # Write content to file
+        # 將內容轉換為字串以進行比較
+        new_content_str = "\n".join(content)
+
+        # 檢查 latest_file_number 的檔案內容
+        latest_file_number = self.get('latest_file_number') or ''
+        if latest_file_number:
+            try:
+                latest_file_path = os.path.join(OUTPUT_DIR, f"{latest_file_number}.txt")
+                if os.path.exists(latest_file_path):
+                    with open(latest_file_path, "r", encoding="cp1252") as f:
+                        existing_content = f.read()
+                    if existing_content == new_content_str:
+                        logger.info(f"Content for PO: {self.name} matches existing file {latest_file_number}, skipping export")
+                        write_debug_log(f"Content for PO: {self.name} matches existing file {latest_file_number}, skipping export")
+                        return
+                    else:
+                        logger.info(f"Content for PO: {self.name} differs from existing file {latest_file_number}, proceeding with export")
+                        write_debug_log(f"Content for PO: {self.name} differs from existing file {latest_file_number}, proceeding with export")
+                else:
+                    logger.info(f"File {latest_file_path} does not exist, proceeding with export")
+                    write_debug_log(f"File {latest_file_path} does not exist, proceeding with export")
+            except Exception as e:
+                logger.error(f"Failed to read file {latest_file_path}: {str(e)}")
+                write_debug_log(f"Failed to read file {latest_file_path}: {str(e)}")
+                return
+
+        # 定義輸出目錄
         try:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(content))
+            os.makedirs(OUTPUT_DIR, exist_ok=True)
+            write_debug_log(f"Created or verified directory: {OUTPUT_DIR}")
+        except Exception as e:
+            logger.error(f"Failed to create directory {OUTPUT_DIR}: {str(e)}")
+            frappe.log_error(f"Purchase Order export directory creation failed: {str(e)}")
+            write_debug_log(f"Failed to create directory {OUTPUT_DIR}: {str(e)}")
+            return
+
+        # 獲取下一個序號
+        try:
+            sequence = get_next_sequence_number()
+            file_name = f"B{sequence}.txt"
+            file_path = os.path.join(OUTPUT_DIR, file_name)
+            logger.info(f"Generating file: {file_path}")
+            write_debug_log(f"Generating file: {file_path}")
+        except Exception as e:
+            logger.error(f"Failed to get sequence number: {str(e)}")
+            frappe.log_error(f"Purchase Order sequence number retrieval failed: {str(e)}")
+            write_debug_log(f"Failed to get sequence number: {str(e)}")
+            return
+
+        # 更新 latest_file_number
+        try:
+            self.latest_file_number = f"B{sequence}"
+            logger.info(f"Updated latest_file_number to B{sequence} for PO: {self.name}")
+            write_debug_log(f"Updated latest_file_number to B{sequence} for PO: {self.name}")
+        except Exception as e:
+            logger.error(f"Failed to update latest_file_number for PO: {self.name}: {str(e)}")
+            write_debug_log(f"Failed to update latest_file_number for PO: {self.name}: {str(e)}")
+            return
+
+        # 寫入檔案內容
+        try:
+            with open(file_path, "w", encoding="cp1252") as f:
+                f.write(new_content_str)
             logger.info(f"Successfully wrote file: {file_path}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Successfully wrote file: {file_path}\n")
+            write_debug_log(f"Successfully wrote file: {file_path}")
         except Exception as e:
             logger.error(f"Failed to write file {file_path}: {str(e)}")
             frappe.log_error(f"Purchase Order file write failed: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: Failed to write file {file_path}: {str(e)}\n")
+            write_debug_log(f"Failed to write file {file_path}: {str(e)}")
 
     def after_save(self):
         """
-        Test if after_save event is triggered.
+        測試 after_save 事件是否被觸發。
         """
         logger = frappe.logger(LOGGER_NAME)
         try:
             frappe.msgprint(f"After_save triggered for PO: {self.name}")
             frappe.db.commit()
-            os.makedirs(os.path.dirname(DEBUG_FILE), exist_ok=True)
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: after_save triggered for PO: {self.name}\n")
+            write_debug_log(f"after_save triggered for PO: {self.name}")
             logger.info(f"after_save triggered for Purchase Order: {self.name}")
         except Exception as e:
             frappe.log_error(f"After_save failed for PO: {self.name}, error: {str(e)}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: after_save failed for PO: {self.name}, error: {str(e)}\n")
+            write_debug_log(f"after_save failed for PO: {self.name}, error: {str(e)}")
 
 def get_next_sequence_number():
     """
-    Get the next sequence number from last_number.txt, starting from 20000.
-    Increment and save the new sequence number.
+    從 last_number.txt 獲取下一個序號，從 20000 開始。
+    遞增並儲存新的序號。
     """
     logger = frappe.logger(LOGGER_NAME)
     sequence = INITIAL_SEQUENCE
@@ -284,34 +259,28 @@ def get_next_sequence_number():
                 try:
                     sequence = int(f.read().strip()) + 1
                     logger.info(f"Read sequence number: {sequence - 1}, incremented to: {sequence}")
-                    with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                        f.write(f"{datetime.now()}: Read sequence number: {sequence - 1}, incremented to: {sequence}\n")
+                    write_debug_log(f"Read sequence number: {sequence - 1}, incremented to: {sequence}")
                 except ValueError:
                     sequence = INITIAL_SEQUENCE
                     logger.warning(f"Invalid content in {LAST_NUMBER_FILE}, using default sequence: {sequence}")
-                    with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                        f.write(f"{datetime.now()}: Invalid content in {LAST_NUMBER_FILE}, using default sequence: {sequence}\n")
+                    write_debug_log(f"Invalid content in {LAST_NUMBER_FILE}, using default sequence: {sequence}")
         else:
             logger.info(f"No {LAST_NUMBER_FILE} found, using default sequence: {sequence}")
-            with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()}: No {LAST_NUMBER_FILE} found, using default sequence: {sequence}\n")
+            write_debug_log(f"No {LAST_NUMBER_FILE} found, using default sequence: {sequence}")
     except Exception as e:
         logger.error(f"Failed to read {LAST_NUMBER_FILE}: {str(e)}")
         frappe.log_error(f"Sequence number read failed: {str(e)}")
-        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-            f.write(f"{datetime.now()}: Failed to read {LAST_NUMBER_FILE}: {str(e)}\n")
+        write_debug_log(f"Failed to read {LAST_NUMBER_FILE}: {str(e)}")
         return sequence
 
     try:
         with open(LAST_NUMBER_FILE, "w", encoding="utf-8") as f:
             f.write(str(sequence))
         logger.info(f"Saved new sequence number: {sequence} to {LAST_NUMBER_FILE}")
-        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-            f.write(f"{datetime.now()}: Saved new sequence number: {sequence} to {LAST_NUMBER_FILE}\n")
+        write_debug_log(f"Saved new sequence number: {sequence} to {LAST_NUMBER_FILE}")
     except Exception as e:
         logger.error(f"Failed to write {LAST_NUMBER_FILE}: {str(e)}")
         frappe.log_error(f"Sequence number write failed: {str(e)}")
-        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
-            f.write(f"{datetime.now()}: Failed to write {LAST_NUMBER_FILE}: {str(e)}\n")
+        write_debug_log(f"Failed to write {LAST_NUMBER_FILE}: {str(e)}")
 
     return sequence

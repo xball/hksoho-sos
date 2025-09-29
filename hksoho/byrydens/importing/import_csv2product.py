@@ -42,6 +42,19 @@ RANGE_MAPPING = {
     "C5": "C5 - Cottex customer Items"
 }
 
+# packaging 欄位映射
+PACKAGING_MAPPING = {
+    "1": "By Ry black box",
+    "2": "White box w/labels",
+    "3": "Dropship",
+    "4": "Plasticbag w/header",
+    "5": "Brown box",
+    "6": "Shrink package",
+    "7": "PET box",
+    "8": "Blister",
+    "9": "White box w/print"
+}
+
 # 格式化日期
 def format_date(date_str):
     if not date_str:
@@ -56,7 +69,7 @@ def format_date(date_str):
 def check_product_exists(article_number):
     return frappe.db.exists(PRODUCT_DOCTYPE, {"article_number": article_number})
 
-# 檢查 Product Group 是否存在
+# 檢查並創建 Product Group
 def validate_product_group(group_id):
     if not group_id:
         return None
@@ -64,16 +77,22 @@ def validate_product_group(group_id):
         group_id = group_id.strip()
         product_group = frappe.db.get_value(PRODUCT_GROUP_DOCTYPE, {"group_id": group_id}, "name")
         if not product_group:
-            logger.warning(f"Product Group 未找到: {group_id}，嘗試使用 NA")
-            # 改用 NA 並再次檢查
-            product_group = frappe.db.get_value(PRODUCT_GROUP_DOCTYPE, {"group_id": "NA"}, "name")
-            if not product_group:
-                logger.warning(f"Product Group NA 未找到")
-                return None
-            return product_group
+            # 創建新的 Product Group
+            logger.info(f"Product Group 未找到: {group_id}，正在創建新記錄")
+            new_group = frappe.new_doc(PRODUCT_GROUP_DOCTYPE)
+            new_group.group_id = group_id
+            new_group.description = group_id
+            new_group.save(ignore_permissions=True)
+            frappe.db.commit()
+            msg = f"已創建新 Product Group: {group_id}"
+            logger.info(msg)
+            print(msg)
+            return new_group.name
         return product_group
     except Exception as e:
-        logger.warning(f"驗證 GROUP 失敗: {group_id}, 錯誤: {str(e)}")
+        msg = f"驗證或創建 Product Group 失敗: {group_id}, 錯誤: {str(e)}"
+        logger.error(msg)
+        print(msg)
         return None
 
 # 安全轉換為整數
@@ -111,13 +130,45 @@ def map_range_value(calctype, article_number=None):
     calctype = calctype.strip()
     mapped_value = RANGE_MAPPING.get(calctype)
     if not mapped_value:
-        msg = f"無效的 CALCTYPE 值: {calctype}，設為 None"
+        msg = f"無效的 CALCTYPE 值: {calctype}，設為 {calctype}"
         if article_number:
             msg += f" (Article Number: {article_number})"
-        logger.warning(msg)
         print(msg)
-        return None
+        return calctype
     return mapped_value
+
+# 映射 packaging 值
+def map_packaging_value(boxinfo, article_number=None):
+    if not boxinfo:
+        return None
+    boxinfo = boxinfo.strip()
+    mapped_value = PACKAGING_MAPPING.get(boxinfo)
+    if not mapped_value:
+        msg = f"無效的 BOXINFO 值: {boxinfo}，設為 {boxinfo}"
+        if article_number:
+            msg += f" (Article Number: {article_number})"
+        print(msg)
+        return boxinfo
+    return mapped_value
+
+# 比較欄位是否不同
+def has_field_changes(existing_product, new_data):
+    fields_to_compare = [
+        "article_number", "article_name", "category", "customs_tariff_code",
+        "minimum_order_quantity", "production_leadtime_days", "gross_width_mm_innerunit_box",
+        "gross_height_mm_innerunit_box", "gross_length_mm_innerunit_box", "gross_weight_kg_innerunit_box",
+        "gross_cbm_innerunit_box", "units_in_carton_pieces_per_carton", "carton_width_mm_outer_carton",
+        "carton_height_mm_outer_carton", "carton_length_mm_outer_carton", "carton_weight_kg_outer_carton",
+        "carton_cbm_outer_carton", "price", "currency", "designer", "range",
+        "sample_article_number", "classification", "qc_required", "packaging"
+    ]
+    for field in fields_to_compare:
+        existing_value = getattr(existing_product, field, None) or ""
+        new_value = new_data.get(field, "") or ""
+        if existing_value != new_value:
+            logger.info(f"欄位 {field} 有變更: 原值={existing_value}, 新值={new_value}")
+            return True
+    return False
 
 # 讀取 TXT 檔案
 def import_product_data(file_path):
@@ -135,12 +186,25 @@ def import_product_data(file_path):
                 category = validate_product_group(row.get('GROUP'))
                 qc_required = 1 if row.get('VENDORQC') == 'Y' else 0
                 # 尺寸從 cm 轉為 mm (乘以 10)
-                eawidth = safe_to_float(row.get('EAWIDTH'), default=0.0, article_number=article_number, field_name='EAWIDTH') * 10
-                eaheight = safe_to_float(row.get('EAHEIGHT'), default=0.0, article_number=article_number, field_name='EAHEIGHT') * 10
-                ealength = safe_to_float(row.get('EALENGTH'), default=0.0, article_number=article_number, field_name='EALENGTH') * 10
-                ctnwidth = safe_to_float(row.get('CTNWIDTH'), default=0.0, article_number=article_number, field_name='CTNWIDTH') * 10
-                ctnheight = safe_to_float(row.get('CTNHEIGHT'), default=0.0, article_number=article_number, field_name='CTNHEIGHT') * 10
-                ctnlength = safe_to_float(row.get('CTNLENGTH'), default=0.0, article_number=article_number, field_name='CTNLENGTH') * 10
+                eawidth = safe_to_int(row.get('EAWIDTH'), default=0, article_number=article_number, field_name='EAWIDTH') * 10
+                eaheight = safe_to_int(row.get('EAHEIGHT'), default=0, article_number=article_number, field_name='EAHEIGHT') * 10
+                ealength = safe_to_int(row.get('EALENGTH'), default=0, article_number=article_number, field_name='EALENGTH') * 10
+                ctnwidth = safe_to_int(row.get('CTNWIDTH'), default=0, article_number=article_number, field_name='CTNWIDTH') * 10
+                ctnheight = safe_to_int(row.get('CTNHEIGHT'), default=0, article_number=article_number, field_name='CTNHEIGHT') * 10
+                ctnlength = safe_to_int(row.get('CTNLENGTH'), default=0, article_number=article_number, field_name='CTNLENGTH') * 10
+
+                # 處理 UPDATED 和 INSERTED
+                updated_date = row.get('UPDATED')
+                if not updated_date:
+                    updated_date = row.get('INSERTED')
+                    if updated_date:
+                        msg = f"UPDATED 為空，使用 INSERTED 值: {updated_date} (Article Number: {article_number})"
+                        logger.info(msg)
+                        print(msg)
+                    else:
+                        msg = f"UPDATED 和 INSERTED 均為空，設為 None (Article Number: {article_number})"
+                        logger.warning(msg)
+                        print(msg)
 
                 product_data = {
                     "article_number": article_number,
@@ -167,8 +231,8 @@ def import_product_data(file_path):
                     "sample_article_number": row.get('SAMPLEARTNO'),
                     "classification": row.get('ABCCLASS'),
                     "qc_required": qc_required,
-                    "packaging": row.get('BOXINFO'),
-                    "updated": row.get('UPDATED')  # 儲存 UPDATED 日期用於檢查
+                    "packaging": map_packaging_value(row.get('BOXINFO'), article_number=article_number),
+                    "updated": updated_date
                 }
                 products[article_number] = product_data
         return True
@@ -191,12 +255,12 @@ def create_or_update_product(product_data):
     if updated_date:
         updated_date = format_date(updated_date)
         if not updated_date:
-            msg = f"無效的 UPDATED 日期: {updated_date}，跳過記錄: {article_number}"
+            msg = f"無效的 UPDATED/INSERTED 日期: {updated_date}，跳過記錄: {article_number}"
             logger.warning(msg)
             print(msg)
             return False, msg
     else:
-        msg = f"缺少 UPDATED 日期，跳過記錄: {article_number}"
+        msg = f"缺少 UPDATED/INSERTED 日期，跳過記錄: {article_number}"
         logger.warning(msg)
         print(msg)
         return False, msg
@@ -205,27 +269,24 @@ def create_or_update_product(product_data):
     
     if product_exists:
         existing_product = frappe.get_doc(PRODUCT_DOCTYPE, {"article_number": article_number})
-        # 檢查 UPDATED 日期是否晚於 modified
-        modified_date = existing_product.modified
-        # if updated_date <= modified_date:
-        #     msg = f"Product {article_number} 的 UPDATED 日期 ({updated_date}) 不晚於 modified 日期 ({modified_date})，跳過更新"
-        #     logger.info(msg)
-        #     print(msg)
-        #     return False, msg
+        # 檢查日期是否較新
+        if updated_date <= existing_product.modified:
+            msg = f"Product {article_number} 的 UPDATED/INSERTED 日期 ({updated_date}) 不晚於 modified 日期 ({existing_product.modified})，跳過更新"
+            logger.info(msg)
+            print(msg)
+            return False, msg
         
         # 檢查是否有其他欄位變化
-        changes = []
-        for field, value in product_data.items():
-            if getattr(existing_product, field, None) != value:
-                changes.append(f"{field}: {getattr(existing_product, field)} -> {value}")
-        if not changes:
-            msg = f"Product {article_number} 無變化，跳過更新"
+        if not has_field_changes(existing_product, product_data):
+            msg = f"Product {article_number} 無欄位變更，跳過更新"
             logger.info(msg)
             print(msg)
             return False, msg
         
         product = existing_product
-        msg = f"Product {article_number} 已存在，正在更新... 變化: {', '.join(changes)}"
+        changes = [f"{field}: {getattr(existing_product, field, None)} -> {product_data.get(field)}" 
+                   for field in product_data if getattr(existing_product, field, None) != product_data.get(field)]
+        msg = f"Product {article_number} 已存在且有欄位變更，正在更新... 變化: {', '.join(changes)}"
         logger.info(msg)
         print(msg)
         action = "Updated"
@@ -346,7 +407,7 @@ def execute():
                 if not error_occurred:
                     try:
                         dest_path = os.path.join(PROCEED_DIR, os.path.basename(file_path))
-                        # shutil.move(file_path, dest_path)
+                        shutil.move(file_path, dest_path)
                         msg = f"檔案已移動到: {dest_path}"
                         logger.info(msg)
                         print(msg)
@@ -362,4 +423,4 @@ def execute():
         message = f"Import Product {'Fail' if error_occurred else 'Success'}，log:\n\n {log_output}"
         if error_occurred:
             message += "\n\n詳細錯誤:\n" + "\n".join(error_messages)
-        # send_notification(subject, message)
+        #send_notification(subject, message)

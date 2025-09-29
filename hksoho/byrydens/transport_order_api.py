@@ -1,30 +1,52 @@
 import frappe
-from frappe import _
 
 @frappe.whitelist()
-def get_po_items(po_name):
-    """回傳指定 Purchase Order 的所有明細項目"""
+def get_po_items(po_name, filters=None):
+    """Return all items for the specified Purchase Order where workflow_state is 'Booked QTY' and qty > 0"""
     if not po_name:
-        frappe.throw(_("請提供有效的採購訂單編號"))
+        frappe.throw("Please provide a valid Purchase Order number")
 
     try:
+        # Check if the Purchase Order has workflow_state = 'Booked QTY'
+        po = frappe.get_doc("Purchase Order", po_name)
+        if po.workflow_state != "Booked QTY":
+            frappe.msgprint({
+                "title": "No Data",
+                "message": f"The Purchase Order {po_name} does not have workflow_state 'Booked QTY'.",
+                "indicator": "orange"
+            })
+            return []
+
+        # Initialize filters for Purchase Order Item
+        filters = filters or {}
+        filters['parent'] = po_name
+
+        # Fetch items with necessary fields
         items = frappe.get_all(
             "Purchase Order Item",
-            filters={"parent": po_name},
-            fields=["name", "line", "article_number", "article_name", "confirmed_qty", "ctns_on_pallet", "carton_cbm", "carton_gross_kg", "unit_price"],
+            filters=filters,
+            fields=["name", "line", "article_number", "article_name", "booked_qty", "delivery_qty", "ctns_on_pallet", "carton_cbm", "carton_gross_kg", "unit_price"],
             order_by="line asc"
         )
 
-        if not items:
+        # Filter items where qty = booked_qty - delivery_qty > 0
+        filtered_items = [
+            item for item in items
+            if (item.get('booked_qty', 0) - item.get('delivery_qty', 0)) > 0
+        ]
+
+        if not filtered_items:
             frappe.msgprint({
-                title: _("無數據"),
-                message: _("未找到指定的採購訂單項目。"),
-                indicator: "orange"
+                "title": "No Data",
+                "message": "No items found for the specified Purchase Order with qty > 0.",
+                "indicator": "orange"
             })
 
-        return items
+        return filtered_items
+    except frappe.DoesNotExistError:
+        frappe.throw(f"Purchase Order {po_name} does not exist.")
     except frappe.PermissionError:
-        frappe.throw(_("您沒有足夠的權限來訪問採購訂單項目。請聯繫您的管理員以獲取訪問權限。"), frappe.PermissionError)
+        frappe.throw("You do not have sufficient permissions to access Purchase Order items. Please contact your administrator for access.", frappe.PermissionError)
     except Exception as e:
         frappe.log_error(f"Error fetching PO items for {po_name}: {str(e)}")
-        frappe.throw(_("無法獲取採購訂單項目，請稍後重試。錯誤：{0}").format(str(e)))
+        frappe.throw(f"Failed to fetch Purchase Order items. Please try again later. Error: {str(e)}")

@@ -42,7 +42,12 @@
   "short_comment",
   "to_items_tab",
   "items",
-  "total_value"
+  "summary_section",
+  "total_qty",
+  "total_value",
+  "column_break_hsgk",
+  "total_ctns",
+  "total_gross_kg"
  ],
  "fields": [
   {
@@ -155,7 +160,7 @@
   },
   {
    "fieldname": "total_value",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Total Value",
    "read_only": 1
   },
@@ -231,6 +236,7 @@
   {
    "fieldname": "dest_code",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Dest Code",
    "read_only": 1
   },
@@ -266,11 +272,38 @@
    "fieldname": "vessel_section",
    "fieldtype": "Section Break",
    "label": "Vessel Section"
+  },
+  {
+   "fieldname": "total_qty",
+   "fieldtype": "Int",
+   "label": "Total Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_ctns",
+   "fieldtype": "Int",
+   "label": "Total Ctns",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_gross_kg",
+   "fieldtype": "Float",
+   "label": "Total Gross Kg",
+   "read_only": 1
+  },
+  {
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "column_break_hsgk",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-09-04 17:17:52.331615",
+ "modified": "2025-09-29 14:32:23.944101",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",

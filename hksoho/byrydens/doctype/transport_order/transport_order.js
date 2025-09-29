@@ -1,18 +1,19 @@
 frappe.ui.form.on('Transport Order', {
     refresh: function(frm) {
-        // 隱藏 items 表的「Add」按鈕
+        // Hide the "Add" button for items table
         frm.fields_dict.items.grid.cannot_add_rows = true;
         frm.fields_dict.items.grid.wrapper.find('.grid-add-row').hide();
 
-        // 添加自訂按鈕「Add Item」
-        frm.add_custom_button(__('Add Item'), function() {
-            // 獲取所有有效的 Purchase Order
+        // Add custom button "Add Item"
+        frm.add_custom_button('Add Item', function() {
+            // Get all valid Purchase Orders with workflow_state = 'Booked QTY'
             frappe.call({
                 method: 'frappe.client.get_list',
                 args: {
                     doctype: 'Purchase Order',
                     filters: {
-                        // docstatus: 1 // 僅顯示已提交的 PO，根據需要可取消註釋
+                        workflow_state: 'Booked QTY' // Only show POs with workflow_state 'Booked QTY'
+                        // docstatus: 1 // Only show submitted PO, uncomment if needed
                     },
                     fields: ['name'],
                     limit_page_length: 100
@@ -21,12 +22,14 @@ frappe.ui.form.on('Transport Order', {
                     if (r.message && r.message.length > 0) {
                         let po_options = r.message.map(po => po.name);
 
-                        // 創建對話框
+                        // Create dialog with increased width
                         let d = new frappe.ui.Dialog({
-                            title: __('Select Purchase Order Items'),
+                            title: 'Select Purchase Order Items',
+                            size: 'extra-large',
+                            width: '90vw', // Set dialog width to 90% of viewport width
                             fields: [
                                 {
-                                    label: __('選擇採購訂單'),
+                                    label: 'Select Purchase Order',
                                     fieldname: 'po_select',
                                     fieldtype: 'Select',
                                     options: po_options,
@@ -36,12 +39,12 @@ frappe.ui.form.on('Transport Order', {
                                     }
                                 },
                                 {
-                                    label: __('項目列表'),
+                                    label: 'Items List',
                                     fieldname: 'items_table',
                                     fieldtype: 'HTML'
                                 }
                             ],
-                            primary_action_label: __('Add Selected Items'),
+                            primary_action_label: 'Add Selected Items',
                             primary_action: function() {
                                 let selected_items = [];
                                 let po_name = d.get_value('po_select');
@@ -61,26 +64,26 @@ frappe.ui.form.on('Transport Order', {
 
                                 if (selected_items.length === 0) {
                                     frappe.msgprint({
-                                        title: __('錯誤'),
-                                        message: __('請至少選擇一個項目！'),
+                                        title: 'Error',
+                                        message: 'Please select at least one item!',
                                         indicator: 'red'
                                     });
                                     return;
                                 }
 
-                                // 檢查是否有重複的 po_line
+                                // Check for duplicate po_line
                                 let existing_po_lines = frm.doc.items ? frm.doc.items.map(item => item.po_line) : [];
                                 let duplicates = selected_items.filter(item => existing_po_lines.includes(item.name));
                                 if (duplicates.length > 0) {
                                     frappe.msgprint({
-                                        title: __('錯誤'),
-                                        message: __('以下項目已存在於 Transport Order Line 中：') + duplicates.map(d => d.line).join(', '),
+                                        title: 'Error',
+                                        message: 'The following items already exist in Transport Order Line: ' + duplicates.map(d => d.line).join(', '),
                                         indicator: 'red'
                                     });
                                     return;
                                 }
 
-                                // 添加選中的項目到 Transport Order Line 子表格
+                                // Add selected items to Transport Order Line child table
                                 selected_items.forEach(item => {
                                     let row = frm.add_child('items');
                                     row.po_number = po_name;
@@ -95,23 +98,32 @@ frappe.ui.form.on('Transport Order', {
                                     row.value = item.qty * item.unit_price;
                                 });
 
-                                // 刷新子表格並更新總值
+                                // Refresh child table and update total
                                 frm.refresh_field('items');
                                 calculate_total(frm);
-                                d.hide(); // 確保對話框關閉
-                                frappe.msgprint({
-                                    title: __('成功'),
-                                    message: __('已成功添加選中的項目！'),
-                                    indicator: 'green'
-                                });
+                                d.hide(); // Ensure dialog closes
+                                // Show success message with increased delay and logging
+                                console.log('Adding items to Transport Order, showing success message');
+                                setTimeout(function() {
+                                    frappe.msgprint({
+                                        title: 'Success',
+                                        message: 'Selected items added successfully to Transport Order!',
+                                        indicator: 'green',
+                                        primary_action_label: 'OK'
+                                    });
+                                }, 1500); // Increased delay to 1500ms
                             }
                         });
 
-                        // 定義刷新表格的函數
+                        // Disable "Add Selected Items" button by default
+                        d.get_primary_btn().prop('disabled', true);
+
+                        // Define function to refresh table
                         function refreshTable(dialog) {
                             let po_name = dialog.get_value('po_select');
                             if (!po_name) {
                                 dialog.fields_dict.items_table.$wrapper.empty();
+                                dialog.get_primary_btn().prop('disabled', true); // Disable button if no PO selected
                                 return;
                             }
 
@@ -122,37 +134,50 @@ frappe.ui.form.on('Transport Order', {
                                 },
                                 callback: function(r) {
                                     let $container = dialog.fields_dict.items_table.$wrapper;
-                                    $container.empty(); // 清空容器
+                                    $container.empty(); // Clear container
 
                                     if (r.message && Array.isArray(r.message) && r.message.length > 0) {
                                         let table = $(`
-                                            <table class="table table-bordered">
+                                            <table class="table table-bordered" style="width: 100%;">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 10%;">${__('選擇')}</th>
-                                                        <th style="width: 15%;">${__('Line')}</th>
-                                                        <th style="width: 15%;">${__('Article #')}</th>
-                                                        <th style="width: 20%;">${__('Article Name')}</th>
-                                                        <th style="width: 10%;">${__('QTY')}</th>
-                                                        <th style="width: 10%;">${__('Ctns')}</th>
-                                                        <th style="width: 10%;">${__('CBM')}</th>
-                                                        <th style="width: 10%;">${__('Gross Kg')}</th>
-                                                        <th style="width: 10%;">${__('Unit Price')}</th>
+                                                        <th style="width: 10%;">
+                                                            <input type="checkbox" id="select_all_items">
+                                                            Select
+                                                        </th>
+                                                        <th style="width: 15%;">Line</th>
+                                                        <th style="width: 15%;">Article #</th>
+                                                        <th style="width: 20%;">Article Name</th>
+                                                        <th style="width: 10%;">QTY</th>
+                                                        <th style="width: 10%;">Ctns</th>
+                                                        <th style="width: 10%;">CBM</th>
+                                                        <th style="width: 10%;">Gross Kg</th>
+                                                        <th style="width: 10%;">Unit Price</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
                                             </table>
                                         `);
 
+                                        // Bind "Select All" checkbox event
+                                        table.find('#select_all_items').on('change', function() {
+                                            table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
+                                            // Enable/disable primary button based on selection
+                                            let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                            dialog.get_primary_btn().prop('disabled', !any_checked);
+                                        });
+
                                         let tbody = table.find('tbody');
                                         r.message.forEach(item => {
+                                            // Use qty calculated from backend (booked_qty - delivery_qty)
+                                            let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
                                             tbody.append(`
                                                 <tr>
                                                     <td><input type="checkbox" name="item_select" value="${item.name}" 
                                                         data-line="${item.line || ''}" 
                                                         data-article-number="${item.article_number || ''}" 
                                                         data-article-name="${item.article_name || ''}" 
-                                                        data-qty="${item.confirmed_qty || 0}" 
+                                                        data-qty="${qty}" 
                                                         data-ctns="${item.ctns_on_pallet || 0}" 
                                                         data-cbm="${item.carton_cbm || 0}" 
                                                         data-gross-kg="${item.carton_gross_kg || 0}" 
@@ -160,7 +185,7 @@ frappe.ui.form.on('Transport Order', {
                                                     <td>${item.line || ''}</td>
                                                     <td>${item.article_number || ''}</td>
                                                     <td>${item.article_name || ''}</td>
-                                                    <td>${item.confirmed_qty || 0}</td>
+                                                    <td>${qty}</td>
                                                     <td>${item.ctns_on_pallet || 0}</td>
                                                     <td>${item.carton_cbm || 0}</td>
                                                     <td>${item.carton_gross_kg || 0}</td>
@@ -169,55 +194,73 @@ frappe.ui.form.on('Transport Order', {
                                             `);
                                         });
 
-                                        $container.append(table);
+                                        // Bind individual checkbox change event
+                                        table.find('tbody input[name="item_select"]').on('change', function() {
+                                            let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                            dialog.get_primary_btn().prop('disabled', !any_checked);
+                                            // Update "Select All" checkbox state
+                                            let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
+                                            table.find('#select_all_items').prop('checked', all_checked);
+                                        });
+
+                                        // Check if tbody is empty
+                                        if (tbody.find('tr').length === 0) {
+                                            $container.html('<p>No items to display</p>');
+                                            dialog.get_primary_btn().prop('disabled', true);
+                                        } else {
+                                            $container.append(table);
+                                            dialog.get_primary_btn().prop('disabled', true); // Initially disable until items are selected
+                                        }
                                     } else {
-                                        $container.html('<p>' + __('無項目可顯示') + '</p>');
+                                        $container.html('<p>No items to display</p>');
+                                        dialog.get_primary_btn().prop('disabled', true);
                                     }
                                 },
                                 error: function(r) {
                                     console.error("Error fetching PO items:", r);
-                                    let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : __('未知錯誤');
-                                    if (error_message.includes('You do not have enough permissions')) {
+                                    let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : 'Unknown error';
+                                    if (error_message.includes('You do not have sufficient permissions')) {
                                         frappe.msgprint({
-                                            title: __('權限不足'),
-                                            message: __('您沒有足夠的權限來訪問採購訂單項目。請聯繫您的管理員以獲取訪問權限。'),
+                                            title: 'Insufficient Permissions',
+                                            message: 'You do not have sufficient permissions to access Purchase Order items. Please contact your administrator for access.',
                                             indicator: 'red'
                                         });
                                     } else {
                                         frappe.msgprint({
-                                            title: __('錯誤'),
-                                            message: __('無法獲取採購訂單項目，請稍後重試。錯誤：') + error_message,
+                                            title: 'Error',
+                                            message: 'Failed to fetch Purchase Order items. Please try again later. Error: ' + error_message,
                                             indicator: 'red'
                                         });
                                     }
+                                    dialog.get_primary_btn().prop('disabled', true);
                                 }
                             });
                         }
 
-                        // 顯示對話框並初始化內容
+                        // Show dialog and initialize content
                         d.show();
                         d.fields_dict.items_table.$wrapper.empty();
                     } else {
                         frappe.msgprint({
-                            title: __('無數據'),
-                            message: __('未找到有效的採購訂單。'),
+                            title: 'No Data',
+                            message: 'No Purchase Orders with workflow_state "Booked QTY" found.',
                             indicator: 'orange'
                         });
                     }
                 },
                 error: function(r) {
                     console.error("Error fetching POs:", r);
-                    let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : __('未知錯誤');
+                    let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : 'Unknown error';
                     if (error_message.includes('You do not have enough permissions')) {
                         frappe.msgprint({
-                            title: __('權限不足'),
-                            message: __('您沒有足夠的權限來訪問採購訂單。請聯繫您的管理員以獲取訪問權限。'),
+                            title: 'Insufficient Permissions',
+                            message: 'You do not have sufficient permissions to access Purchase Orders. Please contact your administrator for access.',
                             indicator: 'red'
                         });
                     } else {
                         frappe.msgprint({
-                            title: __('錯誤'),
-                            message: __('無法獲取採購訂單列表，請稍後重試。錯誤：') + error_message,
+                            title: 'Error',
+                            message: 'Failed to fetch Purchase Order list. Please try again later. Error: ' + error_message,
                             indicator: 'red'
                         });
                     }
@@ -229,18 +272,18 @@ frappe.ui.form.on('Transport Order', {
         let vessel_field = frm.get_field('vessel').$wrapper;
         vessel_field.find('.select-vessel-link').remove(); // Remove any existing hyperlink
         vessel_field.find('.control-label').append(`
-            <a href="#" class="select-vessel-link" style="margin-left: 5px; font-size: 12px; color: #007bff; text-decoration: none;">(${__('Select')})</a>
+            <a href="#" class="select-vessel-link" style="margin-left: 5px; font-size: 12px; color: #007bff; text-decoration: none;">(Select)</a>
         `);
         vessel_field.find('.select-vessel-link').on('click', function(e) {
             e.preventDefault();
             let selected_row = null;
             let dialog = new frappe.ui.Dialog({
-                title: __('Select Vessel'),
+                title: 'Select Vessel',
                 size: 'extra-large',
                 fields: [
                     { fieldtype: 'HTML', fieldname: 'vessel_html' }
                 ],
-                primary_action_label: __('Add New'),
+                primary_action_label: 'Add New',
                 primary_action: function() {
                     frappe.new_doc('Vessels Time Table', {}, function() {
                         dialog.hide();
@@ -390,7 +433,7 @@ frappe.ui.form.on('Transport Order', {
                     frm.set_value('cfs_close', selected_row.cfs_close || '');
                     frm.set_value('etd_date', selected_row.etd_date || '');
                     frm.set_value('eta_date', selected_row.eta_date || '');
-                    frappe.show_alert({ message: __('Selected Vessel: ') + selected_row.vessel, indicator: 'green' });
+                    frappe.show_alert({ message: 'Selected Vessel: ' + selected_row.vessel, indicator: 'green' });
                     dialog.hide();
                 });
             }
@@ -458,13 +501,13 @@ frappe.ui.form.on('Transport Order', {
                         console.log('Fetched records:', records);
                         let promises = records.map(row => {
                             return Promise.all([
-                                row.loading_port ? frappe.db.get_value('Load-Dest Port', row.loading_port, ['name', 'loc_code']) : Promise.resolve({ name: '', loc_code: '' }),
-                                row.destination_port ? frappe.db.get_value('Load-Dest Port', row.destination_port, ['name', 'loc_code']) : Promise.resolve({ name: '', loc_code: '' })
+                                row.loading_port ? frappe.db.get_value('Load-Dest Port', row.loading_port, ['name', 'loc_code']) : Promise.resolve({ message: { name: '', loc_code: '' } }),
+                                row.destination_port ? frappe.db.get_value('Load-Dest Port', row.destination_port, ['name', 'loc_code']) : Promise.resolve({ message: { name: '', loc_code: '' } })
                             ]).then(([loading_port_res, destination_port_res]) => {
-                                row.loading_port_name = loading_port_res.message.name || '';
-                                row.loading_port_loc_code = loading_port_res.message.loc_code || '';
-                                row.destination_port_name = destination_port_res.message.name || '';
-                                row.destination_port_loc_code = destination_port_res.message.loc_code || '';
+                                row.loading_port_name = loading_port_res.message ? loading_port_res.message.name : '';
+                                row.loading_port_loc_code = loading_port_res.message ? loading_port_res.message.loc_code : '';
+                                row.destination_port_name = destination_port_res.message ? destination_port_res.message.name : '';
+                                row.destination_port_loc_code = destination_port_res.message ? destination_port_res.message.loc_code : '';
                                 return row;
                             });
                         });
@@ -513,28 +556,7 @@ frappe.ui.form.on('Transport Order Line', {
         row.value = (row.unit_price || 0) * (row.qty || 0);
         frm.refresh_field('items');
         calculate_total(frm);
-    },
-    // po_line: function(frm, cdt, cdn) {
-    //     var row = locals[cdt][cdn];
-    //     if (row.po_line) {
-    //         var duplicates = frm.doc.items.filter(function(d) {
-    //             return d.po_line === row.po_line && d.name !== row.name;
-    //         });
-    //         if (duplicates.length > 0) {
-    //             frappe.msgprint(__('Duplicate PO Line found! Please remove or change.'));
-    //             frappe.model.set_value(cdt, cdn, 'po_line', '');
-    //         } else {
-    //             frappe.model.get_value('Purchase Order Item', row.po_line, ['article_number', 'article_name'], function(value) {
-    //                 frappe.model.set_value(cdt, cdn, 'article_number', value.article_number);
-    //                 frappe.model.set_value(cdt, cdn, 'article_name', value.article_name);
-    //             });
-    //         }
-    //     } else {
-    //         frappe.model.set_value(cdt, cdn, 'article_number', '');
-    //         frappe.model.set_value(cdt, cdn, 'article_name', '');
-    //     }
-    //     frm.refresh_field('items');
-    // }
+    }
 });
 
 function toggleVesselSection(frm) {
@@ -554,5 +576,6 @@ function calculate_total(frm) {
     frm.doc.items.forEach(row => {
         total += row.value || 0;
     });
-    frm.set_value('total_value', total);
+    frm.set_value('total_value', parseFloat(total.toFixed(2)));
 }
+

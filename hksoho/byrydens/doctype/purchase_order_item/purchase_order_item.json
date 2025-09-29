@@ -28,8 +28,8 @@
   "supplier_art_number",
   "customer_order_number",
   "status",
-  "delivery_quantity",
-  "remaining_quantity",
+  "delivery_qty",
+  "remaining_qty",
   "qc_accepted_qty",
   "qc_rejected_qty",
   "number_of_inspection",
@@ -245,18 +245,7 @@
    "fieldname": "qc_update_status",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "QC Update Status",
-   "read_only": 1
-  },
-  {
-   "fieldname": "delivery_quantity",
-   "fieldtype": "Int",
-   "label": "Delivery Qty"
-  },
-  {
-   "fieldname": "remaining_quantity",
-   "fieldtype": "Int",
-   "label": "Remaining Qty"
+   "label": "QC Update Status"
   },
   {
    "default": "0.0",
@@ -281,6 +270,16 @@
    "label": "Amount",
    "precision": "2",
    "read_only": 1
+  },
+  {
+   "fieldname": "delivery_qty",
+   "fieldtype": "Int",
+   "label": "Delivery Qty"
+  },
+  {
+   "fieldname": "remaining_qty",
+   "fieldtype": "Int",
+   "label": "Remaining Qty"
   }
  ],
  "grid_page_length": 50,
@@ -288,7 +287,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-19 17:21:31.777456",
+ "modified": "2025-09-20 08:49:03.219444",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item",

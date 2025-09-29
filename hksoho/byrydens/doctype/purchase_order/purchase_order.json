@@ -33,10 +33,13 @@
   "responsible",
   "coordinator",
   "purpose",
+  "invoice_number",
   "section_break_vupi",
   "booking_requested_days_before_po_shipdate_ocean_transport_only",
   "consolidation_days_before_po_shipdate_ocean_transport_only_copy",
   "transport_days_days_before_po_shipdate_ocean_transport_only",
+  "sync_back_pyramid",
+  "latest_file_number",
   "column_break_vewu",
   "short_description",
   "remarks",
@@ -144,7 +147,7 @@
    "fieldname": "po_status",
    "fieldtype": "Select",
    "label": "PO Status",
-   "options": "Pending\nConfirmed"
+   "options": "Pending\nConfirmed\nCancel"
   },
   {
    "fieldname": "delivery_status",
@@ -267,6 +270,7 @@
    "columns": 10,
    "fieldname": "po_items",
    "fieldtype": "Table",
+   "ignore_user_permissions": 1,
    "label": "PO Items",
    "options": "Purchase Order Item"
   },
@@ -335,12 +339,32 @@
    "fieldtype": "Float",
    "label": "Total Booked Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice number"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:frappe.user.has_role(\"System Manager\") == 1",
+   "fieldname": "sync_back_pyramid",
+   "fieldtype": "Check",
+   "label": "Sync back Pyramid",
+   "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role(\"System Manager\") == 1",
+   "fieldname": "latest_file_number",
+   "fieldtype": "Data",
+   "label": "Latest file number",
+   "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-19 18:52:19.699378",
+ "modified": "2025-09-29 17:25:56.898933",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",

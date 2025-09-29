@@ -35,6 +35,32 @@ def get_po_items(po_name):
     
     return items
 
+# @frappe.whitelist()
+# def get_po_items_qcstatus(po_name):
+#     """
+#     獲取指定採購訂單的項目，僅返回 qc_update_status 不等於 'Pass' 的項目。
+    
+#     Args:
+#         po_name (str): 採購訂單名稱
+#     Returns:
+#         list: 包含項目詳細信息的列表
+#     """
+#     if not po_name:
+#         frappe.throw(_("請提供有效的採購訂單編號"))
+#     items = frappe.get_all(
+#         "Purchase Order Item",
+#         filters={"parent": po_name, "qc_update_status": ["!=", "Pass"]},
+#         fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty"],
+#         order_by="line asc"
+#     )
+#     if not items and not frappe.has_permission("Purchase Order", "read", po_name):
+#         frappe.throw(
+#             _("You do not have enough permissions to access this resource. Please contact your manager to get access."),
+#             frappe.PermissionError
+#         )
+#     return items
+
+
 @frappe.whitelist()
 def get_po_items_qcstatus(po_name):
     """
@@ -47,17 +73,36 @@ def get_po_items_qcstatus(po_name):
     """
     if not po_name:
         frappe.throw(_("請提供有效的採購訂單編號"))
-    items = frappe.get_all(
-        "Purchase Order Item",
-        filters={"parent": po_name, "qc_update_status": ["!=", "Pass"]},
-        fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty"],
-        order_by="line asc"
-    )
-    if not items and not frappe.has_permission("Purchase Order", "read", po_name):
+
+    # 檢查用戶對 Purchase Order 的讀取權限
+    if not frappe.has_permission("Purchase Order", "read", po_name):
+        frappe.log_error(
+            message=f"User {frappe.session.user} lacks permission to read Purchase Order {po_name}",
+            title="Permission Error in get_po_items_qcstatus"
+        )
         frappe.throw(
-            _("You do not have enough permissions to access this resource. Please contact your manager to get access."),
+            _("您沒有足夠的權限訪問此採購訂單，請聯繫管理員以獲取權限。"),
             frappe.PermissionError
         )
+
+    # 查詢 Purchase Order Item
+    items = frappe.get_all(
+        "Purchase Order Item",
+        filters={
+            "parent": po_name,
+            "qc_update_status": ["!=", "Pass"]
+        },
+        fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty"],
+        order_by="line asc",
+        ignore_permissions=True  # 僅限測試，生產環境應移除
+    )
+
+    # 記錄查詢結果
+    frappe.log_error(
+        message=f"Queried PO Items for {po_name}: {len(items)} items found",
+        title="get_po_items_qcstatus"
+    )
+
     return items
 
 @frappe.whitelist()

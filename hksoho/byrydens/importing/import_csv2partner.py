@@ -46,7 +46,6 @@ def format_date(date_str):
 def check_partner_exists(code):
     return frappe.db.exists(PARTNER_DOCTYPE, {"partner_id": code})
 
-
 # 檢查 Payment Term 是否存在
 def validate_payment_term(paytermcode):
     if not paytermcode:
@@ -63,7 +62,6 @@ def validate_payment_term(paytermcode):
     except Exception as e:
         logger.warning(f"驗證 PAYTERMCODE 失敗: {paytermcode}, 錯誤: {str(e)}")
         return None
-
 
 # 根據文件名設置 partner_type
 def get_partner_type(filename):
@@ -127,6 +125,22 @@ def import_partner_data(file_path, partner_type):
         logger.error(msg)
         print(msg)
 
+# 比較欄位是否不同
+def has_field_changes(existing_partner, new_data):
+    fields_to_compare = [
+        "partner_id", "partner_name", "address", "postal_code", "city", "stateregion",
+        "country", "phone_number", "fax_number", "email_address", "website", "currency",
+        "contact_name", "contact_title", "contact_email", "contact_phone", "contact_mobile",
+        "payment_term", "incotermcode", "default_port", "partner_type"
+    ]
+    for field in fields_to_compare:
+        existing_value = getattr(existing_partner, field, None) or ""
+        new_value = new_data.get(field, "") or ""
+        if existing_value != new_value:
+            logger.info(f"欄位 {field} 有變更: 原值={existing_value}, 新值={new_value}")
+            return True
+    return False
+
 # 創建或更新 Partner
 def create_or_update_partner(partner_data):
     code = partner_data["partner_id"]
@@ -150,15 +164,22 @@ def create_or_update_partner(partner_data):
     
     if partner_exists:
         # 檢查現有記錄的 modified 日期
-        existing_partner = frappe.db.get_value(PARTNER_DOCTYPE, {"partner_id": code}, ["name", "modified"], as_dict=True)
+        existing_partner = frappe.get_doc(PARTNER_DOCTYPE, {"partner_id": code})
         if updated_date <= existing_partner.modified:
             msg = f"Partner {code} 的 UPDATED 日期 ({updated_date}) 不晚於 modified 日期 ({existing_partner.modified})，跳過更新"
             logger.info(msg)
             print(msg)
             return False, msg
         
-        partner = frappe.get_doc(PARTNER_DOCTYPE, {"partner_id": code})
-        msg = f"Partner {code} 已存在，正在更新..."
+        # 檢查欄位是否不同
+        if not has_field_changes(existing_partner, partner_data):
+            msg = f"Partner {code} 無欄位變更，跳過更新"
+            logger.info(msg)
+            print(msg)
+            return False, msg
+        
+        partner = existing_partner
+        msg = f"Partner {code} 已存在且有欄位變更，正在更新..."
         logger.info(msg)
         print(msg)
         action = "Updated"
@@ -269,7 +290,6 @@ def execute():
             os.path.join(INPUT_DIR, CUSTOMER_FILE)
         ]
 
-
         files_to_process = []
         for pattern in file_patterns:
             files_to_process.extend(glob.glob(pattern))
@@ -319,4 +339,4 @@ def execute():
         message = f"Import Partner {'Fail' if error_occurred else 'Success'}，log:\n\n {log_output}"
         if error_occurred:
             message += "\n\n詳細錯誤:\n" + "\n".join(error_messages)
-        send_notification(subject, message)
+        # send_notification(subject, message)
