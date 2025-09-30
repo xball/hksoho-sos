@@ -156,7 +156,8 @@
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Items",
-   "options": "Transport Order Line"
+   "options": "Transport Order Line",
+   "read_only_depends_on": "eval:['Confirmed', 'Shipped', 'ETA Passed','Arrived','Undelivered','Undelivered'].includes(doc.workflow_state)"
   },
   {
    "fieldname": "total_value",
@@ -303,7 +304,7 @@
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-09-29 14:32:23.944101",
+ "modified": "2025-09-30 15:31:04.177733",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",

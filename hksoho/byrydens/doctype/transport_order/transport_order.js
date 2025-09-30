@@ -141,13 +141,13 @@ frappe.ui.form.on('Transport Order', {
                                             <table class="table table-bordered" style="width: 100%;">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 10%;">
+                                                        <th style="width: 5%;">
                                                             <input type="checkbox" id="select_all_items">
                                                             Select
                                                         </th>
-                                                        <th style="width: 15%;">Line</th>
+                                                        <th style="width: 5%;">Line</th>
                                                         <th style="width: 15%;">Article #</th>
-                                                        <th style="width: 20%;">Article Name</th>
+                                                        <th style="width: 25%;">Article Name</th>
                                                         <th style="width: 10%;">QTY</th>
                                                         <th style="width: 10%;">Ctns</th>
                                                         <th style="width: 10%;">CBM</th>
@@ -268,6 +268,14 @@ frappe.ui.form.on('Transport Order', {
             });
         });
 
+        // Show/Hide "Add Item" button based on workflow_state
+        let add_item_button = frm.$wrapper.find('.btn:contains("Add Item")');
+        if (frm.doc.workflow_state === "Unconfirmed" || frm.doc.workflow_state === "Empty TO Head") {
+            add_item_button.css('display', 'inline-block');
+        } else {
+            add_item_button.css('display', 'none');
+        }
+
         // Add "(Select)" hyperlink next to the Vessel label
         let vessel_field = frm.get_field('vessel').$wrapper;
         vessel_field.find('.select-vessel-link').remove(); // Remove any existing hyperlink
@@ -355,7 +363,7 @@ frappe.ui.form.on('Transport Order', {
                                     <div class="eta-filter-container">
                                         <span>&gt;</span>
                                         <input type="date" id="eta_date_filter" placeholder="ETA >=" class="form-control" value="${dialog.fields_dict.vessel_html.$wrapper.find('#eta_date_filter').val() || ''}">
-                                        <span class="clear-filter" data-filter="eta_date_filter">X</span>
+                                    <span class="clear-filter" data-filter="eta_date_filter">X</span>
                                     </div>
                                 </th>
                             </tr>
@@ -578,4 +586,3 @@ function calculate_total(frm) {
     });
     frm.set_value('total_value', parseFloat(total.toFixed(2)));
 }
-
