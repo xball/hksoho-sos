@@ -63,7 +63,10 @@
   "multipack",
   "packaging",
   "attachments_tab",
-  "table_riyx"
+  "attachments",
+  "attachment_preview",
+  "section_break_umjp",
+  "table_files"
  ],
  "fields": [
   {
@@ -306,13 +309,7 @@
   {
    "fieldname": "attachments_tab",
    "fieldtype": "Tab Break",
-   "hidden": 1,
    "label": "Attachments"
-  },
-  {
-   "fieldname": "table_riyx",
-   "fieldtype": "Table",
-   "options": "Product Attachment Item"
   },
   {
    "fieldname": "customs_tariff_code",
@@ -359,13 +356,34 @@
   {
    "fieldname": "column_break_kfpd",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "table_files",
+   "fieldtype": "Table",
+   "label": "Attachments2",
+   "options": "Product Attachment Item"
+  },
+  {
+   "fieldname": "section_break_umjp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "attachment_preview",
+   "fieldtype": "HTML",
+   "label": "Attachment Preview"
+  },
+  {
+   "fieldname": "attachments",
+   "fieldtype": "Table",
+   "label": "Attachments",
+   "options": "Product Attachment Link"
   }
  ],
  "grid_page_length": 50,
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-30 10:47:05.380641",
+ "modified": "2025-10-09 10:21:21.430646",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

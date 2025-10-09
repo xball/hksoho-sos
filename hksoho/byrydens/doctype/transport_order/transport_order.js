@@ -6,14 +6,13 @@ frappe.ui.form.on('Transport Order', {
 
         // Add custom button "Add Item"
         frm.add_custom_button('Add Item', function() {
-            // Get all valid Purchase Orders with workflow_state = 'Booked QTY'
+            // Get all valid Purchase Orders with workflow_state = 'Ready to Ship'
             frappe.call({
                 method: 'frappe.client.get_list',
                 args: {
                     doctype: 'Purchase Order',
                     filters: {
-                        workflow_state: 'Booked QTY' // Only show POs with workflow_state 'Booked QTY'
-                        // docstatus: 1 // Only show submitted PO, uncomment if needed
+                        workflow_state: 'Ready to Ship' // Only show POs with workflow_state 'Ready to Ship'
                     },
                     fields: ['name'],
                     limit_page_length: 100
@@ -26,7 +25,6 @@ frappe.ui.form.on('Transport Order', {
                         let d = new frappe.ui.Dialog({
                             title: 'Select Purchase Order Items',
                             size: 'extra-large',
-                            width: '90vw', // Set dialog width to 90% of viewport width
                             fields: [
                                 {
                                     label: 'Select Purchase Order',
@@ -101,17 +99,14 @@ frappe.ui.form.on('Transport Order', {
                                 // Refresh child table and update total
                                 frm.refresh_field('items');
                                 calculate_total(frm);
-                                d.hide(); // Ensure dialog closes
-                                // Show success message with increased delay and logging
-                                console.log('Adding items to Transport Order, showing success message');
+                                d.hide();
                                 setTimeout(function() {
                                     frappe.msgprint({
                                         title: 'Success',
                                         message: 'Selected items added successfully to Transport Order!',
-                                        indicator: 'green',
-                                        primary_action_label: 'OK'
+                                        indicator: 'green'
                                     });
-                                }, 1500); // Increased delay to 1500ms
+                                }, 1500);
                             }
                         });
 
@@ -123,7 +118,7 @@ frappe.ui.form.on('Transport Order', {
                             let po_name = dialog.get_value('po_select');
                             if (!po_name) {
                                 dialog.fields_dict.items_table.$wrapper.empty();
-                                dialog.get_primary_btn().prop('disabled', true); // Disable button if no PO selected
+                                dialog.get_primary_btn().prop('disabled', true);
                                 return;
                             }
 
@@ -134,7 +129,7 @@ frappe.ui.form.on('Transport Order', {
                                 },
                                 callback: function(r) {
                                     let $container = dialog.fields_dict.items_table.$wrapper;
-                                    $container.empty(); // Clear container
+                                    $container.empty();
 
                                     if (r.message && Array.isArray(r.message) && r.message.length > 0) {
                                         let table = $(`
@@ -148,7 +143,7 @@ frappe.ui.form.on('Transport Order', {
                                                         <th style="width: 5%;">Line</th>
                                                         <th style="width: 15%;">Article #</th>
                                                         <th style="width: 25%;">Article Name</th>
-                                                        <th style="width: 10%;">QTY</th>
+                                                        <th style="width: 10%;">Qty</th>
                                                         <th style="width: 10%;">Ctns</th>
                                                         <th style="width: 10%;">CBM</th>
                                                         <th style="width: 10%;">Gross Kg</th>
@@ -159,17 +154,14 @@ frappe.ui.form.on('Transport Order', {
                                             </table>
                                         `);
 
-                                        // Bind "Select All" checkbox event
                                         table.find('#select_all_items').on('change', function() {
                                             table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
-                                            // Enable/disable primary button based on selection
                                             let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
                                             dialog.get_primary_btn().prop('disabled', !any_checked);
                                         });
 
                                         let tbody = table.find('tbody');
                                         r.message.forEach(item => {
-                                            // Use qty calculated from backend (booked_qty - delivery_qty)
                                             let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
                                             tbody.append(`
                                                 <tr>
@@ -194,78 +186,171 @@ frappe.ui.form.on('Transport Order', {
                                             `);
                                         });
 
-                                        // Bind individual checkbox change event
                                         table.find('tbody input[name="item_select"]').on('change', function() {
                                             let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
                                             dialog.get_primary_btn().prop('disabled', !any_checked);
-                                            // Update "Select All" checkbox state
                                             let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
                                             table.find('#select_all_items').prop('checked', all_checked);
                                         });
 
-                                        // Check if tbody is empty
                                         if (tbody.find('tr').length === 0) {
                                             $container.html('<p>No items to display</p>');
                                             dialog.get_primary_btn().prop('disabled', true);
                                         } else {
                                             $container.append(table);
-                                            dialog.get_primary_btn().prop('disabled', true); // Initially disable until items are selected
+                                            dialog.get_primary_btn().prop('disabled', true);
                                         }
                                     } else {
                                         $container.html('<p>No items to display</p>');
                                         dialog.get_primary_btn().prop('disabled', true);
                                     }
-                                },
-                                error: function(r) {
-                                    console.error("Error fetching PO items:", r);
-                                    let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : 'Unknown error';
-                                    if (error_message.includes('You do not have sufficient permissions')) {
-                                        frappe.msgprint({
-                                            title: 'Insufficient Permissions',
-                                            message: 'You do not have sufficient permissions to access Purchase Order items. Please contact your administrator for access.',
-                                            indicator: 'red'
-                                        });
-                                    } else {
-                                        frappe.msgprint({
-                                            title: 'Error',
-                                            message: 'Failed to fetch Purchase Order items. Please try again later. Error: ' + error_message,
-                                            indicator: 'red'
-                                        });
-                                    }
-                                    dialog.get_primary_btn().prop('disabled', true);
                                 }
                             });
                         }
 
-                        // Show dialog and initialize content
                         d.show();
                         d.fields_dict.items_table.$wrapper.empty();
                     } else {
                         frappe.msgprint({
                             title: 'No Data',
-                            message: 'No Purchase Orders with workflow_state "Booked QTY" found.',
+                            message: 'No Purchase Orders with workflow_state "Ready to Ship" found.',
                             indicator: 'orange'
-                        });
-                    }
-                },
-                error: function(r) {
-                    console.error("Error fetching POs:", r);
-                    let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : 'Unknown error';
-                    if (error_message.includes('You do not have enough permissions')) {
-                        frappe.msgprint({
-                            title: 'Insufficient Permissions',
-                            message: 'You do not have sufficient permissions to access Purchase Orders. Please contact your administrator for access.',
-                            indicator: 'red'
-                        });
-                    } else {
-                        frappe.msgprint({
-                            title: 'Error',
-                            message: 'Failed to fetch Purchase Order list. Please try again later. Error: ' + error_message,
-                            indicator: 'red'
                         });
                     }
                 }
             });
+        });
+
+        // Add custom button "Vendor Invoice" (visible in all workflow states)
+        frm.add_custom_button('Vendor Invoice', function() {
+            // Get unique PO numbers from Transport Order Line
+            let po_numbers = [...new Set(frm.doc.items ? frm.doc.items.map(item => item.po_number) : [])];
+            if (po_numbers.length === 0) {
+                frappe.msgprint({
+                    title: 'No Data',
+                    message: 'No Purchase Order items found in Transport Order to update invoice details.',
+                    indicator: 'orange'
+                });
+                return;
+            }
+
+            // Create dialog for entering invoice details
+            let d = new frappe.ui.Dialog({
+                title: 'Enter Vendor Invoice Details',
+                size: 'large',
+                fields: [
+                    {
+                        label: 'Select Purchase Order',
+                        fieldname: 'po_select',
+                        fieldtype: 'Select',
+                        options: po_numbers,
+                        reqd: 1
+                    },
+                    {
+                        label: 'Invoice Received',
+                        fieldname: 'invoice_received',
+                        fieldtype: 'Check',
+                        default: 0
+                    },
+                    {
+                        label: 'Invoice Number',
+                        fieldname: 'invoice_no',
+                        fieldtype: 'Data',
+                        depends_on: 'eval:doc.invoice_received==1'
+                    },
+                    {
+                        label: 'Invoice Currency',
+                        fieldname: 'invoice_currency',
+                        fieldtype: 'Link',
+                        options: 'Currency',
+                        depends_on: 'eval:doc.invoice_received==1'
+                    },
+                    {
+                        label: 'Invoice Date',
+                        fieldname: 'invoice_date',
+                        fieldtype: 'Date',
+                        depends_on: 'eval:doc.invoice_received==1'
+                    },
+                    {
+                        label: 'Invoice Due Date',
+                        fieldname: 'invoice_due_date',
+                        fieldtype: 'Date',
+                        depends_on: 'eval:doc.invoice_received==1'
+                    },
+                    {
+                        label: 'Invoice Paid',
+                        fieldname: 'invoice_paid',
+                        fieldtype: 'Check',
+                        default: 0,
+                        depends_on: 'eval:doc.invoice_received==1'
+                    },
+                    {
+                        label: 'Exchange Rate to SEK',
+                        fieldname: 'exchange_rate_to_sek',
+                        fieldtype: 'Float',
+                        depends_on: 'eval:doc.invoice_received==1'
+                    }
+                ],
+                primary_action_label: 'Apply',
+                primary_action: function() {
+                    let values = d.get_values();
+                    if (!values) return;
+
+                    let po_name = values.po_select;
+                    let updated = false;
+
+                    // Update invoice fields for all rows with the selected PO
+                    frm.doc.items.forEach(row => {
+                        if (row.po_number === po_name) {
+                            row.invoice_received = values.invoice_received;
+                            if (values.invoice_received) {
+                                row.invoice_no = values.invoice_no;
+                                row.invoice_currency = values.invoice_currency;
+                                row.invoice_date = values.invoice_date;
+                                row.invoice_due_date = values.invoice_due_date;
+                                row.invoice_paid = values.invoice_paid;
+                                row.exchange_rate_to_sek = values.exchange_rate_to_sek;
+                            } else {
+                                row.invoice_no = null;
+                                row.invoice_currency = null;
+                                row.invoice_date = null;
+                                row.invoice_due_date = null;
+                                row.invoice_paid = 0;
+                                row.exchange_rate_to_sek = null;
+                            }
+                            updated = true;
+                        }
+                    });
+
+                    if (updated) {
+                        frm.refresh_field('items');
+                        frm.dirty();
+                        frappe.msgprint({
+                            title: 'Success',
+                            message: 'Invoice details updated successfully for the selected Purchase Order!',
+                            indicator: 'green'
+                        });
+                        d.hide();
+                    } else {
+                        frappe.msgprint({
+                            title: 'No Updates',
+                            message: 'No items found matching the selected Purchase Order.',
+                            indicator: 'orange'
+                        });
+                    }
+                }
+            });
+
+            // Show/hide invoice fields based on invoice_received
+            d.fields_dict.invoice_received.$input.on('change', function() {
+                let invoice_received = d.get_value('invoice_received');
+                let fields = ['invoice_no', 'invoice_currency', 'invoice_date', 'invoice_due_date', 'invoice_paid', 'exchange_rate_to_sek'];
+                fields.forEach(field => {
+                    d.set_df_property(field, 'hidden', invoice_received ? 0 : 1);
+                });
+            });
+
+            d.show();
         });
 
         // Show/Hide "Add Item" button based on workflow_state
@@ -276,9 +361,9 @@ frappe.ui.form.on('Transport Order', {
             add_item_button.css('display', 'none');
         }
 
-        // Add "(Select)" hyperlink next to the Vessel label
+        // Show "(Select)" hyperlink next to the Vessel label
         let vessel_field = frm.get_field('vessel').$wrapper;
-        vessel_field.find('.select-vessel-link').remove(); // Remove any existing hyperlink
+        vessel_field.find('.select-vessel-link').remove();
         vessel_field.find('.control-label').append(`
             <a href="#" class="select-vessel-link" style="margin-left: 5px; font-size: 12px; color: #007bff; text-decoration: none;">(Select)</a>
         `);
@@ -299,7 +384,6 @@ frappe.ui.form.on('Transport Order', {
                 }
             });
 
-            // Debounce function to delay filter and sort execution
             function debounce(func, wait) {
                 let timeout;
                 return function executedFunction(...args) {
@@ -343,27 +427,27 @@ frappe.ui.form.on('Transport Order', {
                         <thead>
                             <tr class="filter-row">
                                 <th style="width: 150px;">
-                                    <input type="text" id="vessel_filter" placeholder="Vessel" class="form-control" value="${dialog.fields_dict.vessel_html.$wrapper.find('#vessel_filter').val() || ''}">
+                                    <input type="text" id="vessel_filter" placeholder="Vessel" class="form-control">
                                     <span class="clear-filter" data-filter="vessel_filter">X</span>
                                 </th>
                                 <th style="width: 100px;">
-                                    <input type="text" id="voyage_filter" placeholder="Voyage" class="form-control" value="${dialog.fields_dict.vessel_html.$wrapper.find('#voyage_filter').val() || ''}">
+                                    <input type="text" id="voyage_filter" placeholder="Voyage" class="form-control">
                                     <span class="clear-filter" data-filter="voyage_filter">X</span>
                                 </th>
                                 <th style="width: 120px;">
-                                    <input type="text" id="loading_port_filter" placeholder="Load Port" class="form-control" value="${dialog.fields_dict.vessel_html.$wrapper.find('#loading_port_filter').val() || ''}">
+                                    <input type="text" id="loading_port_filter" placeholder="Load Port" class="form-control">
                                     <span class="clear-filter" data-filter="loading_port_filter">X</span>
                                 </th>
                                 <th style="width: 120px;">
-                                    <input type="text" id="destination_port_filter" placeholder="Dest Port" class="form-control" value="${dialog.fields_dict.vessel_html.$wrapper.find('#destination_port_filter').val() || ''}">
+                                    <input type="text" id="destination_port_filter" placeholder="Dest Port" class="form-control">
                                     <span class="clear-filter" data-filter="destination_port_filter">X</span>
                                 </th>
                                 <th style="width: 100px;"></th>
                                 <th style="width: 100px;">
                                     <div class="eta-filter-container">
                                         <span>&gt;</span>
-                                        <input type="date" id="eta_date_filter" placeholder="ETA >=" class="form-control" value="${dialog.fields_dict.vessel_html.$wrapper.find('#eta_date_filter').val() || ''}">
-                                    <span class="clear-filter" data-filter="eta_date_filter">X</span>
+                                        <input type="date" id="eta_date_filter" placeholder="ETA >=" class="form-control">
+                                        <span class="clear-filter" data-filter="eta_date_filter">X</span>
                                     </div>
                                 </th>
                             </tr>
@@ -395,7 +479,7 @@ frappe.ui.form.on('Transport Order', {
                         <tfoot>
                             <tr class="footer">
                                 <td colspan="6" style="padding: 5px;">
-                                    <a href="#" onclick="frappe.new_doc('Vessels Time Table', {}, function() { dialog.hide(); });">(add new)</a> (${records.length} records)
+                                    <a href="#" onclick="frappe.new_doc('Vessels Time Table', {}, function() { dialog.hide(); });">(Add New)</a> (${records.length} records)
                                 </td>
                             </tr>
                         </tfoot>
@@ -404,9 +488,7 @@ frappe.ui.form.on('Transport Order', {
                 `;
                 if (initial) {
                     dialog.fields_dict.vessel_html.$wrapper.html(html);
-                    // Bind events only on initial render
                     const debounced_load_data = debounce(load_data, 300);
-                    const debounced_sort_data = debounce(sort_data, 300);
                     dialog.fields_dict.vessel_html.$wrapper.find('#vessel_filter').on('input', debounced_load_data);
                     dialog.fields_dict.vessel_html.$wrapper.find('#voyage_filter').on('input', debounced_load_data);
                     dialog.fields_dict.vessel_html.$wrapper.find('#loading_port_filter').on('input', debounced_load_data);
@@ -430,7 +512,6 @@ frappe.ui.form.on('Transport Order', {
                     $(this).addClass('sel');
                     let name = $(this).data('name');
                     selected_row = records.find(r => r.name === name);
-                    console.log('Selected vessel:', selected_row);
                     frm.set_value('vessel', selected_row.name);
                     frm.set_value('carrier', selected_row.carrier || '');
                     frm.set_value('voyage', selected_row.voyage || '');
@@ -499,14 +580,11 @@ frappe.ui.form.on('Transport Order', {
                 if (eta_date_filter) filters.eta_date = ['>=', eta_date_filter];
 
                 Promise.all(promises).then(() => {
-                    console.log('Filters applied:', filters);
-
                     frappe.db.get_list('Vessels Time Table', {
                         fields: ['name', 'vessel', 'voyage', 'loading_port', 'destination_port', 'etd_date', 'eta_date', 'carrier', 'cfs_close'],
                         filters: filters,
                         limit: 100
                     }).then(records => {
-                        console.log('Fetched records:', records);
                         let promises = records.map(row => {
                             return Promise.all([
                                 row.loading_port ? frappe.db.get_value('Load-Dest Port', row.loading_port, ['name', 'loc_code']) : Promise.resolve({ message: { name: '', loc_code: '' } }),
@@ -521,7 +599,6 @@ frappe.ui.form.on('Transport Order', {
                         });
 
                         Promise.all(promises).then(updated_records => {
-                            console.log('Updated records with loc_code:', updated_records);
                             selected_row = null;
                             render_table(updated_records);
                         });
@@ -529,13 +606,11 @@ frappe.ui.form.on('Transport Order', {
                 });
             }
 
-            render_table([], true); // Initial render with empty records
+            render_table([], true);
             load_data();
             dialog.show();
-            console.log('Dialog shown');
         });
 
-        // Set vessel field readonly based on add_vessel_now and show vessel_section
         toggleVesselSection(frm);
     },
     add_vessel_now: function(frm) {
@@ -564,13 +639,22 @@ frappe.ui.form.on('Transport Order Line', {
         row.value = (row.unit_price || 0) * (row.qty || 0);
         frm.refresh_field('items');
         calculate_total(frm);
+    },
+    invoice_due_date: function(frm, cdt, cdn) {
+        var row = locals[cdt][cdn];
+        if (row.invoice_date && row.invoice_due_date && row.invoice_due_date < row.invoice_date) {
+            frappe.msgprint({
+                title: 'Error',
+                message: 'Invoice Due Date cannot be earlier than Invoice Date',
+                indicator: 'red'
+            });
+            frappe.model.set_value(cdt, cdn, 'invoice_due_date', null);
+        }
     }
 });
 
 function toggleVesselSection(frm) {
-    // Show or hide vessel_section based on add_vessel_now
     frm.set_df_property('vessel_section', 'hidden', frm.doc.add_vessel_now == 1 ? 0 : 1);
-    // Set vessel field readonly via HTML when add_vessel_now is checked
     let vessel_input = frm.get_field('vessel').$input;
     if (frm.doc.add_vessel_now == 1) {
         vessel_input.prop('readonly', true);

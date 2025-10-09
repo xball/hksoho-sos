@@ -1,18 +1,20 @@
 import frappe
+from frappe import _
+import json
 
 @frappe.whitelist()
 def get_po_items(po_name, filters=None):
-    """Return all items for the specified Purchase Order where workflow_state is 'Booked QTY' and qty > 0"""
+    """Return all items for the specified Purchase Order where workflow_state is 'Ready to Ship' and qty > 0"""
     if not po_name:
         frappe.throw("Please provide a valid Purchase Order number")
 
     try:
-        # Check if the Purchase Order has workflow_state = 'Booked QTY'
+        # Check if the Purchase Order has workflow_state = 'Ready to Ship'
         po = frappe.get_doc("Purchase Order", po_name)
-        if po.workflow_state != "Booked QTY":
+        if po.workflow_state != "Ready to Ship":
             frappe.msgprint({
                 "title": "No Data",
-                "message": f"The Purchase Order {po_name} does not have workflow_state 'Booked QTY'.",
+                "message": f"The Purchase Order {po_name} does not have workflow_state 'Ready to Ship'.",
                 "indicator": "orange"
             })
             return []
@@ -50,3 +52,96 @@ def get_po_items(po_name, filters=None):
     except Exception as e:
         frappe.log_error(f"Error fetching PO items for {po_name}: {str(e)}")
         frappe.throw(f"Failed to fetch Purchase Order items. Please try again later. Error: {str(e)}")
+        
+        
+import frappe
+from frappe import _
+import json
+
+@frappe.whitelist()
+def update_to_line_invoice(to_name, po_number, invoice_data):
+    """
+    Update invoice details for Transport Order Line items matching the given po_number and save the Transport Order.
+
+    Args:
+        to_name (str): Name of the Transport Order
+        po_number (str): Selected Purchase Order number
+        invoice_data (str or dict): Dictionary or JSON string containing invoice details, e.g.:
+            {
+                "invoice_received": 1,
+                "invoice_no": "INV-20251003",
+                "invoice_currency": "USD",
+                "invoice_date": "2025-10-03",
+                "invoice_due_date": "2025-11-03",
+                "invoice_paid": 0,
+                "exchange_rate_to_sek": 10.5
+            }
+    Returns:
+        dict: Result message indicating success or failure
+    """
+    try:
+        # Parse invoice_data if it's a string
+        if isinstance(invoice_data, str):
+            invoice_data = json.loads(invoice_data)
+        elif not isinstance(invoice_data, dict):
+            frappe.throw(_("Invalid invoice_data format. Expected a dictionary or JSON string."))
+
+        # Get Transport Order
+        to_doc = frappe.get_doc("Transport Order", to_name)
+
+        # Validate po_line links
+        invalid_lines = []
+        for item in to_doc.items:
+            if item.po_number == po_number and item.po_line:
+                if not frappe.db.exists("Purchase Order Item", item.po_line):
+                    invalid_lines.append(f"Row #{item.idx}: PO Line: {item.po_line}")
+
+        if invalid_lines:
+            frappe.throw(_("Could not find the following PO Line references: {0}").format(", ".join(invalid_lines)))
+
+        # Validate invoice data
+        if invoice_data.get("invoice_received") and invoice_data.get("invoice_date") and invoice_data.get("invoice_due_date"):
+            if invoice_data["invoice_due_date"] < invoice_data["invoice_date"]:
+                frappe.throw(_("Invoice Due Date cannot be earlier than Invoice Date."))
+
+        updated = False
+        # Update Transport Order Line
+        for item in to_doc.items:
+            if item.po_number == po_number:
+                item.invoice_received = invoice_data.get("invoice_received", 0)
+                if item.invoice_received:
+                    item.invoice_no = invoice_data.get("invoice_no")
+                    item.invoice_currency = invoice_data.get("invoice_currency")
+                    item.invoice_date = invoice_data.get("invoice_date")
+                    item.invoice_due_date = invoice_data.get("invoice_due_date")
+                    item.invoice_paid = invoice_data.get("invoice_paid", 0)
+                    item.exchange_rate_to_sek = invoice_data.get("exchange_rate_to_sek")
+                else:
+                    item.invoice_no = None
+                    item.invoice_currency = None
+                    item.invoice_date = None
+                    item.invoice_due_date = None
+                    item.invoice_paid = 0
+                    item.exchange_rate_to_sek = None
+                updated = True
+
+        if not updated:
+            frappe.throw(_("No items found matching the selected Purchase Order: {0}").format(po_number))
+
+        # Save Transport Order
+        to_doc.save(ignore_permissions=True)
+        frappe.db.commit()
+
+        return {
+            "status": "success",
+            "message": "Invoice details updated and form saved successfully!"
+        }
+
+    except Exception as e:
+        # Truncate error message to avoid CharacterLengthExceededError
+        error_message = str(e)[:100] + "..." if len(str(e)) > 100 else str(e)
+        frappe.log_error(f"Failed to update Transport Order Line: {error_message}", "Update TO Line Invoice")
+        return {
+            "status": "error",
+            "message": f"Failed to update invoice details: {error_message}"
+        }

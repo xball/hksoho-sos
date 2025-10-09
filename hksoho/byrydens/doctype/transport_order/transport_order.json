@@ -5,6 +5,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "details_tab",
+  "section_break_tyxj",
   "mode",
   "shipper",
   "forwarder",
@@ -40,6 +42,7 @@
   "priority",
   "process_model",
   "short_comment",
+  "cancelled",
   "to_items_tab",
   "items",
   "summary_section",
@@ -150,7 +153,8 @@
   {
    "fieldname": "to_items_tab",
    "fieldtype": "Tab Break",
-   "label": "TO Items"
+   "label": "TO Items",
+   "read_only_depends_on": "eval:doc.cancelled==0"
   },
   {
    "fieldname": "items",
@@ -300,11 +304,27 @@
   {
    "fieldname": "column_break_hsgk",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "cancelled",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Cancelled"
+  },
+  {
+   "fieldname": "section_break_tyxj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Details"
   }
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-09-30 15:31:04.177733",
+ "modified": "2025-10-01 18:00:08.269516",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",

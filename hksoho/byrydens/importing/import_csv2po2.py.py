@@ -33,16 +33,12 @@ def format_date(date_str):
     if not date_str:
         return None
     try:
-        # 先嘗試解析 YYYY-MM-DD 格式
-        return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y-%m-%d")
+        # 假設 CSV 日期格式為 DD/MM/YYYY，根據實際格式調整
+        return datetime.strptime(date_str, "%d/%m/%Y").strftime("%Y-%m-%d")
     except ValueError:
-        try:
-            # 再嘗試解析 DD/MM/YYYY 格式
-            return datetime.strptime(date_str, "%d/%m/%Y").strftime("%Y-%m-%d")
-        except ValueError:
-            logger.warning(f"無效的日期格式: {date_str}")
-            return None
-        
+        logger.warning(f"無效的日期格式: {date_str}")
+        return None
+
 # 檢查 Link 欄位是否存在
 def validate_link_field(doctype, fieldname, value):
     if not value:
@@ -150,21 +146,14 @@ def create_purchase_order(po_data):
         print(msg)
         return False, msg
     partner = validate_link_field("Partner", "name", supplier_code)
-    qc_required = 1 if partner and frappe.get_value("Partner", partner, "quality_control") == "Always Requested" else 0
-
-    updated_fields = []
-    action = "Created"
+    qc_required = 0
+    # copy the fields to PO by default
+    if not partner:
+        qc_required = 1 if partner.quality_control == "Always Requested" else 0
 
     # 載入或創建 PO
     if po_exists:
         po = frappe.get_doc(PO_DOCTYPE, {"po_number": po_data["po_number"]})
-        # 檢查工作流程狀態
-        workflow_state = frappe.get_value(PO_DOCTYPE, po.name, "workflow_state")
-        if workflow_state not in ["Draft", "Submitted"]:
-            msg = f"採購訂單 {po_data['po_number']} 狀態為 {workflow_state}，無法更新"
-            logger.warning(msg)
-            print(msg)
-            return False, msg
         msg = f"採購訂單 {po_data['po_number']} 已存在，正在更新..."
         logger.info(msg)
         print(msg)
@@ -174,34 +163,23 @@ def create_purchase_order(po_data):
         msg = f"創建新採購訂單: {po_data['po_number']}"
         logger.info(msg)
         print(msg)
+        action = "Created"
 
-    # 更新主表欄位（僅更新有變更的欄位）
-    po_fields = {
-        "po_number": po_data["po_number"],
-        "supplier": supplier_code,
-        "purchaser": purchaser,
-        "po_placed": format_date(po_data["po_placed"]),
-        "payment_terms": payment_terms,
-        "delivery_mode": delivery_mode,
-        "delivery_terms": delivery_terms,
-        "delivery_address": po_data["delivery_address"],
-        "requested_forwarder": po_data["requested_forwarder"],
-        "responsible": responsible,
-        "order_type": order_type,
-        "purpose": po_data["purpose"],
-        "qc_requested": qc_required,
-        "conversion_rate": 1.0
-    }
-
-    if po_exists:
-        for field, new_value in po_fields.items():
-            old_value = getattr(po, field, None)
-            if old_value != new_value:
-                setattr(po, field, new_value)
-                updated_fields.append(f"{field}: {old_value} -> {new_value}")
-    else:
-        for field, value in po_fields.items():
-            setattr(po, field, value)
+    # 更新主表欄位
+    po.po_number = po_data["po_number"]
+    po.supplier = supplier_code
+    po.purchaser = purchaser
+    po.po_placed = (po_data["po_placed"])
+    po.payment_terms = payment_terms
+    po.delivery_mode = delivery_mode
+    po.delivery_terms = delivery_terms
+    po.conversion_rate = 1.0
+    po.delivery_address = po_data["delivery_address"]
+    po.requested_forwarder = po_data["requested_forwarder"]
+    po.responsible = responsible
+    po.order_type = order_type
+    po.purpose = po_data["purpose"]
+    po.dc_required = qc_required
 
     # 處理子表
     existing_items = {item.line: item for item in po.po_items if item.line} if po_exists else {}
@@ -221,8 +199,8 @@ def create_purchase_order(po_data):
             "supplier_selling_price_unit": item["supplier_selling_price_unit"],
             "article_name": item["article_name"],
             "short_description": "\n".join(item["short_description"]),
-            "requested_finish_date": format_date(item["requested_finish_date"]),
-            "requested_eta": format_date(item["requested_eta"]),
+            "requested_finish_date": (item["requested_finish_date"]),
+            "requested_eta": (item["requested_eta"]),
             "line": item["line"],
             "supplier_art_number": item["supplier_art_number"],
             "po_number": po_data["po_number"]
@@ -230,11 +208,7 @@ def create_purchase_order(po_data):
 
         if po_exists and item["line"] in existing_items:
             existing_item = existing_items[item["line"]]
-            for field, new_value in item_data.items():
-                old_value = getattr(existing_item, field, None)
-                if old_value != new_value:
-                    setattr(existing_item, field, new_value)
-                    updated_fields.append(f"Item {item['line']} {field}: {old_value} -> {new_value}")
+            existing_item.update(item_data)
             new_items.append(existing_item.as_dict())
         else:
             new_items.append(item_data)
@@ -244,8 +218,6 @@ def create_purchase_order(po_data):
     try:
         po.save(ignore_permissions=True)
         comment = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Import CSV file - {action}"
-        if updated_fields:
-            comment += f"\nUpdated fields:\n" + "\n".join(updated_fields)
         add_activity_message(PO_DOCTYPE, po.name, comment, 'Info')
         frappe.db.commit()
         msg = f"已{action}採購訂單: {po.name}"
@@ -277,6 +249,7 @@ def add_activity_message(doctype_name, doc_name, message, comment_type='Info'):
 # 發送電子郵件通知
 def send_notification(subject, message, recipients=None):
     try:
+        
         if not recipients:
             recipients = [frappe.get_value("User", {"send_system_notification": 1}, "email")]
             frappe.sendmail(
@@ -285,6 +258,7 @@ def send_notification(subject, message, recipients=None):
                 message=message,
                 now=True
             )
+        
         msg = f"已發送電子郵件通知: {subject} to {recipients}"
         logger.info(msg)
         print(msg)
