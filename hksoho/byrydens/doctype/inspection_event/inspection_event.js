@@ -1,183 +1,231 @@
 frappe.ui.form.on('Inspection Event', {
     refresh: function(frm) {
-        // 隐藏 po_items 表的「Add」按钮
-        frm.fields_dict.po_items.grid.cannot_add_rows = true;
-        frm.fields_dict.po_items.grid.wrapper.find('.grid-add-row').hide();
+        control_po_items_and_buttons(frm);
+    },
+    starts_on: function(frm) { control_po_items_and_buttons(frm); },
+    ends_on: function(frm) { control_po_items_and_buttons(frm); },
+    supplier: function(frm) { control_po_items_and_buttons(frm); },
+    inspector: function(frm) { control_po_items_and_buttons(frm); }
+});
 
-        // 添加按钮以打开自定义对话框
-        frm.add_custom_button(__('Add PO Items'), function() {
-            // 获取状态为 "Ready to QC" 的采购订单
-            frappe.call({
-                method: 'frappe.client.get_list',
-                args: {
-                    doctype: 'Purchase Order',
-                    filters: {
-                        workflow_state: 'Ready to QC'
+function control_po_items_and_buttons(frm) {
+    const is_new = frm.doc.__islocal || !frm.doc.name;
+
+    if (is_new) {
+        frm.set_df_property('po_items', 'hidden', 1);
+        if (frm.fields_dict.po_items?.grid) {
+            frm.fields_dict.po_items.grid.cannot_add_rows = true;
+            frm.fields_dict.po_items.grid.wrapper.find('.grid-add-row').hide();
+        }
+        if (!frm._po_hint_shown) {
+            frm.dashboard.add_comment(
+                __('Please save the Inspection Event first to add PO items.'),
+                'blue',
+                true
+            );
+            frm._po_hint_shown = true;
+        }
+        frm.remove_custom_button(__('Add PO Items'));
+        frm.remove_custom_button(__('Send Invitation'));
+
+    } else {
+        frm.set_df_property('po_items', 'hidden', 0);
+        if (frm.fields_dict.po_items?.grid) {
+            frm.fields_dict.po_items.grid.cannot_add_rows = true;
+            frm.fields_dict.po_items.grid.wrapper.find('.grid-add-row').hide();
+        }
+        frm.dashboard.clear_comment(__('Please save the Inspection Event first to add PO items.'));
+        delete frm._po_hint_shown;
+
+        // Add PO Items 按鈕
+        if (!frm.page.btn_primary || frm.page.btn_primary.text() !== __('Add PO Items')) {
+            frm.add_custom_button(__('Add PO Items'), function() {
+                open_po_items_dialog(frm);
+            }, null, { primary: true });
+            frm.change_custom_button_type(__('Add PO Items'), null, 'primary');
+        }
+
+        // 新增 Send Invitation 按鈕（放在旁邊）
+        frm.add_custom_button(__('Send Invitation'), function() {
+            send_invitation_email(frm);
+        }, null, { primary: true });
+        frm.change_custom_button_type(__('Send Invitation'), null, 'primary');
+    }
+}
+// === 發送邀請函數 ===
+function send_invitation_email(frm) {
+    frappe.call({
+        method: 'hksoho.byrydens.inspection_api.send_inspection_invitation',
+        args: { inspection_event_name: frm.doc.name },
+        callback: function(r) {
+            if (r.message.status === "success") {
+                frappe.msgprint({
+                    title: __('成功'),
+                    message: r.message.message,
+                    indicator: 'green'
+                });
+            }
+        },
+        error: function(err) {
+            frappe.msgprint({
+                title: __('錯誤'),
+                message: __('無法發送邀請，請檢查 Inspector email。'),
+                indicator: 'red'
+            });
+        }
+    });
+}
+
+
+// =======================================
+// Dialog: Select PO → Select Items → Add via API
+// =======================================
+function open_po_items_dialog(frm) {
+    frappe.call({
+        method: 'frappe.client.get_list',
+        args: {
+            doctype: 'Purchase Order',
+            filters: { workflow_state: 'Ready to QC' },
+            fields: ['name']
+        },
+        callback: function(r) {
+            if (!r.message || r.message.length === 0) {
+                frappe.msgprint(__('No Purchase Orders found with status "Ready to QC".'));
+                return;
+            }
+
+            let po_options = r.message.map(po => po.name);
+
+            let d = new frappe.ui.Dialog({
+                title: __('Select PO Items'),
+                fields: [
+                    {
+                        label: __('Select Purchase Order'),
+                        fieldname: 'po_select',
+                        fieldtype: 'Select',
+                        options: po_options,
+                        reqd: 1,
+                        change: function() { refresh_po_items_table(d); }
                     },
-                    fields: ['name']
-                },
-                callback: function(r) {
-                    if (r.message) {
-                        let po_options = r.message.map(po => po.name);
-                        if (po_options.length === 0) {
-                            frappe.msgprint(__('No Purchase Orders found with status "Ready to QC".'));
-                            return;
-                        }
-
-                        // 创建对话框
-                        let d = new frappe.ui.Dialog({
-                            title: __('Select PO Items'),
-                            fields: [
-                                {
-                                    fieldtype: 'Select',
-                                    fieldname: 'po_select',
-                                    label: __('选择采购订单'),
-                                    options: po_options,
-                                    change: function() {
-                                        refreshTable(d);
-                                    }
-                                },
-                                {
-                                    fieldtype: 'HTML',
-                                    fieldname: 'items_table'
-                                }
-                            ],
-                            primary_action_label: __('Add Selected Items'),
-                            primary_action: function() {
-                                let selected_items = [];
-                                $('input[name="item_select"]:checked').each(function() {
-                                    selected_items.push($(this).val());
-                                });
-
-                                if (selected_items.length === 0) {
-                                    frappe.msgprint(__('請至少選擇一個項目'));
-                                    return;
-                                }
-
-                                console.log("Adding items to Inspection Event:", selected_items, "Type:", typeof selected_items); // 調試日誌
-                                // 調用 Python 函數將項目添加到 po_items 表
-                                frappe.call({
-                                    method: 'hksoho.byrydens.inspection_api.add_po_items_to_inspection_event',
-                                    args: {
-                                        inspection_event_name: frm.doc.name,
-                                        selected_items: selected_items // 直接傳遞陣列
-                                    },
-                                    callback: function(r) {
-                                        console.log("Add items response:", r); // 調試日誌
-                                        if (r.message && r.message.status === "success") {
-                                            frm.reload_doc();
-                                            d.hide();
-                                            frappe.msgprint({
-                                                title: __('Success'),
-                                                message: r.message.message,
-                                                indicator: 'green'
-                                            });
-                                        } else if (r.message && r.message.status === "warning") {
-                                            d.hide();
-                                            frappe.msgprint({
-                                                title: __('Warning'),
-                                                message: r.message.message,
-                                                indicator: 'orange'
-                                            });
-                                        }
-                                    },
-                                    error: function(r) {
-                                        console.error("Error adding PO items:", r); // 調試日誌
-                                        // 處理權限錯誤
-                                        let error_message = r.exc ? (JSON.parse(r.exc)[0] || r.exc) : __('未知錯誤');
-                                        if (error_message.includes('You do not have enough permissions')) {
-                                            frappe.msgprint({
-                                                title: __('Not permitted'),
-                                                message: __('You do not have enough permissions to access this resource. Please contact your manager to get access.'),
-                                                indicator: 'red'
-                                            });
-                                        } else if (error_message.includes('無有效的項目被選擇')) {
-                                            frappe.msgprint({
-                                                title: __('Error'),
-                                                message: __('無有效的項目被選擇。'),
-                                                indicator: 'red'
-                                            });
-                                        } else if (error_message.includes('無效的項目選擇格式')) {
-                                            frappe.msgprint({
-                                                title: __('Error'),
-                                                message: __('無效的項目選擇格式。'),
-                                                indicator: 'red'
-                                            });
-                                        } else {
-                                            frappe.msgprint({
-                                                title: __('Error'),
-                                                message: __('無法添加項目，請稍後重試。錯誤：') + error_message,
-                                                indicator: 'red'
-                                            });
-                                        }
-                                    }
-                                });
-                            }
-                        });
-
-                        // 定义刷新表格的函数
-                        function refreshTable(dialog) {
-                            let po_name = dialog.get_value('po_select');
-                            if (!po_name) {
-                                dialog.fields_dict.items_table.$wrapper.empty();
-                                return;
-                            }
-
-                            frappe.call({
-                                method: 'hksoho.byrydens.inspection_api.get_po_items_qcstatus',
-                                args: {
-                                    po_name: po_name
-                                },
-                                callback: function(r) {
-                                    let $container = dialog.fields_dict.items_table.$wrapper;
-                                    $container.empty(); // 清空容器
-
-                                    if (r.message && Array.isArray(r.message)) {
-                                        let table = $(`
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Select</th>
-                                                        <th>Line</th>
-                                                        <th>Requested QTY</th>
-                                                        <th>Article #</th>
-                                                        <th>Article Name</th>
-                                                        <th>Confirmed QTY</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-                                        `);
-
-                                        let tbody = table.find('tbody');
-                                        r.message.forEach(item => {
-                                            tbody.append(`
-                                                <tr>
-                                                    <td><input type="checkbox" name="item_select" value="${item.name}"></td>
-                                                    <td>${item.line || ''}</td>
-                                                    <td>${item.requested_qty || 0}</td>
-                                                    <td>${item.article_number || ''}</td>
-                                                    <td>${item.article_name || ''}</td>
-                                                    <td>${item.confirmed_qty || 0}</td>
-                                                </tr>
-                                            `);
-                                        });
-
-                                        $container.append(table);
-                                    } else {
-                                        $container.html('<p>无项目可显示</p>');
-                                    }
-                                }
-                            });
-                        }
-
-                        // 在对话框显示时初始化内容
-                        d.show();
-                        // 初始清空表格区域
-                        d.fields_dict.items_table.$wrapper.empty();
+                    {
+                        fieldname: 'items_table',
+                        fieldtype: 'HTML'
                     }
+                ],
+                primary_action_label: __('Add Selected Items'),
+                primary_action: function() {
+                    let selected_items = [];
+                    d.$wrapper.find('input[name="item_select"]:checked').each(function() {
+                        selected_items.push($(this).val());
+                    });
+
+                    if (selected_items.length === 0) {
+                        frappe.msgprint(__('Please select at least one item.'));
+                        return;
+                    }
+
+                    frappe.call({
+                        method: 'hksoho.byrydens.inspection_api.add_po_items_to_inspection_event',
+                        args: {
+                            inspection_event_name: frm.doc.name,
+                            selected_items: selected_items
+                        },
+                        callback: function(resp) {
+                            if (resp.message?.status === "success") {
+                                frm.reload_doc();
+                                d.hide();
+                                frappe.show_alert({
+                                    message: resp.message.message,
+                                    indicator: 'green'
+                                }, 5);
+                            } else if (resp.message?.status === "warning") {
+                                d.hide();
+                                frappe.msgprint({
+                                    title: __('Warning'),
+                                    message: resp.message.message,
+                                    indicator: 'orange'
+                                });
+                            }
+                        },
+                        error: function(err) {
+                            let msg = __('Failed to add items');
+                            try {
+                                let exc = JSON.parse(err.message || err.exc || '{}');
+                                msg += ': ' + (exc[0]?.message || exc.message || err.message);
+                            } catch (e) {
+                                msg += '.';
+                            }
+                            frappe.msgprint({ title: __('Error'), message: msg, indicator: 'red' });
+                        }
+                    });
                 }
             });
-        });
+
+            d.show();
+            d.fields_dict.items_table.$wrapper.html('<p>Please select a Purchase Order first.</p>');
+        },
+        error: function() {
+            frappe.msgprint(__('Failed to load Purchase Orders.'));
+        }
+    });
+}
+
+function refresh_po_items_table(dialog) {
+    let po_name = dialog.get_value('po_select');
+    if (!po_name) {
+        dialog.fields_dict.items_table.$wrapper.html('<p>Please select a Purchase Order.</p>');
+        return;
     }
-});
+
+    frappe.call({
+        method: 'hksoho.byrydens.inspection_api.get_po_items_qcstatus',
+        args: { po_name: po_name },
+        callback: function(r) {
+            let $wrapper = dialog.fields_dict.items_table.$wrapper.empty();
+
+            if (!r.message || !Array.isArray(r.message) || r.message.length === 0) {
+                $wrapper.html('<p>No items available for inspection.</p>');
+                return;
+            }
+
+            let table = $(`
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="50"><input type="checkbox" id="select_all"></th>
+                            <th>Line</th>
+                            <th>Requested QTY</th>
+                            <th>Article #</th>
+                            <th>Article Name</th>
+                            <th>Confirmed QTY</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `);
+
+            let tbody = table.find('tbody');
+            r.message.forEach(item => {
+                tbody.append(`
+                    <tr>
+                        <td><input type="checkbox" name="item_select" value="${item.name}"></td>
+                        <td>${item.line || ''}</td>
+                        <td>${item.requested_qty || 0}</td>
+                        <td>${item.article_number || ''}</td>
+                        <td>${item.article_name || ''}</td>
+                        <td>${item.confirmed_qty || 0}</td>
+                    </tr>
+                `);
+            });
+
+            table.find('#select_all').on('change', function() {
+                table.find('input[name="item_select"]').prop('checked', this.checked);
+            });
+
+            $wrapper.append(table);
+        },
+        error: function() {
+            dialog.fields_dict.items_table.$wrapper.html('<p>Failed to load items.</p>');
+        }
+    });
+}

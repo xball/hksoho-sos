@@ -3,6 +3,12 @@ from frappe import _
 from frappe.model.document import Document
 import json
 
+from frappe.utils import format_date, format_time
+from icalendar import Calendar, Event
+from datetime import datetime
+import io
+
+
 @frappe.whitelist()
 def get_suppliers():
     return frappe.get_list('Partner', filters={'partner_type': 'Supplier', 'status': 'Active'}, fields=['name', 'partner_name'])
@@ -199,3 +205,62 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     frappe.msgprint(message)
 
     return {"status": "success", "message": message}
+
+
+@frappe.whitelist()
+def send_inspection_invitation(inspection_event_name):
+    doc = frappe.get_doc("Inspection Event", inspection_event_name)
+    
+    if not doc.inspector:
+        frappe.throw(_("請先設定 Inspector"))
+    
+    inspector_email = frappe.db.get_value("User", doc.inspector, "email")
+    if not inspector_email:
+        frappe.throw(_("Inspector 無 email"))
+    
+    # === 產生 .ics 附件 ===
+    cal = Calendar()
+    cal.add('prodid', '-//By Rydéns ERP//')
+    cal.add('version', '2.0')
+    
+    event = Event()
+    event.add('summary', f"Inspection Event: {doc.name}")
+    event.add('dtstart', doc.starts_on)  # 直接使用 datetime 物件
+    event.add('dtend', doc.ends_on or doc.starts_on)  # 直接使用 datetime 物件
+    event.add('description', doc.description or "No description")
+    event.add('location', doc.supplier or "N/A")
+    event.add('uid', f"{doc.name}@byrydens.com")
+    
+    cal.add_component(event)
+    
+    ics_buffer = io.BytesIO()
+    ics_buffer.write(cal.to_ical())
+    ics_buffer.seek(0)
+    
+    # === 郵件內容 ===
+    html = f"""
+    <p>親愛的 {doc.inspector}，</p>
+    <p>您有一個 Inspection Event 邀請：</p>
+    <ul>
+        <li><strong>事件</strong>: {doc.name}</li>
+        <li><strong>開始</strong>: {format_date(doc.starts_on)} {format_time(doc.starts_on)}</li>
+        <li><strong>結束</strong>: {format_date(doc.ends_on) if doc.ends_on else 'N/A'}</li>
+        <li><strong>供應商</strong>: {doc.supplier or 'N/A'}</li>
+        <li><strong>描述</strong>: {doc.description or 'N/A'}</li>
+    </ul>
+    <p>請匯入附件到 Outlook 日曆。</p>
+    """
+    
+    # === 發送郵件 ===
+    frappe.sendmail(
+        recipients=[inspector_email],
+        subject=f"Inspection Invitation: {doc.name} - {format_date(doc.starts_on)}",
+        message=html,
+        attachments=[{
+            'fname': 'invitation.ics',
+            'fcontent': ics_buffer.read(),
+            'content_type': 'text/calendar'
+        }]
+    )
+    
+    return {"status": "success", "message": _("邀請已發送")}

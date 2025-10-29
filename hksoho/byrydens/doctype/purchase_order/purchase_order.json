@@ -34,6 +34,7 @@
   "coordinator",
   "purpose",
   "invoice_number",
+  "way_of_delivery",
   "section_break_vupi",
   "booking_requested_days_before_po_shipdate_ocean_transport_only",
   "consolidation_days_before_po_shipdate_ocean_transport_only_copy",
@@ -137,6 +138,8 @@
   {
    "fieldname": "purpose",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Purpose"
   },
   {
@@ -359,12 +362,19 @@
    "fieldtype": "Data",
    "label": "Latest file number",
    "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
+  },
+  {
+   "fieldname": "way_of_delivery",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Way of Delivery",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-29 17:25:56.898933",
+ "modified": "2025-10-22 17:41:38.223485",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",
@@ -411,7 +421,5 @@
  "sort_order": "DESC",
  "states": [],
  "title_field": "po_number",
- "track_changes": 1,
- "track_seen": 1,
- "track_views": 1
+ "track_changes": 1
 }

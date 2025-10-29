@@ -12,6 +12,7 @@
   "article_name",
   "item_type",
   "unit_price",
+  "price_currency",
   "requested_qty",
   "confirmed_qty",
   "booked_qty",
@@ -43,8 +44,9 @@
   "column_break_lipu",
   "pcs_per_cartion",
   "carton_gross_kg",
+  "short_description",
   "article_photo",
-  "short_description"
+  "image_view"
  ],
  "fields": [
   {
@@ -280,6 +282,18 @@
    "fieldname": "remaining_qty",
    "fieldtype": "Int",
    "label": "Remaining Qty"
+  },
+  {
+   "fieldname": "image_view",
+   "fieldtype": "Image",
+   "label": "Image View",
+   "options": "article_photo"
+  },
+  {
+   "fieldname": "price_currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
   }
  ],
  "grid_page_length": 50,
@@ -287,7 +301,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-20 08:49:03.219444",
+ "modified": "2025-10-24 18:31:00.388575",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item",

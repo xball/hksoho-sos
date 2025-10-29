@@ -1,19 +1,21 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "field:attachment_name",
+ "autoname": "File-.#####",
  "creation": "2025-10-09 03:11:13.954967",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "active",
   "attachment_name",
   "attachment_file",
   "file_type",
   "description",
-  "column_break_wzxr",
   "version",
   "uploaded_by",
-  "upload_date"
+  "upload_date",
+  "column_break_wzxr",
+  "product_link"
  ],
  "fields": [
   {
@@ -36,7 +38,8 @@
    "fieldname": "file_type",
    "fieldtype": "Select",
    "label": "File Type",
-   "options": "\nImage\nPDF\nDrawing\nDocument\nOther"
+   "options": "\nImage\nPDF\nDrawing\nDocument\nOther",
+   "reqd": 1
   },
   {
    "fieldname": "description",
@@ -44,6 +47,7 @@
    "label": "Description"
   },
   {
+   "default": "1",
    "fieldname": "column_break_wzxr",
    "fieldtype": "Column Break"
   },
@@ -61,17 +65,31 @@
   {
    "fieldname": "upload_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Uploaded Date"
+  },
+  {
+   "default": "1",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "fieldname": "product_link",
+   "fieldtype": "Table",
+   "label": "Product link",
+   "options": "Product Attachment Link"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 10:36:28.179192",
+ "modified": "2025-10-10 06:02:05.340682",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product Attachment",
- "naming_rule": "By fieldname",
+ "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [
   {

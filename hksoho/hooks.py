@@ -29,7 +29,12 @@ scheduler_events = {
         "hksoho.byrydens.importing.import_csv2partner.execute",
         "hksoho.byrydens.importing.import_csv2product.execute",
         "hksoho.byrydens.importing.import_csv2currency.execute"
-    ]
+    ],
+    "cron": {
+        "0 8 * * *": [
+            "hksoho.byrydens.utils.send_daily_inspection_reminders"
+        ]
+    }
 }
 
 doc_events = {
@@ -107,6 +112,11 @@ doc_events = {
 # 	"filters": "hksoho.utils.jinja_filters"
 # }
 
+jinja = {
+    "globals": {
+        "get_image_datauri": "hksoho.byrydens.utils.get_image_datauri"
+    }
+}
 # Installation
 # ------------
 

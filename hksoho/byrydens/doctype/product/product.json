@@ -63,10 +63,7 @@
   "multipack",
   "packaging",
   "attachments_tab",
-  "attachments",
-  "attachment_preview",
-  "section_break_umjp",
-  "table_files"
+  "list_of_attachment"
  ],
  "fields": [
   {
@@ -358,32 +355,17 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "table_files",
-   "fieldtype": "Table",
-   "label": "Attachments2",
-   "options": "Product Attachment Item"
-  },
-  {
-   "fieldname": "section_break_umjp",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "attachment_preview",
+   "default": "<p>No associated attachments</p>",
+   "fieldname": "list_of_attachment",
    "fieldtype": "HTML",
-   "label": "Attachment Preview"
-  },
-  {
-   "fieldname": "attachments",
-   "fieldtype": "Table",
-   "label": "Attachments",
-   "options": "Product Attachment Link"
+   "label": "List of Attachment"
   }
  ],
  "grid_page_length": 50,
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-09 10:21:21.430646",
+ "modified": "2025-10-10 11:20:15.076002",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

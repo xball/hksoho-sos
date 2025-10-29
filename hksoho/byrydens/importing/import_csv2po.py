@@ -112,8 +112,8 @@ def import_po_data(file_path):
                         "requested_qty": int(row[4]) if row[4] else 0,
                         "article_name": row[6],
                         "supplier_art_number": row[7],
-                        "supplier_selling_price": float(row[8]) if row[8] else 0,
-                        "supplier_selling_price_unit": row[9],
+                        "unit_price": float(row[8]) if row[8] else 0,
+                        "price_currency": row[9],
                         "requested_finish_date": row[12] if row[12] else None,
                         "requested_eta": row[13] if row[13] else None,
                         "short_description": []
@@ -151,6 +151,13 @@ def create_purchase_order(po_data):
         return False, msg
     partner = validate_link_field("Partner", "name", supplier_code)
     qc_required = 1 if partner and frappe.get_value("Partner", partner, "quality_control") == "Always Requested" else 0
+
+    # 獲取任意 PO 項目的 requested_eta 作為 po_shipdate
+    po_shipdate = None
+    for item in po_data["items"]:
+        if item["requested_eta"]:
+            po_shipdate = format_date(item["requested_eta"])
+            break
 
     updated_fields = []
     action = "Created"
@@ -190,7 +197,7 @@ def create_purchase_order(po_data):
         "order_type": order_type,
         "purpose": po_data["purpose"],
         "qc_requested": qc_required,
-        "conversion_rate": 1.0
+        "po_shipdate": po_shipdate
     }
 
     if po_exists:
@@ -217,8 +224,8 @@ def create_purchase_order(po_data):
         item_data = {
             "article_number": article_number,
             "requested_qty": item["requested_qty"],
-            "supplier_selling_price": item["supplier_selling_price"],
-            "supplier_selling_price_unit": item["supplier_selling_price_unit"],
+            "unit_price": item["unit_price"],
+            "price_currency": item["price_currency"],
             "article_name": item["article_name"],
             "short_description": "\n".join(item["short_description"]),
             "requested_finish_date": format_date(item["requested_finish_date"]),

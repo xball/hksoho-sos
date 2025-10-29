@@ -5,7 +5,6 @@
  "creation": "2025-09-01 14:53:03.640195",
  "doctype": "DocType",
  "document_type": "Document",
- "email_append_to": 1,
  "engine": "InnoDB",
  "field_order": [
   "details",
@@ -13,13 +12,13 @@
   "supplier",
   "inspector",
   "inspection",
-  "type",
+  "status",
+  "column_break_jbps",
   "starts_on",
   "ends_on",
-  "status",
-  "sender",
+  "type",
   "send_reminder",
-  "column_break_jbps",
+  "section_break_deek",
   "po_items",
   "section_break_8",
   "description"
@@ -62,13 +61,6 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Open\nCompleted\nClosed\nCancelled"
-  },
-  {
-   "fieldname": "sender",
-   "fieldtype": "Data",
-   "label": "Sender",
-   "options": "Email",
-   "read_only": 1
   },
   {
    "fieldname": "section_break_8",
@@ -125,12 +117,15 @@
    "label": "Type",
    "options": "Final Inspection\nSample Inspection\nInline Inspection",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_deek",
+   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
- "icon": "fa fa-calendar",
  "links": [],
- "modified": "2025-09-03 10:37:26.311424",
+ "modified": "2025-10-28 17:45:09.031171",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Inspection Event",
@@ -177,7 +172,5 @@
  "sort_order": "DESC",
  "states": [],
  "subject_field": "subject",
- "track_changes": 1,
- "track_seen": 1,
- "track_views": 1
+ "track_changes": 1
 }
