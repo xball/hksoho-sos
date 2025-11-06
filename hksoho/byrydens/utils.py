@@ -2,9 +2,11 @@ import frappe
 import base64
 import mimetypes
 
-import frappe
 from frappe import _
-from frappe.utils import format_date, format_time, today
+
+from frappe.utils.data import now_datetime, get_system_timezone, format_date, format_time  # 修正匯入為 get_system_timezone
+from datetime import date
+import pytz
 
 def get_image_datauri(file_url):
     if not file_url:
@@ -41,29 +43,28 @@ def get_image_datauri(file_url):
 
 
 
+
 def send_daily_inspection_reminders():
     """
-    Daily at 8:00 AM: Send reminder to Inspector
+    每小時執行：根據 Inspector 時區發送早上 8 點提醒
     TEST MODE: Print sent emails to console
     """
-    current_date = today()
-    print(f"\n=== Inspection Reminder Job Started at {frappe.utils.now()} ===")
-    print(f"Searching for Inspection Events on: {current_date}\n")
+    now_utc = now_datetime()  # 取得 UTC 時間
+    print(f"\n=== Inspection Reminder Job Started at {frappe.utils.now()} (UTC) ===")
 
-    # 找出今天 starts_on 的 Open 事件
+    # 找出所有 Open 事件（不限今天，以防時區差異）
     events = frappe.get_all(
         "Inspection Event",
         filters={
-            "starts_on": ["between", [f"{current_date} 00:00:00", f"{current_date} 23:59:59"]],
             "status": "Open",
             "send_reminder": 1,
             "inspector": [">", ""]
         },
-        fields=["name", "inspector"]
+        fields=["name", "inspector", "starts_on"]
     )
 
     if not events:
-        print("No events found for today. Job completed.\n")
+        print("No open events found. Job completed.\n")
         return
 
     sent_count = 0
@@ -71,32 +72,62 @@ def send_daily_inspection_reminders():
         try:
             doc = frappe.get_doc("Inspection Event", event.name)
             inspector_email = frappe.db.get_value("User", doc.inspector, "email")
-
             if not inspector_email:
                 print(f"SKIP: Inspector '{doc.inspector}' has no email → Event: {doc.name}")
                 continue
 
-            # === 測試用：印出即將寄送的資訊 ===
-            print(f"SENDING REMINDER →")
-            print(f"   Event     : {doc.name}")
-            print(f"   Inspector : {doc.inspector}")
-            print(f"   Email     : {inspector_email}")
-            print(f"   Starts On : {doc.starts_on}")
-            print("-" * 50)
+            # 取得 Inspector 的時區
+            user_tz = frappe.db.get_value("User", doc.inspector, "time_zone") or get_system_timezone()  # 修正為 get_system_timezone
+            tz = pytz.timezone(user_tz)
+            now_local = now_utc.astimezone(tz)  # 轉換為當地時間
+            today_local = now_local.date()  # 當地今日日期
 
-            # 實際寄信（可關閉測試時）
-            subject = f"Inspection Event Reminder: {doc.name} - {format_date(doc.starts_on)}"
-            html_body = get_email_html(doc)
+            # 檢查事件 starts_on 是否為當地今天（基於時區調整）
+            starts_on_local = frappe.utils.get_datetime(doc.starts_on).astimezone(tz).date()
+            if starts_on_local != today_local:
+                print(f"SKIP: Event {doc.name} not today in {user_tz} (starts_on: {starts_on_local})")
+                continue
 
-            frappe.sendmail(
-                recipients=[inspector_email],
-                subject=subject,
-                content=html_body,  # 直接用 HTML，不用 template
-                delayed=False
-            )
+            # 檢查最後發送記錄
+            log_name = frappe.db.get_value("Reminder Log", {"user": doc.inspector})
+            last_sent = None
+            if log_name:
+                last_sent = frappe.db.get_value("Reminder Log", log_name, "last_sent_date")
+            else:
+                # 如果無記錄，建立新的一筆
+                new_log = frappe.get_doc({
+                    "doctype": "Reminder Log",
+                    "user": doc.inspector,
+                    "last_sent_date": None
+                }).insert(ignore_permissions=True)
+                log_name = new_log.name
 
-            sent_count += 1
-            print(f"SUCCESS: Email sent to {inspector_email}\n")
+            # 如果是當地早上 8 點，且今天尚未發送
+            if now_local.hour == 8 and (not last_sent or last_sent < today_local):
+                # === 測試用：印出即將寄送的資訊 ===
+                print(f"SENDING REMINDER →")
+                print(f"   Event     : {doc.name}")
+                print(f"   Inspector : {doc.inspector}")
+                print(f"   Email     : {inspector_email}")
+                print(f"   Starts On : {doc.starts_on} (Local: {now_local})")
+                print("-" * 50)
+
+                # 實際寄信
+                subject = f"Inspection Event Reminder: {doc.name} - {format_date(doc.starts_on)}"
+                html_body = get_email_html(doc)
+
+                frappe.sendmail(
+                    recipients=[inspector_email],
+                    subject=subject,
+                    content=html_body,
+                    delayed=False
+                )
+
+                sent_count += 1
+                print(f"SUCCESS: Email sent to {inspector_email}\n")
+
+                # 更新最後發送日期
+                frappe.db.set_value("Reminder Log", log_name, "last_sent_date", today_local)
 
         except Exception as e:
             error_msg = str(e)
@@ -104,7 +135,7 @@ def send_daily_inspection_reminders():
             frappe.log_error(f"Inspection reminder failed for {doc.name}: {error_msg}")
 
     print(f"=== Job Completed: {sent_count} reminder(s) sent ===\n")
-    
+
     
 def get_email_html(doc):
     """Generate HTML email with safe CSS (no #RRGGBBAA)"""

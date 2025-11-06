@@ -28,13 +28,9 @@ scheduler_events = {
         "hksoho.byrydens.importing.import_csv2po.execute",
         "hksoho.byrydens.importing.import_csv2partner.execute",
         "hksoho.byrydens.importing.import_csv2product.execute",
-        "hksoho.byrydens.importing.import_csv2currency.execute"
-    ],
-    "cron": {
-        "0 8 * * *": [
-            "hksoho.byrydens.utils.send_daily_inspection_reminders"
-        ]
-    }
+        "hksoho.byrydens.importing.import_csv2currency.execute",
+        "hksoho.byrydens.utils.send_daily_inspection_reminders"
+    ]
 }
 
 doc_events = {
@@ -202,6 +198,12 @@ jinja = {
 # 	"monthly": [
 # 		"hksoho.tasks.monthly"
 # 	],
+
+    # "cron": {
+    #     "0 8 * * *": [
+    #         "hksoho.byrydens.utils.send_daily_inspection_reminders"
+    #     ]
+    # }
 # }
 
 # Testing

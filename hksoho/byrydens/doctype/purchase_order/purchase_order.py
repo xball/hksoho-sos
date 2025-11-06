@@ -6,7 +6,9 @@ from datetime import datetime, date
 # Constants
 DEBUG_FILE = "/home/frappe/frappe-bench/temp/debug_log.txt"
 OUTPUT_DIR = "/home/ftpuser/topyramid"
-LAST_NUMBER_FILE = "/home/ftpuser/topyramid/last_number.txt"
+OUTPUT_DIR_OWN = "/home/frappe/topyramid"
+
+LAST_NUMBER_FILE = "/home/frappe/last_number.txt"
 INITIAL_SEQUENCE = 20000
 FIELDS_TO_CHECK = ['po_status']
 ITEM_FIELDS_TO_CHECK = ['article_number', 'line', 'article_name', 'unit_price', 'confirmed_qty', 'requested_qty', 'confirmed_shipdate']
@@ -168,7 +170,7 @@ class PurchaseOrder(Document):
         latest_file_number = self.get('latest_file_number') or ''
         if latest_file_number:
             try:
-                latest_file_path = os.path.join(OUTPUT_DIR, f"{latest_file_number}.txt")
+                latest_file_path = os.path.join(OUTPUT_DIR_OWN, f"{latest_file_number}.txt")
                 if os.path.exists(latest_file_path):
                     with open(latest_file_path, "r", encoding="cp1252") as f:
                         existing_content = f.read()
@@ -201,7 +203,9 @@ class PurchaseOrder(Document):
         try:
             sequence = get_next_sequence_number()
             file_name = f"B{sequence}.txt"
-            file_path = os.path.join(OUTPUT_DIR, file_name)
+            file_path = os.path.join(OUTPUT_DIR_OWN, file_name)
+            file_path_ftp = os.path.join(OUTPUT_DIR, file_name)
+            
             logger.info(f"Generating file: {file_path}")
             write_debug_log(f"Generating file: {file_path}")
         except Exception as e:
@@ -220,9 +224,12 @@ class PurchaseOrder(Document):
             write_debug_log(f"Failed to update latest_file_number for PO: {self.name}: {str(e)}")
             return
 
+        os.umask(0)
         # 寫入檔案內容
         try:
             with open(file_path, "w", encoding="cp1252") as f:
+                f.write(new_content_str)
+            with open(file_path_ftp, "w", encoding="cp1252") as f:
                 f.write(new_content_str)
             logger.info(f"Successfully wrote file: {file_path}")
             write_debug_log(f"Successfully wrote file: {file_path}")
