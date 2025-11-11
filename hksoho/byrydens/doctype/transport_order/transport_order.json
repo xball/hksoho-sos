@@ -255,7 +255,7 @@
    "fieldname": "etd_date",
    "fieldtype": "Date",
    "label": "ETD Date",
-   "read_only": 1
+   "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
   },
   {
    "fieldname": "eta_date",
@@ -324,7 +324,7 @@
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-10-01 18:00:08.269516",
+ "modified": "2025-11-10 16:59:07.212821",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",

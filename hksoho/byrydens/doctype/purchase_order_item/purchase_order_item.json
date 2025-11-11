@@ -35,6 +35,8 @@
   "qc_rejected_qty",
   "number_of_inspection",
   "qc_update_status",
+  "order_status",
+  "container_no",
   "section_break_odpq",
   "carton_cbm",
   "unit_net_kg",
@@ -294,6 +296,18 @@
    "fieldtype": "Link",
    "label": "Currency",
    "options": "Currency"
+  },
+  {
+   "fieldname": "order_status",
+   "fieldtype": "Data",
+   "label": "Order Status",
+   "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
+  },
+  {
+   "fieldname": "container_no",
+   "fieldtype": "Data",
+   "label": "Container Number",
+   "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
   }
  ],
  "grid_page_length": 50,
@@ -301,7 +315,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-10-24 18:31:00.388575",
+ "modified": "2025-11-11 16:41:33.754616",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item",

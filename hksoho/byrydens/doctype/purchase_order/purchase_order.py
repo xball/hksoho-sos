@@ -140,8 +140,24 @@ class PurchaseOrder(Document):
                 content.append(f"#12451;{unit_price}")
                 logger.info(f"Item {article_number}: unit_price={unit_price}")
                 write_debug_log(f"Item {article_number}: unit_price={unit_price}")
-                qty_diff = (item.confirmed_qty or 0) - (item.requested_qty or 0)
+                
+                
+                # ---------- 關鍵修改：根據 order_status 決定 #12441 的值 ----------
+                order_status = (item.order_status or "").strip()
+                qc_status = (item.qc_update_status or "").strip()
+                if qc_status and qc_status == "Pass":
+                    qc_status_output = "APPROVED"
+                else: 
+                    qc_status_output = "REQUESTED"
+                if order_status == "Shipped":
+                # 已出貨 → 數量差異強制為 0
+                    qty_diff = 0
+                else:
+                # 未出貨 → 原本邏輯：confirmed_qty - requested_qty
+                    qty_diff = (item.confirmed_qty or 0) - (item.requested_qty or 0)
+
                 content.append(f"#12441;{qty_diff}")
+                
                 ship_date = item.confirmed_shipdate 
                 if ship_date:
                     try:
@@ -154,7 +170,17 @@ class PurchaseOrder(Document):
                         logger.warning(f"Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}")
                         write_debug_log(f"Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}")
                         ship_date = ''
-                content.append(f"#5513;{ship_date or ''}")
+                content.append(f"¤5513;{ship_date or ''}")
+                
+                content.append(f"¤18549;{po_status.upper() or ''}")
+                content.append(f"¤18550;{qc_status_output or ''}")
+                
+                if order_status == "Shipped":
+                    # 新增 SHIPPED 標記
+                    content.append(f"¤18551;SHIPPED")
+                    # 新增 container_no（如有的話）
+                    container_no = item.container_no or ""
+                    content.append(f"¤18541;{container_no}")
             logger.info(f"Processed {len(self.po_items)} items for PO: {po_id}")
             write_debug_log(f"Processed {len(self.po_items)} items for PO: {po_id}")
         except Exception as e:
