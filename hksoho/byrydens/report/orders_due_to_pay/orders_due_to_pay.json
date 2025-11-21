@@ -1,0 +1,37 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [],
+ "creation": "2025-11-17 16:40:07.790186",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "javascript": "",
+ "letter_head": "Company Logo header",
+ "letterhead": null,
+ "modified": "2025-11-17 17:02:57.927152",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Orders Due to Pay",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Purchase Order",
+ "report_name": "Orders Due to Pay",
+ "report_script": "# \u6975\u7c21\u6e2c\u8a66\u7248 - \u4fdd\u8b49\u4e00\u5b9a\u6709\u8f38\u51fa\uff01\r\n\r\ndef execute(filters=None):\r\n    columns = [\r\n        {\"label\": \"\u6e2c\u8a66\u8a0a\u606f\", \"fieldname\": \"msg\", \"fieldtype\": \"Data\", \"width\": 300},\r\n        {\"label\": \"\u6642\u9593\", \"fieldname\": \"time\", \"fieldtype\": \"Data\", \"width\": 200},\r\n    ]\r\n\r\n    data = [\r\n        {\"msg\": \"\u606d\u559c\uff01\u5831\u8868\u5df2\u7d93\u6210\u529f\u57f7\u884c\u4e86\uff01\", \"time\": frappe.utils.now()},\r\n        {\"msg\": \"\u4ee3\u8868 Server Script \u5b8c\u5168\u6b63\u5e38\", \"time\": \"Frappe v15.77.0 OK\"},\r\n        {\"msg\": \"\u63a5\u4e0b\u4f86\u6211\u5011\u518d\u6162\u6162\u52a0\u56de\u539f\u672c\u908f\u8f2f\", \"time\": \"\u4e0b\u4e00\u6b65\u6e96\u5099\u597d\u4e86\"},\r\n    ]\r\n\r\n    return columns, data",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Purchase Manager"
+  },
+  {
+   "role": "Co-operator"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "timeout": 0
+}

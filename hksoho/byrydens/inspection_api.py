@@ -264,3 +264,19 @@ def send_inspection_invitation(inspection_event_name):
     )
     
     return {"status": "success", "message": _("邀請已發送")}
+
+
+@frappe.whitelist()
+def update_qc_accepted_qty(purchase_order, line_number, aql_qty):
+    try:
+        po_item = frappe.get_doc("Purchase Order Item", {
+            "parent": purchase_order,
+            "line": line_number
+        })
+        po_item.qc_accepted_qty = (po_item.qc_accepted_qty or 0) + aql_qty
+        po_item.save(ignore_permissions=True)
+        frappe.db.commit()
+        return {"success": True, "qc_accepted_qty": po_item.qc_accepted_qty}
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "update_qc_accepted_qty")
+        return {"success": False, "error": str(e)}

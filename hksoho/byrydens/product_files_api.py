@@ -33,7 +33,7 @@ def get_product_attachments(product_name):
         # Fetch attachment details for valid names only
         attachments = frappe.get_all('Product Attachment',
                                    filters={'name': ['in', valid_names],'active': 1},
-                                   fields=['attachment_name', 'file_type', 'attachment_file'])
+                                   fields=['name', 'attachment_name', 'file_type', 'attachment_file'])
         frappe.log_error(message=f"Found {len(attachments)} attachments", title="Product Attachment Debug")
 
         # Generate HTML table
@@ -41,7 +41,9 @@ def get_product_attachments(product_name):
         html += '<thead><tr><th>File Name</th><th>Type</th><th>Download</th></tr></thead>'
         html += '<tbody>'
         for attachment in attachments:
-            html += f'<tr><td>{attachment.attachment_name}</td><td>{attachment.file_type}</td><td><a href="{attachment.attachment_file}" target="_blank">Download</a></td></tr>'
+            attachment_url = f'/app/product-attachment/{attachment["name"]}'
+            html += f'<tr><td><a href="{attachment_url}" target="_blank">{attachment.attachment_name}</a></td><td>{attachment.file_type}</td><td><a href="{attachment.attachment_file}" target="_blank">Download</a></td></tr>'
+        
         html += '</tbody></table>'
 
         return {'html': html}

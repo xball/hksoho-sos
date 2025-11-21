@@ -38,7 +38,7 @@
    "fieldname": "file_type",
    "fieldtype": "Select",
    "label": "File Type",
-   "options": "\nImage\nPDF\nDrawing\nDocument\nOther",
+   "options": "Assembly Instruction\nBOM List\nBusiness Intelligence\nCertificate\nCorrective Action Report\nDocument\nDrawing\nGuarantee Letter\nImage\nInitial Sample Report\nLabel\nOffer\nPackaging Instruction\nProduction sheet\nQuotation sheet\nReference\nTechnical change note\nTechnical Specification",
    "reqd": 1
   },
   {
@@ -85,7 +85,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-10 06:02:05.340682",
+ "modified": "2025-11-21 03:16:42.832664",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product Attachment",

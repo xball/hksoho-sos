@@ -218,3 +218,96 @@ def get_email_html(doc):
         </div>
     </div>
     """
+    
+# Server Script → Script Type = API
+# API Method 欄位請填： get_due_po_details
+
+@frappe.whitelist()
+def get_due_po_details(year, month_name):
+    
+    print(f"\n{'='*60}")
+    print(f"DEBUG: Starting get_due_po_details")
+    print(f"DEBUG: year = {year}, month_name = {month_name}")
+    print(f"{'='*60}\n")
+    month_map = {"January":"01","February":"02","March":"03","April":"04","May":"06",
+                 "July":"07","August":"08","September":"09","October":"10","November":"11","December":"12"}
+    month = month_map.get(month_name)
+    if not month: frappe.throw("Invalid month")
+
+    start = f"{year}-{month}-01"
+    end = frappe.utils.get_last_day(start)
+
+    print("DEBUG: Executing SQL query...")
+
+    data = frappe.db.sql("""
+        SELECT 
+            po.name AS po_number,
+            po.supplier AS partner_id,
+            COALESCE(p.partner_name, po.supplier) AS partner_name,
+            po.po_shipdate,
+            po.po_status,
+            po.order_purchase_currency AS currency,
+            SUM(item.confirmed_qty * item.unit_price) AS undelivered_value
+        FROM `tabPurchase Order` po
+        LEFT JOIN `tabPartner` p ON p.partner_id = po.supplier
+        JOIN `tabPurchase Order Item` item ON item.parent = po.name
+        WHERE po.po_shipdate BETWEEN %s AND %s AND COALESCE(item.order_status, '') != "Shipped"
+        GROUP BY po.name
+        ORDER BY po.po_shipdate DESC
+    """, (start, end), as_dict=1)
+    
+    print(f"DEBUG: Query returned {len(data)} records\n")
+    
+    if data:
+        print("DEBUG: First record:")
+        print(f"  {data[0]}\n")
+        
+    columns = [
+        {"label": "PO Number", "fieldname": "po_number", "fieldtype": "Link", "options": "Purchase Order", "width": 130},
+        {"label": "Partner ID", "fieldname": "partner_id", "fieldtype": "Data", "width": 110},
+        {"label": "Partner Name", "fieldname": "partner_name", "fieldtype": "Data", "width": 220},
+        {"label": "Ship Date", "fieldname": "po_shipdate", "fieldtype": "Date", "width": 110},
+        {"label": "Status", "fieldname": "po_status", "fieldtype": "Data", "width": 90},
+        {"label": "Undelivered Value", "fieldname": "undelivered_value", "fieldtype": "Currency", "width": 140},
+        {"label": "Currency", "fieldname": "currency", "fieldtype": "Link", "options": "Currency", "width": 80}
+    ]
+    result = {
+        "title": f"{month_name} {year} – Orders Due to Pay ({len(data)} POs)",
+        "subtitle": "",
+        "columns": columns,
+        "data": data,
+        "print_settings": {}
+    }
+    print("DEBUG: Building return object...")
+    print(f"  title: {result['title']}")
+    print(f"  subtitle: '{result['subtitle']}'")
+    print(f"  columns: {len(result['columns'])} columns")
+    print(f"  data: {len(result['data'])} rows")
+    print(f"  print_settings: {result['print_settings']}")
+    print(f"\n{'='*60}")
+    print("DEBUG: Function completed successfully")
+    print(f"{'='*60}\n")
+    
+    print("\n" + "="*80)
+    print(f"ALL {len(result['data'])} PO RECORDS - COMPLETE DATA")
+    print("="*80)
+
+    for i, row in enumerate(result['data'], 1):
+        print(f"\n{'─'*80}")
+        print(f"Record {i} of {len(result['data'])}")
+        print(f"{'─'*80}")
+        print(f"  PO Number         : {row['po_number']}")
+        print(f"  Partner ID        : {row['partner_id']}")
+        print(f"  Partner Name      : {row['partner_name']}")
+        print(f"  Ship Date         : {row['po_shipdate']}")
+        print(f"  Status            : {row['po_status']}")
+        print(f"  Currency          : {row['currency']}")
+        print(f"  Undelivered Value : {row['undelivered_value']:,.2f}")
+
+    print("\n" + "="*80)
+    print(f"TOTAL RECORDS: {len(result['data'])}")
+    print("="*80)    
+    
+    
+    return result
+
