@@ -365,7 +365,7 @@
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-10 11:20:15.076002",
+ "modified": "2025-11-25 10:25:02.301799",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",
@@ -412,6 +412,15 @@
    "role": "Co-operator",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
   }
  ],
  "row_format": "Dynamic",

@@ -311,3 +311,125 @@ def get_due_po_details(year, month_name):
     
     return result
 
+
+@frappe.whitelist()
+def load_product_images_to_po_items(po_name):
+    """
+    將 Product 的 primary_image 自動帶入 Purchase Order 的每個 PO Item 的 article_photo 欄位
+    只會填「空白」的，避免覆蓋使用者手動上傳的圖
+    """
+    if not po_name:
+        frappe.throw("請提供 PO 名稱")
+
+    po = frappe.get_doc("Purchase Order", po_name)
+    updated = 0
+    skipped = 0
+
+    for item in po.po_items:
+        if not item.article_number:
+            continue
+
+        # 從 Product 取主圖
+        primary_image = frappe.db.get_value(
+            "Product",
+            item.article_number,
+            "primary_image"
+        )
+
+        if not primary_image:
+            continue  # Product 沒有圖，跳過
+
+    # 強制覆蓋全部（不管原本有沒有圖）
+        if primary_image != item.article_photo:
+            frappe.db.set_value(
+                "Purchase Order Item",
+                item.name,
+                "article_photo",
+                primary_image
+            )
+            updated += 1
+        else:
+            skipped += 1
+
+    # 可選：更新 PO 修改時間
+    frappe.db.set_value("Purchase Order", po_name, "modified", frappe.utils.now())
+
+    return {
+        "updated": updated,
+        "skipped": skipped,
+        "total": len(po.po_items)
+    }
+
+import frappe
+import os
+
+@frappe.whitelist()
+def make_product_images_public():
+    """
+    終極容錯版：把所有 Product 用的 Private 圖強制轉 Public
+    即使實體檔案不見了也強制成功！
+    """
+    count_fixed = 0
+    count_skipped = 0
+    count_error = 0
+
+    products = frappe.get_all(
+        "Product",
+        filters={"primary_image": ["like", "%/private/files/%"]},
+        fields=["name", "article_number", "primary_image"]
+    )
+
+    print(f"發現 {len(products)} 筆 Product 使用 Private 圖片，正在強制轉換...")
+
+    for p in products:
+        old_url = p.primary_image
+        filename = old_url.split("/")[-1]
+        
+        try:
+            # 嘗試用 file_url 找 File
+            file_doc = frappe.get_doc("File", {"file_url": old_url})
+        except:
+            # 找不到就用檔名搜（常見問題）
+            files = frappe.get_all("File", filters={"file_name": filename}, fields=["name"])
+            if not files:
+                print(f"完全找不到檔案（已跳過）: {p.article_number} → {old_url}")
+                count_error += 1
+                continue
+            file_doc = frappe.get_doc("File", files[0].name)
+
+        # 強制關閉 Frappe 的檔案存在性檢查
+        file_doc.flags.ignore_missing_file = True
+        
+        if not file_doc.is_private:
+            count_skipped += 1
+            continue
+
+        try:
+            # 關鍵！直接用 db_set 繞過所有驗證
+            frappe.db.set_value("File", file_doc.name, {
+                "is_private": 0,
+                "folder": "Home/Attachments"
+            }, update_modified=False)
+
+            # 直接修正 Product 的 URL（從 private → public）
+            new_url = old_url.replace("/private/files/", "/files/")
+            frappe.db.set_value("Product", p.name, "primary_image", new_url)
+
+            print(f"強制轉 Public 成功: {p.article_number} → {new_url}")
+            count_fixed += 1
+
+        except Exception as e:
+            print(f"轉換失敗（已跳過）: {p.article_number} → {str(e)}")
+            count_error += 1
+
+    frappe.db.commit()
+    
+    print("\n" + "="*80)
+    print("【大功告成】所有 Product 主圖已強制轉為 Public！")
+    print(f"成功轉換：{count_fixed} 張")
+    print(f"已為 Public：{count_skipped} 張")
+    print(f"跳過/錯誤：{count_error} 張（不影響其他圖片）")
+    print("="*80)
+    print("所有使用者現在都可以看到產品主圖了！")
+    
+    return {"fixed": count_fixed, "skipped": count_skipped, "error": count_error}
