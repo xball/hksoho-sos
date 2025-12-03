@@ -147,6 +147,7 @@
   {
    "fieldname": "load_port",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Load Port",
    "read_only": 1
   },
@@ -235,6 +236,7 @@
   {
    "fieldname": "dest_port",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Dest Port",
    "read_only": 1
   },
@@ -254,8 +256,7 @@
   {
    "fieldname": "etd_date",
    "fieldtype": "Date",
-   "label": "ETD Date",
-   "read_only_depends_on": "eval:frappe.user.has_role(\"System Manager\") != 1"
+   "label": "ETD Date"
   },
   {
    "fieldname": "eta_date",
@@ -324,7 +325,7 @@
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-11-10 16:59:07.212821",
+ "modified": "2025-12-02 05:16:42.592758",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Transport Order",

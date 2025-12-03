@@ -20,7 +20,7 @@ CURRENCY_FILE = "xpin_currency.txt"
 
 # 設置日誌
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, filename=LOG_FILE, filemode='a', format='[%(asctime)s] %(levelname)s: %(message)s')
+logging.basicConfig(level=logging.CRITICAL, filename=LOG_FILE, filemode='a', format='[%(asctime)s] %(levelname)s: %(message)s')
 
 # 儲存 Currency Rate 資料結構
 currency_rates = {}

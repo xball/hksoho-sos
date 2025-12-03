@@ -145,3 +145,49 @@ def update_to_line_invoice(to_name, po_number, invoice_data):
             "status": "error",
             "message": f"Failed to update invoice details: {error_message}"
         }
+        
+
+
+@frappe.whitelist()
+def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=None, dest_port_free_days=0, to_name=None):
+    vessel = frappe.get_doc("Vessels Time Table", vessel_name)
+    
+    if cfs_close: 
+        vessel.cfs_close = cfs_close
+    if etd_date:  
+        vessel.etd_date = etd_date
+    if eta_date:  
+        vessel.eta_date = eta_date
+    vessel.dest_port_free_days = int(dest_port_free_days)
+    
+    vessel.save(ignore_permissions=True)
+
+# 2. 更新 Transport Order → 改用 set_value 強制寫入（完全無視 workflow 凍結）
+    if to_name:
+        updates = {}
+        if cfs_close:          
+            updates["cfs_close"] = cfs_close
+        if etd_date:           
+            updates["etd_date"] = etd_date
+            #updates["booked_etd"] = etd_date
+        if eta_date:           
+            updates["eta_date"] = eta_date
+            updates["dest_port_free_days"] = int(dest_port_free_days)
+
+        frappe.db.set_value("Transport Order", to_name, updates)
+
+    frappe.db.commit()
+    return {"status": "success"}
+    
+    # if to_name:
+    #     to_doc = frappe.get_doc("Transport Order", to_name)
+    #     if cfs_close: to_doc.cfs_close = cfs_close
+    #     if etd_date:
+    #         to_doc.etd_date = etd_date
+    #         #to_doc.booked_etd = etd_date          # 同步 Booked ETD
+    #     if eta_date: to_doc.eta_date = eta_date
+    #     to_doc.dest_port_free_days = int(dest_port_free_days)
+    #     to_doc.save(ignore_permissions=True)
+    
+    # frappe.db.commit()
+    # return {"status": "success"}

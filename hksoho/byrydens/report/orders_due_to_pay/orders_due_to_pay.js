@@ -17,16 +17,17 @@ frappe.query_reports["Orders Due to Pay"] = {
             $('.dt-dropdown-container').remove();
         }, 200);
     },
-    
     formatter: function(value, row, column, data, default_formatter) {
-        if (column.fieldname === "details" && data && data.details && data.details.label) {
+        if (column.fieldname === "details" && data && data.details) {
+            const month_name = data.month.split(' ')[0];   // 取出 "March"
             return `<button class="btn btn-xs btn-primary" 
-                            onclick="showDuePODetails('${data.year}', '${data.month}')">
+                            onclick="showDuePODetails('${data.year}', '${month_name}')">
                     View Details
                     </button>`;
         }
         return default_formatter(value, row, column, data);
     }
+
 };
 
 function showDuePODetails(year, month) {

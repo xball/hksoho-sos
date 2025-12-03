@@ -255,6 +255,26 @@ def create_purchase_order(po_data):
             comment += f"\nUpdated fields:\n" + "\n".join(updated_fields)
         add_activity_message(PO_DOCTYPE, po.name, comment, 'Info')
         frappe.db.commit()
+        
+    # === 新增：匯入完立刻自動補產品圖！===
+        try:
+            from hksoho.byrydens.utils import load_product_images_to_po_items
+            result = load_product_images_to_po_items(po.name)
+            updated_images = result.get("updated", 0)
+            if updated_images > 0:
+                add_activity_message(PO_DOCTYPE, po.name, 
+                    f"Auto-loaded {updated_images} product image", 
+                    'Info')
+                print(f"PO {po.name} → auto-loaded {updated_images} product image！")
+            else:
+                print(f"PO {po.name} → no new product images to load.")
+        except Exception as e:
+            error_msg = f"Cannot load product image : {str(e)}"
+            logger.warning(error_msg)
+            print(error_msg)
+            add_activity_message(PO_DOCTYPE, po.name, error_msg, 'Warning')        
+    ##################################################    
+        
         msg = f"已{action}採購訂單: {po.name}"
         logger.info(msg)
         print(msg)

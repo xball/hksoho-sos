@@ -4,6 +4,15 @@ frappe.ui.form.on('Transport Order', {
         frm.fields_dict.items.grid.cannot_add_rows = true;
         frm.fields_dict.items.grid.wrapper.find('.grid-add-row').hide();
 
+
+
+        if (frm.doc.vessel && !frm.doc.__islocal) {
+            frm.add_custom_button('Update Vessel Schedule', function() {
+                updateVesselDates(frm);
+            });
+        }
+
+
         // Add custom button "Add Item"
         frm.add_custom_button('Add Item', function() {
             // Get all valid Purchase Orders with workflow_state = 'Ready to Ship'
@@ -353,6 +362,7 @@ frappe.ui.form.on('Transport Order', {
             d.show();
         });
 
+
         // Show/Hide "Add Item" button based on workflow_state
         let add_item_button = frm.$wrapper.find('.btn:contains("Add Item")');
         if (frm.doc.workflow_state === "Unconfirmed" || frm.doc.workflow_state === "Empty TO Head") {
@@ -621,7 +631,11 @@ frappe.ui.form.on('Transport Order', {
     },
     items_remove: function(frm, cdt, cdn) {
         calculate_total(frm);
+    },
+    vessel: function(frm) {
+        frm.trigger('refresh');
     }
+
 });
 
 frappe.ui.form.on('Transport Order Line', {
@@ -669,4 +683,114 @@ function calculate_total(frm) {
         total += row.value || 0;
     });
     frm.set_value('total_value', parseFloat(total.toFixed(2)));
+}
+
+
+
+function updateVesselDates(frm) {
+    if (!frm.doc.vessel) {
+        frappe.msgprint('Please select a Vessel first');
+        return;
+    }
+
+    // 先取得 Vessels Time Table 主檔
+    frappe.db.get_doc('Vessels Time Table', frm.doc.vessel).then(vessel_doc => {
+
+        // 同時取得 loading_port 和 destination_port 的 loc_code
+        const load_port_promise = vessel_doc.loading_port
+            ? frappe.db.get_value('Load-Dest Port', vessel_doc.loading_port, 'loc_code')
+            : Promise.resolve({ message: { loc_code: '(Not set)' } });
+
+        const dest_port_promise = vessel_doc.destination_port
+            ? frappe.db.get_value('Load-Dest Port', vessel_doc.destination_port, 'loc_code')
+            : Promise.resolve({ message: { loc_code: '(Not set)' } });
+
+        Promise.all([load_port_promise, dest_port_promise]).then(([load_res, dest_res]) => {
+            const load_code = load_res.message.loc_code || '(Not set)';
+            const dest_code = dest_res.message.loc_code || '(Not set)';
+
+            let d = new frappe.ui.Dialog({
+                title: 'Update Vessel Schedule Dates',
+                fields: [
+                    {
+                        label: 'CFS Close',
+                        fieldname: 'cfs_close',
+                        fieldtype: 'Date',
+                        default: vessel_doc.cfs_close
+                    },
+                    {
+                        label: 'ETD Date',
+                        fieldname: 'etd_date',
+                        fieldtype: 'Date',
+                        default: vessel_doc.etd_date,
+                        reqd: 1
+                    },
+                    {
+                        label: 'ETA Date',
+                        fieldname: 'eta_date',
+                        fieldtype: 'Date',
+                        default: vessel_doc.eta_date
+                    },
+                    {
+                        label: 'Dest. Port Free Days',
+                        fieldname: 'dest_port_free_days',
+                        fieldtype: 'Int',
+                        default: vessel_doc.dest_port_free_days || 0
+                    },
+                    { fieldtype: 'Section Break' },
+                    {
+                        fieldtype: 'HTML',
+                        fieldname: 'info_html',
+                        options: `
+                            <div style="padding:15px; background:#f8f9fa; border-left:4px solid #007bff; font-size:13px; line-height:1.6;">
+                                <p><strong>Current Vessel Schedule:</strong></p>
+                                <ul style="margin:8px 0;">
+                                    <li><strong>Vessel:</strong> ${vessel_doc.vessel || ''}</li>
+                                    <li><strong>Voyage:</strong> ${vessel_doc.voyage || '(Not set)'}</li>
+                                    <li><strong>Carrier:</strong> ${vessel_doc.carrier || '(Not set)'}</li>
+                                    <li><strong>Route:</strong> 
+                                        <code style="background:#e9ecef; padding:2px 8px; border-radius:4px; font-weight:bold;">
+                                            ${load_code}
+                                        </code>
+                                        → 
+                                        <code style="background:#e9ecef; padding:2px 8px; border-radius:4px; font-weight:bold;">
+                                            ${dest_code}
+                                        </code>
+                                    </li>
+                                </ul>
+                                <p style="color:#d63031; margin-top:12px; font-weight:500;">
+                                    Warning: These changes will update BOTH the <strong>Vessels Time Table</strong> record and the current <strong>Transport Order</strong>.
+                                </p>
+                            </div>`
+                    }
+                ],
+                primary_action_label: 'Save Changes',
+                primary_action: function(values) {
+                    frappe.call({
+                        method: 'hksoho.byrydens.transport_order_api.update_vessel_dates',
+                        args: {
+                            vessel_name: frm.doc.vessel,
+                            cfs_close: values.cfs_close || null,
+                            etd_date: values.etd_date,
+                            eta_date: values.eta_date || null,
+                            dest_port_free_days: values.dest_port_free_days || 0,
+                            to_name: frm.doc.name
+                        },
+                        callback: function(r) {
+                            if (!r.exc) {
+                                frappe.msgprint({
+                                    title: 'Success',
+                                    message: 'Vessel schedule dates have been updated successfully!',
+                                    indicator: 'green'
+                                });
+                                d.hide();
+                                frm.reload_doc();
+                            }
+                        }
+                    });
+                }
+            });
+            d.show();
+        });
+    });
 }

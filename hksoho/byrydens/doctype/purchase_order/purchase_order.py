@@ -34,6 +34,8 @@ class PurchaseOrder(Document):
         try:
             write_debug_log(f"validate triggered for PO: {self.name}")
             logger.info(f"validate triggered for Purchase Order: {self.name}")
+            treq_qty = 0
+            treq_amt = 0.0
             tconf_qty = 0
             tconf_amt = 0.0
             tbook_qty = 0
@@ -42,10 +44,21 @@ class PurchaseOrder(Document):
                 uprice = item.unit_price
                 uconf_qty = item.confirmed_qty
                 ubook_qty = item.booked_qty
+                ureq_qty = item.requested_qty
+                
                 if uprice is None or uconf_qty is None:	
                     item.amount = 0.0
                 else:
                     item.amount = uprice * uconf_qty
+                    
+                if uprice is None or ureq_qty is None:	
+                    req_amt = 0.0
+                else:
+                    req_amt = uprice * ureq_qty
+
+                treq_qty += ureq_qty or 0
+                treq_amt += req_amt or 0.0
+
                 tconf_qty += uconf_qty or 0
                 tconf_amt += item.amount or 0.0
                 tbook_qty += item.booked_qty or 0
@@ -55,7 +68,9 @@ class PurchaseOrder(Document):
             self.total_confirmed_amount = tconf_amt
             self.total_booked_qty = tbook_qty
             self.total_booked_amount = tbook_amt
-            
+            self.total_requested_qty = treq_qty
+            self.total_requested_amount = treq_amt            
+            write_debug_log(f"##Purchase Order: {self.name} , req_QTY {self.total_requested_qty}")
         except Exception as e:
             frappe.log_error(f"Validate failed for PO: {self.name}, error: {str(e)}")
             write_debug_log(f"validate failed for PO: {self.name}, error: {str(e)}")
@@ -76,7 +91,7 @@ class PurchaseOrder(Document):
             return
 
         # 檢查 sync_back_pyramid 欄位
-        if not self.get('sync_back_pyramid'):
+        if (not self.get('sync_back_pyramid')) or self.workflow_state == "Draft":
             logger.info(f"sync_back_pyramid is False for PO: {self.name}, skipping export")
             write_debug_log(f"sync_back_pyramid is False for PO: {self.name}, skipping export")
             return

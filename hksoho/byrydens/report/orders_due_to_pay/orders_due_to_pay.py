@@ -1,86 +1,55 @@
-# Copyright (c) 2025, HKSoHo and contributors
-# For license information, please see license.txt
-
 import frappe
 from frappe import _
 
-
 def execute(filters=None):
-    # 定義要顯示的年份範圍
-    current_year = int(frappe.utils.nowdate()[:4])
-    start_year = 2023  # 起始年份
-    end_year = current_year + 2  # 顯示到未來2年
+    # 使用您系統真正的欄位：requested_qty
+    data = frappe.db.sql("""
+        SELECT 
+            YEAR(po.po_shipdate) AS year,
+            MONTH(po.po_shipdate) AS month_num,
+            SUM((item.requested_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS due_amount
+        FROM `tabPurchase Order` po
+        JOIN `tabPurchase Order Item` item ON item.parent = po.name
+        WHERE po.po_shipdate IS NOT NULL
+          AND item.requested_qty > COALESCE(item.booked_qty, 0)
+          AND item.requested_qty > 0
+          AND item.unit_price > 0
+        GROUP BY YEAR(po.po_shipdate), MONTH(po.po_shipdate)
+        HAVING due_amount > 0
+        ORDER BY year ASC, month_num ASC
+    """, as_dict=1)
+
+    if not data:
+        return [
+            {"label": "訊息", "fieldname": "msg", "fieldtype": "Data", "width": 600}
+        ], [{"msg": "目前沒有任何未出貨訂單（requested_qty > booked_qty）"}]
+
+    rows = []
+    total = 0
+
+    for d in data:
+        month_name = frappe.utils.getdate(f"{d.year}-{d.month_num:02d}-01").strftime("%B %Y")
+        rows.append({
+            "year": d.year,
+            "month": month_name,
+            "due_amount": d.due_amount,
+            "details": {"label": "View Details"}
+        })
+        total += float(d.due_amount)
+
+    # 總計列
+    rows.append({
+        "year": "",
+        "month": "<strong style='color:#e74c3c; font-size:16px;'>Grand Total (All Time)</strong>",
+        "due_amount": total,
+        "details": ""
+    })
 
     columns = [
-        {"label": _("Year"), "fieldname": "year", "fieldtype": "Data", "width": 80},
-        {"label": _("Month"), "fieldname": "month", "fieldtype": "Data", "width": 110},
-        {"label": _("Amount Due"), "fieldname": "due_amount", "fieldtype": "Currency", "width": 160},
-        {"label": _("Details"), "fieldname": "details", "fieldtype": "Button", "width": 110},
+        {"label": "Year",       "fieldname": "year",       "fieldtype": "Int",      "width": 80},
+        {"label": "Month",      "fieldname": "month",      "fieldtype": "Data",     "width": 160},
+        {"label": "Amount Due", "fieldname": "due_amount", "fieldtype": "Currency", "width": 180},
+        {"label": "Details",    "fieldname": "details",    "fieldtype": "Button",   "width": 130}
     ]
 
-    month_names = {1:"January", 2:"February", 3:"March", 4:"April", 5:"May", 6:"June",
-                   7:"July", 8:"August", 9:"September", 10:"October", 11:"November", 12:"December"}
-
-    data = []
-    grand_total = 0
-
-    # 循環每一年
-    for year in range(start_year, end_year + 1):
-        yearly_total = 0
-        currency_summary = {}
-        year_has_data = False
-
-        # 循環每個月
-        for m in range(1, 13):
-            start = f"{year}-{str(m).zfill(2)}-01"
-            end = frappe.utils.get_last_day(start)
-
-            result = frappe.db.sql("""
-                SELECT po.order_purchase_currency,
-                       SUM(item.confirmed_qty * item.unit_price) AS amt
-                FROM `tabPurchase Order` po
-                JOIN `tabPurchase Order Item` item ON item.parent = po.name
-                WHERE 
-                  po.po_shipdate BETWEEN %s AND %s
-                  AND COALESCE(item.order_status, '') != "Shipped"
-                GROUP BY po.order_purchase_currency
-            """, (start, end), as_dict=1)
-
-            month_total = sum(frappe.utils.flt(r.amt or 0) for r in result)
-            
-            for r in result:
-                currency_summary[r.order_purchase_currency] = currency_summary.get(r.order_purchase_currency, 0) + frappe.utils.flt(r.amt or 0)
-
-            yearly_total += month_total
-
-            # 只加入 due_amount > 0 的資料行
-            if month_total > 0:
-                year_has_data = True
-                data.append({
-                    "year": year,
-                    "month": month_names[m],
-                    "due_amount": month_total,
-                    "details": {"label": "View Details"}
-                })
-
-        # 加入年度小計（只在該年有資料時）
-        if year_has_data and yearly_total > 0:
-            breakdown = "<br>".join([f"{c}: {a:,.2f}" for c, a in currency_summary.items()])
-            data.append({
-                "year": year,
-                "month": f"<strong style='color:#2980b9;'>Sub-Total {year}</strong>",
-                "due_amount": yearly_total,
-                "details": ""
-            })
-            grand_total += yearly_total
-
-    # 加入總計行
-    if grand_total > 0:
-        data.append({
-            "year": "",
-            "month": f"<strong style='color:#e74c3c;'>Grand Total ({start_year}-{end_year})</strong>",
-            "due_amount": grand_total,
-            "details": ""
-        })
-
-    return columns, data
+    return columns, rows

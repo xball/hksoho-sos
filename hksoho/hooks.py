@@ -25,10 +25,10 @@ app_include_css = ["/assets/hksoho/css/custom.css"]  # 將 your_app_name 替換�
 
 scheduler_events = {
     "hourly": [
-        "hksoho.byrydens.importing.import_csv2po.execute",
-        "hksoho.byrydens.importing.import_csv2partner.execute",
         "hksoho.byrydens.importing.import_csv2product.execute",
+        "hksoho.byrydens.importing.import_csv2partner.execute",
         "hksoho.byrydens.importing.import_csv2currency.execute",
+        "hksoho.byrydens.importing.import_csv2po.execute",
         "hksoho.byrydens.utils.send_daily_inspection_reminders"
     ]
 }

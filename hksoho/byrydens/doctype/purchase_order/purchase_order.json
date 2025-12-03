@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "autoname": "field:po_number",
  "creation": "2025-09-03 15:51:07.231999",
  "doctype": "DocType",
@@ -47,7 +48,9 @@
   "po_items_tab",
   "po_items",
   "summary_section",
+  "total_requested_qty",
   "total_confirmed_qty",
+  "total_requested_amount",
   "total_confirmed_amount",
   "column_break_trgt",
   "total_booked_qty",
@@ -349,7 +352,7 @@
    "label": "Invoice number"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "sync_back_pyramid",
    "fieldtype": "Check",
    "label": "Sync back Pyramid",
@@ -367,12 +370,26 @@
    "hidden": 1,
    "label": "Way of Delivery",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "total_requested_amount",
+   "fieldtype": "Float",
+   "label": "Total Requested Amount",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "total_requested_qty",
+   "fieldtype": "Int",
+   "label": "Total Requested QTY",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-17 15:52:14.431000",
+ "modified": "2025-12-01 15:25:13.132485",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",

@@ -218,148 +218,108 @@ def get_email_html(doc):
         </div>
     </div>
     """
-    
-# Server Script → Script Type = API
-# API Method 欄位請填： get_due_po_details
-
-@frappe.whitelist()
-def get_due_po_details(year, month_name):
-    
-    print(f"\n{'='*60}")
-    print(f"DEBUG: Starting get_due_po_details")
-    print(f"DEBUG: year = {year}, month_name = {month_name}")
-    print(f"{'='*60}\n")
-    month_map = {"January":"01","February":"02","March":"03","April":"04","May":"06",
-                 "July":"07","August":"08","September":"09","October":"10","November":"11","December":"12"}
-    month = month_map.get(month_name)
-    if not month: frappe.throw("Invalid month")
-
-    start = f"{year}-{month}-01"
-    end = frappe.utils.get_last_day(start)
-
-    print("DEBUG: Executing SQL query...")
-
-    data = frappe.db.sql("""
-        SELECT 
-            po.name AS po_number,
-            po.supplier AS partner_id,
-            COALESCE(p.partner_name, po.supplier) AS partner_name,
-            po.po_shipdate,
-            po.po_status,
-            po.order_purchase_currency AS currency,
-            SUM(item.confirmed_qty * item.unit_price) AS undelivered_value
-        FROM `tabPurchase Order` po
-        LEFT JOIN `tabPartner` p ON p.partner_id = po.supplier
-        JOIN `tabPurchase Order Item` item ON item.parent = po.name
-        WHERE po.po_shipdate BETWEEN %s AND %s AND COALESCE(item.order_status, '') != "Shipped"
-        GROUP BY po.name
-        ORDER BY po.po_shipdate DESC
-    """, (start, end), as_dict=1)
-    
-    print(f"DEBUG: Query returned {len(data)} records\n")
-    
-    if data:
-        print("DEBUG: First record:")
-        print(f"  {data[0]}\n")
-        
-    columns = [
-        {"label": "PO Number", "fieldname": "po_number", "fieldtype": "Link", "options": "Purchase Order", "width": 130},
-        {"label": "Partner ID", "fieldname": "partner_id", "fieldtype": "Data", "width": 110},
-        {"label": "Partner Name", "fieldname": "partner_name", "fieldtype": "Data", "width": 220},
-        {"label": "Ship Date", "fieldname": "po_shipdate", "fieldtype": "Date", "width": 110},
-        {"label": "Status", "fieldname": "po_status", "fieldtype": "Data", "width": 90},
-        {"label": "Undelivered Value", "fieldname": "undelivered_value", "fieldtype": "Currency", "width": 140},
-        {"label": "Currency", "fieldname": "currency", "fieldtype": "Link", "options": "Currency", "width": 80}
-    ]
-    result = {
-        "title": f"{month_name} {year} – Orders Due to Pay ({len(data)} POs)",
-        "subtitle": "",
-        "columns": columns,
-        "data": data,
-        "print_settings": {}
-    }
-    print("DEBUG: Building return object...")
-    print(f"  title: {result['title']}")
-    print(f"  subtitle: '{result['subtitle']}'")
-    print(f"  columns: {len(result['columns'])} columns")
-    print(f"  data: {len(result['data'])} rows")
-    print(f"  print_settings: {result['print_settings']}")
-    print(f"\n{'='*60}")
-    print("DEBUG: Function completed successfully")
-    print(f"{'='*60}\n")
-    
-    print("\n" + "="*80)
-    print(f"ALL {len(result['data'])} PO RECORDS - COMPLETE DATA")
-    print("="*80)
-
-    for i, row in enumerate(result['data'], 1):
-        print(f"\n{'─'*80}")
-        print(f"Record {i} of {len(result['data'])}")
-        print(f"{'─'*80}")
-        print(f"  PO Number         : {row['po_number']}")
-        print(f"  Partner ID        : {row['partner_id']}")
-        print(f"  Partner Name      : {row['partner_name']}")
-        print(f"  Ship Date         : {row['po_shipdate']}")
-        print(f"  Status            : {row['po_status']}")
-        print(f"  Currency          : {row['currency']}")
-        print(f"  Undelivered Value : {row['undelivered_value']:,.2f}")
-
-    print("\n" + "="*80)
-    print(f"TOTAL RECORDS: {len(result['data'])}")
-    print("="*80)    
-    
-    
-    return result
-
-
 @frappe.whitelist()
 def load_product_images_to_po_items(po_name):
     """
-    將 Product 的 primary_image 自動帶入 Purchase Order 的每個 PO Item 的 article_photo 欄位
-    只會填「空白」的，避免覆蓋使用者手動上傳的圖
+    One-click sync from Product → Purchase Order Item
+    Automatically fills:
+    • Primary Image
+    • Inner box CBM
+    • Inner box weight
+    • Pieces per carton
+    • Customs tariff code (HS Origin)
+    Only updates fields that are blank or different.
     """
     if not po_name:
-        frappe.throw("請提供 PO 名稱")
+        frappe.throw("PO name is required")
 
-    po = frappe.get_doc("Purchase Order", po_name)
-    updated = 0
-    skipped = 0
+    # Query child table directly to avoid cache issues
+    items = frappe.get_all(
+        "Purchase Order Item",
+        filters={"parent": po_name},
+        fields=[
+            "name", "article_number", "line",
+            "article_photo", "carton_cbm", "unit_net_kg",
+            "pcs_per_cartion", "hs_origin"
+        ]
+    )
 
-    for item in po.po_items:
+    if not items:
+        return {"updated": 0, "skipped": 0, "total": 0, "details": []}
+
+    updated_count = 0
+    detail_log = []
+
+    for item in items:
         if not item.article_number:
             continue
 
-        # 從 Product 取主圖
-        primary_image = frappe.db.get_value(
+        # Fetch multiple fields from Product in one query
+        product_data = frappe.db.get_value(
             "Product",
             item.article_number,
-            "primary_image"
+            [
+                "primary_image",
+                "gross_cbm_innerunit_box",
+                "gross_weight_kg_innerunit_box",
+                "units_in_carton_pieces_per_carton",
+                "customs_tariff_code"
+            ],
+            as_dict=True
         )
 
-        if not primary_image:
-            continue  # Product 沒有圖，跳過
+        if not product_data:
+            continue
 
-    # 強制覆蓋全部（不管原本有沒有圖）
-        if primary_image != item.article_photo:
-            frappe.db.set_value(
-                "Purchase Order Item",
-                item.name,
-                "article_photo",
-                primary_image
-            )
-            updated += 1
-        else:
-            skipped += 1
+        changes = []
 
-    # 可選：更新 PO 修改時間
-    frappe.db.set_value("Purchase Order", po_name, "modified", frappe.utils.now())
+        # 1. Primary Image
+        if product_data.primary_image and product_data.primary_image != item.article_photo:
+            frappe.db.set_value("Purchase Order Item", item.name, "article_photo", product_data.primary_image)
+            changes.append("Primary Image")
+
+        # 2. Inner box CBM
+        if product_data.gross_cbm_innerunit_box is not None:
+            current = item.carton_cbm or 0
+            if abs(float(current) - float(product_data.gross_cbm_innerunit_box)) > 0.0001:
+                frappe.db.set_value("Purchase Order Item", item.name, "carton_cbm", product_data.gross_cbm_innerunit_box)
+                changes.append("Inner Box CBM")
+
+        # 3. Inner box weight
+        if product_data.gross_weight_kg_innerunit_box is not None:
+            current = item.unit_net_kg or 0
+            if abs(float(current) - float(product_data.gross_weight_kg_innerunit_box)) > 0.0001:
+                frappe.db.set_value("Purchase Order Item", item.name, "unit_net_kg", product_data.gross_weight_kg_innerunit_box)
+                changes.append("Inner Box Weight")
+
+        # 4. Pieces per carton
+        if product_data.units_in_carton_pieces_per_carton:
+            if item.pcs_per_cartion != product_data.units_in_carton_pieces_per_carton:
+                frappe.db.set_value("Purchase Order Item", item.name, "pcs_per_cartion", product_data.units_in_carton_pieces_per_carton)
+                changes.append("Pcs per Carton")
+
+        # 5. Customs tariff code (HS Origin)
+        if product_data.customs_tariff_code and product_data.customs_tariff_code != item.hs_origin:
+            frappe.db.set_value("Purchase Order Item", item.name, "hs_origin", product_data.customs_tariff_code)
+            changes.append("HS Code")
+
+        if changes:
+            updated_count += 1
+            line_no = item.line or "?"
+            detail_log.append(f"Line {line_no}: {', '.join(changes)}")
+
+    # Clear cache so users see changes immediately
+    if updated_count > 0:
+        frappe.clear_document_cache("Purchase Order", po_name)
+        frappe.db.set_value("Purchase Order", po_name, "modified", frappe.utils.now(), update_modified=False)
+        frappe.db.commit()
 
     return {
-        "updated": updated,
-        "skipped": skipped,
-        "total": len(po.po_items)
+        "updated": updated_count,
+        "skipped": len(items) - updated_count,
+        "total": len(items),
+        "details": detail_log
     }
-
 import frappe
 import os
 
@@ -433,3 +393,58 @@ def make_product_images_public():
     print("所有使用者現在都可以看到產品主圖了！")
     
     return {"fixed": count_fixed, "skipped": count_skipped, "error": count_error}
+
+import frappe
+from frappe.utils import get_last_day
+from frappe import _
+
+@frappe.whitelist()
+def get_due_po_details(year, month_name):
+    month_map = {
+        "January": "01", "February": "02", "March": "03", "April": "04",
+        "May": "05", "June": "06", "July": "07", "August": "08",
+        "September": "09", "October": "10", "November": "11", "December": "12"
+    }
+    
+    month = month_map.get(month_name)
+    if not month:
+        return {"title": "錯誤", "data": [], "columns": [], "message": "月份格式錯誤"}
+
+    start = f"{year}-{month}-01"
+    end = get_last_day(start)
+
+    data = frappe.db.sql("""
+        SELECT 
+            po.name AS po_number,
+            po.supplier AS partner_id,
+            COALESCE(p.partner_name, po.supplier, 'Unknown') AS partner_name,
+            po.po_shipdate,
+            po.po_status,
+            po.order_purchase_currency AS currency,
+            SUM((item.requested_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS undelivered_value
+        FROM `tabPurchase Order` po
+        LEFT JOIN `tabPartner` p ON p.partner_id = po.supplier
+        JOIN `tabPurchase Order Item` item ON item.parent = po.name
+        WHERE po.po_shipdate BETWEEN %s AND %s
+          AND item.requested_qty > COALESCE(item.booked_qty, 0)
+          AND item.unit_price > 0
+        GROUP BY po.name
+        HAVING undelivered_value > 0
+        ORDER BY po.po_shipdate DESC, po.name DESC
+    """, (start, end), as_dict=1)
+
+    columns = [
+        {"label": "PO Number", "fieldname": "po_number", "fieldtype": "Link", "options": "Purchase Order", "width": 140},
+        {"label": "Partner ID", "fieldname": "partner_id", "fieldtype": "Data", "width": 120},
+        {"label": "Partner Name", "fieldname": "partner_name", "fieldtype": "Data", "width": 280},
+        {"label": "Ship Date", "fieldname": "po_shipdate", "fieldtype": "Date", "width": 110},
+        {"label": "Status", "fieldname": "po_status", "fieldtype": "Data", "width": 100},
+        {"label": "Currency", "fieldname": "currency", "fieldtype": "Data", "width": 80},
+        {"label": "Undelivered Value", "fieldname": "undelivered_value", "fieldtype": "Currency", "width": 160},
+    ]
+
+    return {
+        "title": f"{month_name} {year} – Orders Due to Pay ({len(data)} POs)",
+        "columns": columns,
+        "data": data
+    }
