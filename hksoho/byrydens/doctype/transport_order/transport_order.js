@@ -11,6 +11,63 @@ frappe.ui.form.on('Transport Order', {
                 updateVesselDates(frm);
             });
         }
+        
+        frm.add_custom_button('Load Product Data', function() {
+            // 檢查是否有明細行
+            if (!frm.doc.items || frm.doc.items.length === 0) {
+                frappe.msgprint('Please add line items first.');
+                return;
+            }
+
+            let rows_with_article = frm.doc.items.filter(row => row.article_number);
+            
+            if (rows_with_article.length === 0) {
+                frappe.msgprint('No Article Number found in line items. Cannot load data.');
+                return;
+            }
+
+            let processed = 0;
+            let skipped = 0;
+
+            rows_with_article.forEach(function(row) {
+                frappe.call({
+                    method: 'frappe.client.get',
+                    args: {
+                        doctype: 'Product',
+                        name: row.article_number
+                    },
+                    callback: function(r) {
+                        if (r.message) {
+                            let product = r.message;
+
+                            // 填入對應欄位（外箱資料）
+                            frappe.model.set_value(row.doctype, row.name, 'ctns', 
+                                product.number_of_cartons_colli_per_unit || 1);
+
+                            frappe.model.set_value(row.doctype, row.name, 'cbm', 
+                                product.carton_cbm_outer_carton || 0);
+
+                            frappe.model.set_value(row.doctype, row.name, 'gross_kg', 
+                                product.carton_weight_kg_outer_carton || 0);
+
+                            processed++;
+                        } else {
+                            skipped++;
+                        }
+
+                        // 所有有 Article Number 的行都處理完後顯示結果
+                        if (processed + skipped === rows_with_article.length) {
+                            frm.refresh_field('items');
+                            frappe.msgprint({
+                                title: 'Completed',
+                                message: `Successfully loaded data for ${processed} item(s).<br>Skipped ${skipped} item(s).`,
+                                indicator: 'green'
+                            });
+                        }
+                    }
+                });
+            });
+        });  // 按鈕顯示在 Actions 群組
 
 
         // Add custom button "Add Item"
@@ -123,7 +180,190 @@ frappe.ui.form.on('Transport Order', {
                         d.get_primary_btn().prop('disabled', true);
 
                         // Define function to refresh table
+
                         function refreshTable(dialog) {
+                            let po_name = dialog.get_value('po_select');
+                            if (!po_name) {
+                                dialog.fields_dict.items_table.$wrapper.empty();
+                                dialog.get_primary_btn().prop('disabled', true);
+                                return;
+                            }
+
+                            frappe.call({
+                                method: 'hksoho.byrydens.transport_order_api.get_po_items',
+                                args: {
+                                    po_name: po_name
+                                },
+                                callback: function(r) {
+                                    let $container = dialog.fields_dict.items_table.$wrapper;
+                                    $container.empty();
+
+                                    if (r.message && Array.isArray(r.message) && r.message.length > 0) {
+                                        let table = $(`
+                                            <table class="table table-bordered" style="width: 100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 5%;">
+                                                            <input type="checkbox" id="select_all_items">
+                                                            Select
+                                                        </th>
+                                                        <th style="width: 5%;">Line</th>
+                                                        <th style="width: 15%;">Article #</th>
+                                                        <th style="width: 25%;">Article Name</th>
+                                                        <th style="width: 10%;">Qty</th>
+                                                        <th style="width: 10%;">Ctns</th>
+                                                        <th style="width: 10%;">CBM</th>
+                                                        <th style="width: 10%;">Gross Kg</th>
+                                                        <th style="width: 10%;">Unit Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        `);
+
+                                        table.find('#select_all_items').on('change', function() {
+                                            table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
+                                            let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                            dialog.get_primary_btn().prop('disabled', !any_checked);
+                                        });
+
+                                        let tbody = table.find('tbody');
+
+                                        // 批次處理所有項目的 Product 資料
+                                        let items = r.message;
+                                        let processed = 0;
+
+                                        items.forEach((item, index) => {
+                                            let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
+                                            let article_number = item.article_number || '';
+
+                                            // 預設值先用 PO 的（若有）
+                                            let display_ctns = item.ctns_on_pallet || 0;
+                                            let display_cbm = item.carton_cbm || 0;
+                                            let display_gross_kg = item.carton_gross_kg || 0;
+
+                                            // 如果有 article_number，就去抓 Product 的標準外箱資料
+                                            if (article_number) {
+                                                frappe.db.get_doc('Product', article_number).then(product => {
+                                                    if (product) {
+                                                        display_ctns = product.number_of_cartons_colli_per_unit || 1;
+                                                        display_cbm = product.carton_cbm_outer_carton || 0;
+                                                        display_gross_kg = product.carton_weight_kg_outer_carton || 0;
+                                                    }
+
+                                                    // 動態新增表格列
+                                                    tbody.append(`
+                                                        <tr>
+                                                            <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                                data-line="${item.line || ''}" 
+                                                                data-article-number="${article_number}" 
+                                                                data-article-name="${item.article_name || ''}" 
+                                                                data-qty="${qty}" 
+                                                                data-ctns="${display_ctns}" 
+                                                                data-cbm="${display_cbm}" 
+                                                                data-gross-kg="${display_gross_kg}" 
+                                                                data-unit-price="${item.unit_price || 0}"></td>
+                                                            <td>${item.line || ''}</td>
+                                                            <td>${article_number}</td>
+                                                            <td>${item.article_name || ''}</td>
+                                                            <td>${qty}</td>
+                                                            <td>${display_ctns}</td>
+                                                            <td>${display_cbm}</td>
+                                                            <td>${display_gross_kg}</td>
+                                                            <td>${item.unit_price || 0}</td>
+                                                        </tr>
+                                                    `);
+
+                                                    processed++;
+                                                    if (processed === items.length) {
+                                                        setupCheckboxEvents();
+                                                    }
+                                                }).catch(() => {
+                                                    // 若抓不到 Product，維持 PO 原值
+                                                    tbody.append(`
+                                                        <tr>
+                                                            <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                                data-line="${item.line || ''}" 
+                                                                data-article-number="${article_number}" 
+                                                                data-article-name="${item.article_name || ''}" 
+                                                                data-qty="${qty}" 
+                                                                data-ctns="${display_ctns}" 
+                                                                data-cbm="${display_cbm}" 
+                                                                data-gross-kg="${display_gross_kg}" 
+                                                                data-unit-price="${item.unit_price || 0}"></td>
+                                                            <td>${item.line || ''}</td>
+                                                            <td>${article_number}</td>
+                                                            <td>${item.article_name || ''}</td>
+                                                            <td>${qty}</td>
+                                                            <td>${display_ctns}</td>
+                                                            <td>${display_cbm}</td>
+                                                            <td>${display_gross_kg}</td>
+                                                            <td>${item.unit_price || 0}</td>
+                                                        </tr>
+                                                    `);
+
+                                                    processed++;
+                                                    if (processed === items.length) {
+                                                        setupCheckboxEvents();
+                                                    }
+                                                });
+                                            } else {
+                                                // 沒有 article_number，直接用 PO 值
+                                                tbody.append(`
+                                                    <tr>
+                                                        <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                            data-line="${item.line || ''}" 
+                                                            data-article-number="" 
+                                                            data-article-name="${item.article_name || ''}" 
+                                                            data-qty="${qty}" 
+                                                            data-ctns="${display_ctns}" 
+                                                            data-cbm="${display_cbm}" 
+                                                            data-gross-kg="${display_gross_kg}" 
+                                                            data-unit-price="${item.unit_price || 0}"></td>
+                                                        <td>${item.line || ''}</td>
+                                                        <td></td>
+                                                        <td>${item.article_name || ''}</td>
+                                                        <td>${qty}</td>
+                                                        <td>${display_ctns}</td>
+                                                        <td>${display_cbm}</td>
+                                                        <td>${display_gross_kg}</td>
+                                                        <td>${item.unit_price || 0}</td>
+                                                    </tr>
+                                                `);
+
+                                                processed++;
+                                                if (processed === items.length) {
+                                                    setupCheckboxEvents();
+                                                }
+                                            }
+                                        });
+
+                                        // 獨立出 checkbox 事件綁定，避免重複綁定
+                                        function setupCheckboxEvents() {
+                                            table.find('tbody input[name="item_select"]').on('change', function() {
+                                                let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                                dialog.get_primary_btn().prop('disabled', !any_checked);
+                                                let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
+                                                table.find('#select_all_items').prop('checked', all_checked);
+                                            });
+
+                                            $container.append(table);
+                                            dialog.get_primary_btn().prop('disabled', true);
+                                        }
+
+                                        if (items.length === 0) {
+                                            $container.html('<p>No items to display</p>');
+                                            dialog.get_primary_btn().prop('disabled', true);
+                                        }
+                                    } else {
+                                        $container.html('<p>No items to display</p>');
+                                        dialog.get_primary_btn().prop('disabled', true);
+                                    }
+                                }
+                            });
+                        }
+                        
+                        function refreshTable1(dialog) {
                             let po_name = dialog.get_value('po_select');
                             if (!po_name) {
                                 dialog.fields_dict.items_table.$wrapper.empty();
@@ -637,6 +877,8 @@ frappe.ui.form.on('Transport Order', {
     }
 
 });
+
+
 
 frappe.ui.form.on('Transport Order Line', {
     value: function(frm, cdt, cdn) {

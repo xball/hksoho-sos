@@ -136,19 +136,19 @@ def send_daily_inspection_reminders():
 
     print(f"=== Job Completed: {sent_count} reminder(s) sent ===\n")
 
-    
+
 def get_email_html(doc):
-    """Generate HTML email with safe CSS (no #RRGGBBAA)"""
+    """Generate HTML email for Inspection Event (Confirmed QTY 已移除)"""
     po_items = doc.get("po_items") or []
     
-    # === 安全欄位映射（防呆）===
+    # === 安全欄位映射（防呆，支援不同專案的欄位名稱）===
     child_meta = frappe.get_meta("Inspection Line")
     field_map = {
         "line": next((f for f in child_meta.fields if f.fieldname in ["line", "idx", "po_line"]), None),
         "article_number": next((f for f in child_meta.fields if f.fieldname in ["article_number", "item_code", "article_no"]), None),
         "article_name": next((f for f in child_meta.fields if f.fieldname in ["article_name", "item_name"]), None),
-        "requested_qty": next((f for f in child_meta.fields if f.fieldname in ["requested_qty", "qty"]), None),
-        "confirmed_qty": next((f for f in child_meta.fields if f.fieldname in ["confirmed_qty", "received_qty"]), None),
+        "confirmed_qty": next((f for f in child_meta.fields if f.fieldname in ["confirmed_qty", "qty", "po_qty"]), None),
+        # confirmed_qty 已徹底移除
     }
 
     rows = ""
@@ -156,8 +156,7 @@ def get_email_html(doc):
         line = getattr(item, field_map["line"].fieldname, "") if field_map["line"] else ""
         article_number = getattr(item, field_map["article_number"].fieldname, "") if field_map["article_number"] else ""
         article_name = getattr(item, field_map["article_name"].fieldname, "") if field_map["article_name"] else ""
-        req_qty = getattr(item, field_map["requested_qty"].fieldname, 0) if field_map["requested_qty"] else 0
-        conf_qty = getattr(item, field_map["confirmed_qty"].fieldname, 0) if field_map["confirmed_qty"] else 0
+        req_qty = getattr(item, field_map["confirmed_qty"].fieldname, 0) if field_map["confirmed_qty"] else 0
 
         rows += f"""
         <tr style="border-bottom: 1px solid #eee;">
@@ -165,16 +164,14 @@ def get_email_html(doc):
             <td style="padding: 8px;">{article_number}</td>
             <td style="padding: 8px;">{article_name}</td>
             <td style="padding: 8px; text-align: right;">{req_qty}</td>
-            <td style="padding: 8px; text-align: right;">{conf_qty}</td>
         </tr>
         """
 
     if not rows:
-        rows = '<tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No PO Items</td></tr>'
+        rows = '<tr><td colspan="4" style="text-align:center; color:#999; padding:20px;">No PO Items</td></tr>'
 
     supplier_name = frappe.db.get_value("Partner", doc.supplier, "partner_name") if doc.supplier else "N/A"
 
-    # === 關鍵：所有陰影改用 rgba() ===
     return f"""
     <div style="font-family: Arial, sans-serif; max-width: 700px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
         <div style="background: #1a5fb4; color: white; padding: 16px; text-align: center;">
@@ -184,13 +181,13 @@ def get_email_html(doc):
             <h3 style="color: #1a5fb4; margin-top:0; border-bottom: 2px solid #1a5fb4; padding-bottom: 8px;">{doc.name}</h3>
             
             <table style="width:100%; margin:16px 0; font-size:14px;">
-                <tr><td style="font-weight:bold; width:140px;">Inspector:</td><td>{doc.inspector}</td></tr>
+                <tr><td style="font-weight:bold; width:140px;">Inspector:</td><td>{doc.inspector or 'N/A'}</td></tr>
                 <tr><td style="font-weight:bold;">Supplier:</td><td>{supplier_name}</td></tr>
-                <tr><td style="font-weight:bold;">Type:</td><td>{doc.type}</td></tr>
-                <tr><td style="font-weight:bold;">Inspection:</td><td>{doc.inspection}</td></tr>
+                <tr><td style="font-weight:bold;">Type:</td><td>{doc.type or ''}</td></tr>
+                <tr><td style="font-weight:bold;">Inspection:</td><td>{doc.inspection or ''}</td></tr>
                 <tr><td style="font-weight:bold;">Starts On:</td><td>{format_date(doc.starts_on)} {format_time(doc.starts_on)}</td></tr>
                 <tr><td style="font-weight:bold;">Ends On:</td><td>{doc.ends_on and (format_date(doc.ends_on) + ' ' + format_time(doc.ends_on)) or 'N/A'}</td></tr>
-                <tr><td style="font-weight:bold;">Status:</td><td><span style="background:#28a745; color:white; padding:2px 8px; border-radius:4px; font-size:12px;">{doc.status}</span></td></tr>
+                <tr><td style="font-weight:bold;">Status:</td><td><span style="background:#28a745; color:white; padding:2px 8px; border-radius:4px; font-size:12px;">{doc.status or ''}</span></td></tr>
             </table>
 
             <h4 style="color:#1a5fb4; margin:24px 0 12px;">PO Items</h4>
@@ -200,8 +197,7 @@ def get_email_html(doc):
                         <th style="padding:8px; text-align:left; border-bottom:2px solid #1a5fb4;">Line</th>
                         <th style="padding:8px; text-align:left; border-bottom:2px solid #1a5fb4;">Article #</th>
                         <th style="padding:8px; text-align:left; border-bottom:2px solid #1a5fb4;">Article Name</th>
-                        <th style="padding:8px; text-align:right; border-bottom:2px solid #1a5fb4;">Req QTY</th>
-                        <th style="padding:8px; text-align:right; border-bottom:2px solid #1a5fb4;">Conf QTY</th>
+                        <th style="padding:8px; text-align:right; border-bottom:2px solid #1a5fb4;">Ordered QTY</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -218,6 +214,7 @@ def get_email_html(doc):
         </div>
     </div>
     """
+
 @frappe.whitelist()
 def load_product_images_to_po_items(po_name):
     """
@@ -421,12 +418,12 @@ def get_due_po_details(year, month_name):
             po.po_shipdate,
             po.po_status,
             po.order_purchase_currency AS currency,
-            SUM((item.requested_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS undelivered_value
+            SUM((item.confirmed_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS undelivered_value
         FROM `tabPurchase Order` po
         LEFT JOIN `tabPartner` p ON p.partner_id = po.supplier
         JOIN `tabPurchase Order Item` item ON item.parent = po.name
         WHERE po.po_shipdate BETWEEN %s AND %s
-          AND item.requested_qty > COALESCE(item.booked_qty, 0)
+          AND item.confirmed_qty > COALESCE(item.booked_qty, 0)
           AND item.unit_price > 0
         GROUP BY po.name
         HAVING undelivered_value > 0

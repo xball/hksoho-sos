@@ -112,9 +112,7 @@
   {
    "fieldname": "category",
    "fieldtype": "Link",
-   "in_filter": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Category",
    "options": "Product Group"
   },
@@ -326,7 +324,6 @@
    "fieldname": "group",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Group",
    "options": "Product Group"
   },
@@ -365,7 +362,7 @@
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-25 10:25:02.301799",
+ "modified": "2025-12-13 02:12:42.920691",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

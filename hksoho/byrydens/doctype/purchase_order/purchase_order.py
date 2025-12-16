@@ -2,6 +2,8 @@ import frappe
 from frappe.model.document import Document
 import os
 from datetime import datetime, date
+from datetime import date, datetime, timedelta
+
 
 # Constants
 DEBUG_FILE = "/home/frappe/frappe-bench/temp/debug_log.txt"
@@ -169,7 +171,7 @@ class PurchaseOrder(Document):
                     qty_diff = 0
                 else:
                 # 未出貨 → 原本邏輯：confirmed_qty - requested_qty
-                    qty_diff = (item.confirmed_qty or 0) - (item.requested_qty or 0)
+                    qty_diff = (item.remaining_qty or 0) 
 
                 content.append(f"#12441;{qty_diff}")
                 
@@ -177,6 +179,7 @@ class PurchaseOrder(Document):
                 if ship_date:
                     try:
                         date_obj = ship_date if isinstance(ship_date, date) else datetime.strptime(str(ship_date), "%Y-%m-%d").date()
+                        date_obj = date_obj + timedelta(days=60)
                         year = str(date_obj.year)[-2:]
                         week = str(date_obj.isocalendar()[1]).zfill(2)
                         weekday = str(date_obj.isoweekday())
@@ -185,6 +188,7 @@ class PurchaseOrder(Document):
                         logger.warning(f"Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}")
                         write_debug_log(f"Invalid confirmed_shipdate format for item {article_number}: {ship_date}, error: {str(e)}")
                         ship_date = ''
+                
                 content.append(f"¤5513;{ship_date or ''}")
                 
                 content.append(f"¤18549;{po_status.upper() or ''}")
@@ -279,6 +283,8 @@ class PurchaseOrder(Document):
             frappe.log_error(f"Purchase Order file write failed: {str(e)}")
             write_debug_log(f"Failed to write file {file_path}: {str(e)}")
 
+    
+    
     def after_save(self):
         """
         測試 after_save 事件是否被觸發。

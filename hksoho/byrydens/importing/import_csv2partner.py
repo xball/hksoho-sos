@@ -31,6 +31,14 @@ partners = {}
 # 用於收集日誌訊息
 log_buffer = StringIO()
 
+def get_effective_date(partner_data):
+    # UPDATED 優先，無效則用 INSERTED
+    updated = partner_data.get("updated")
+    inserted = partner_data.get("inserted")
+
+    # partner_data 裡的 updated/inserted 目前是 format_date 後的 yyyy-mm-dd 或 None
+    return updated or inserted
+
 # 格式化日期
 def format_date(date_str):
     if not date_str:
@@ -144,13 +152,20 @@ def has_field_changes(existing_partner, new_data):
 # 創建或更新 Partner
 def create_or_update_partner(partner_data):
     code = partner_data["partner_id"]
-    updated_date = partner_data["updated"]
+    # updated_date = partner_data["updated"]
+    updated_date = get_effective_date(partner_data)
     
     if not updated_date:
-        msg = f"無效的 UPDATED 日期，跳過記錄: {code}"
+        msg = f"UPDATED/INSERTED 日期都無效，跳過記錄: {code}"
         logger.warning(msg)
         print(msg)
-        return False, msg
+        return False, msg    
+
+    # if not updated_date:
+    #     msg = f"無效的 UPDATED 日期，跳過記錄: {code}"
+    #     logger.warning(msg)
+    #     print(msg)
+    #     return False, msg
 
     try:
         updated_date = datetime.strptime(updated_date, "%Y-%m-%d")

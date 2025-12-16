@@ -86,7 +86,9 @@ function open_po_items_dialog(frm) {
         args: {
             doctype: 'Purchase Order',
             filters: { workflow_state: 'Ready to QC' },
-            fields: ['name']
+            fields: ['name'],
+            limit_page_length: 200,
+            ignore_permissions: true   
         },
         callback: function(r) {
             if (!r.message || r.message.length === 0) {
@@ -194,7 +196,6 @@ function refresh_po_items_table(dialog) {
                         <tr>
                             <th width="50"><input type="checkbox" id="select_all"></th>
                             <th>Line</th>
-                            <th>Requested QTY</th>
                             <th>Article #</th>
                             <th>Article Name</th>
                             <th>Confirmed QTY</th>
@@ -210,7 +211,6 @@ function refresh_po_items_table(dialog) {
                     <tr>
                         <td><input type="checkbox" name="item_select" value="${item.name}"></td>
                         <td>${item.line || ''}</td>
-                        <td>${item.requested_qty || 0}</td>
                         <td>${item.article_number || ''}</td>
                         <td>${item.article_name || ''}</td>
                         <td>${item.confirmed_qty || 0}</td>

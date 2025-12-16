@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"YpGCeLfign\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"b7abeqw4NZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product\",\"col\":3}},{\"id\":\"3b-gDnqA23\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachment\",\"col\":3}},{\"id\":\"oFB4l28FMU\",\"type\":\"spacer\",\"data\":{\"col\":12}}]",
+ "content": "[{\"id\":\"YpGCeLfign\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"b7abeqw4NZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product\",\"col\":3}},{\"id\":\"3b-gDnqA23\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachment\",\"col\":3}},{\"id\":\"xeMWY9cAxy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachement Detail\",\"col\":3}}]",
  "creation": "2025-07-09 05:49:30.377847",
  "custom_blocks": [],
  "docstatus": 0,
@@ -92,7 +92,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-10-09 10:12:10.055220",
+ "modified": "2025-12-13 15:46:14.373317",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Products",
@@ -132,6 +132,14 @@
    "link_to": "Product Attachment",
    "stats_filter": "[]",
    "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Product Attachement Detail",
+   "link_to": "Product Attachement Detail",
+   "report_ref_doctype": "Product Attachment",
+   "type": "Report"
   }
  ],
  "title": "Products"

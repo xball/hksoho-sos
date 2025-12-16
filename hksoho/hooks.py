@@ -21,8 +21,8 @@ app_license = "mit"
 # 	}
 # ]
 # 確保 CSS 檔案被包含在應用程式的資源中
-app_include_css = ["/assets/hksoho/css/custom.css"]  # 將 your_app_name 替換為您的應用程式名稱
-
+app_include_css = ["/assets/hksoho/css/custom2.css?v=1.1"]  # 將 your_app_name 替換為您的應用程式名稱
+#web_include_css = ["/assets/hksoho/css/custom.css"]
 scheduler_events = {
     "hourly": [
         "hksoho.byrydens.importing.import_csv2product.execute",
@@ -30,7 +30,10 @@ scheduler_events = {
         "hksoho.byrydens.importing.import_csv2currency.execute",
         "hksoho.byrydens.importing.import_csv2po.execute",
         "hksoho.byrydens.utils.send_daily_inspection_reminders"
-    ]
+    ],
+	"daily": [
+		"hksoho.byrydens.inspection_check.execute"
+	]
 }
 
 doc_events = {

@@ -1,47 +1,27 @@
 {
  "add_total_row": 0,
  "add_translate_data": 0,
- "columns": [
-  {
-   "fieldname": "po_number",
-   "fieldtype": "Data",
-   "label": "PO#",
-   "width": 0
-  },
-  {
-   "fieldname": "po_shipdate",
-   "fieldtype": "Date",
-   "label": "PO ShipDate",
-   "width": 0
-  }
- ],
+ "columns": [],
  "creation": "2025-09-04 06:21:37.299470",
  "disabled": 0,
  "docstatus": 0,
  "doctype": "Report",
- "filters": [
-  {
-   "fieldname": "po_number",
-   "fieldtype": "Data",
-   "label": "PO#",
-   "mandatory": 0,
-   "wildcard_filter": 0
-  }
- ],
+ "filters": [],
  "idx": 0,
  "is_standard": "Yes",
  "json": "{}",
  "letter_head": "Company Logo header",
  "letterhead": null,
- "modified": "2025-09-04 06:47:06.188008",
+ "modified": "2025-12-09 08:06:26.821949",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "PO detail",
  "owner": "Administrator",
  "prepared_report": 0,
+ "query": "SELECT\r\n    po.name AS \"PO ID:Link/Purchase Order:150\",\r\n    po.po_number AS \"PO Number:Data:130\",\r\n    po.workflow_state AS \"WF State:Data:100\",\r\n    po.po_status AS \"PO Status:Data:100\",\r\n    po.order_type AS \"Order Type:Data:100\",\r\n    po.po_placed AS \"PO Placed:Date:100\",\r\n    \r\n    -- Buyer \u986f\u793a Partner \u540d\u7a31\r\n    IFNULL(buyer_partner.partner_name, po.buyer) AS \"Buyer:Data:170\",\r\n    \r\n    -- Supplier \u986f\u793a Partner \u540d\u7a31\uff08\u91cd\u9ede\uff01\uff09\r\n    IFNULL(supplier_partner.partner_name, po.supplier) AS \"Supplier:Data:190\",\r\n    \r\n    po.purpose AS \"Purpose:Data:150\",\r\n    po.origin_country AS \"Origin Country:Link/Country:120\",\r\n    po.origin_port AS \"Origin Port:Data:110\",\r\n    po.destination_port AS \"Destination Port:Data:120\",\r\n    \r\n    -- Coordinator \u986f\u793a User \u771f\u540d\r\n    IFNULL(coord_user.full_name, coord_user.name) AS \"Coordinator:Data:130\",\r\n    \r\n    po.po_shipdate AS \"PO ShipDate:Date:110\",\r\n    po.requested_dc_eta AS \"Finish Date:Date:120\",\r\n    po.booking_status AS \"Booking Status:Data:110\",\r\n    po.creation AS \"Created On:Datetime:130\",\r\n    po.modified AS \"Last Updated:Datetime:130\"\r\n\r\nFROM\r\n    `tabPurchase Order` po\r\n    LEFT JOIN `tabPartner` buyer_partner    ON po.buyer = buyer_partner.name\r\n    LEFT JOIN `tabPartner` supplier_partner ON po.supplier = supplier_partner.name\r\n    LEFT JOIN `tabUser`    coord_user       ON po.coordinator = coord_user.name\r\nWHERE\r\n    po.docstatus < 2\r\nORDER BY\r\n    po.po_shipdate DESC, po.creation DESC",
  "ref_doctype": "Purchase Order",
  "report_name": "PO detail",
- "report_type": "Script Report",
+ "report_type": "Query Report",
  "roles": [
   {
    "role": "System Manager"

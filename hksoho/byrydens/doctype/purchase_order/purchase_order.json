@@ -37,24 +37,22 @@
   "invoice_number",
   "way_of_delivery",
   "section_break_vupi",
-  "booking_requested_days_before_po_shipdate_ocean_transport_only",
-  "consolidation_days_before_po_shipdate_ocean_transport_only_copy",
-  "transport_days_days_before_po_shipdate_ocean_transport_only",
+  "short_description",
   "sync_back_pyramid",
   "latest_file_number",
   "column_break_vewu",
-  "short_description",
   "remarks",
   "po_items_tab",
   "po_items",
   "summary_section",
-  "total_requested_qty",
-  "total_confirmed_qty",
-  "total_requested_amount",
   "total_confirmed_amount",
+  "total_confirmed_qty",
   "column_break_trgt",
   "total_booked_qty",
   "total_booked_amount",
+  "section_break_itja",
+  "total_requested_amount",
+  "total_requested_qty",
   "address_tab",
   "supplier_address",
   "loading_place",
@@ -74,12 +72,14 @@
   {
    "fieldname": "order_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Order Type",
    "options": "Standard\nSample\nNew Item\nSpareparts"
   },
   {
    "fieldname": "po_placed",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "PO Placed"
   },
   {
@@ -220,21 +220,6 @@
    "options": "Partner"
   },
   {
-   "fieldname": "booking_requested_days_before_po_shipdate_ocean_transport_only",
-   "fieldtype": "Int",
-   "label": "Booking Requested (days before PO Shipdate (ocean transport only))"
-  },
-  {
-   "fieldname": "consolidation_days_before_po_shipdate_ocean_transport_only_copy",
-   "fieldtype": "Int",
-   "label": "Consolidation (days before PO Shipdate (ocean transport only))"
-  },
-  {
-   "fieldname": "transport_days_days_before_po_shipdate_ocean_transport_only",
-   "fieldtype": "Int",
-   "label": "Transport Days (days before PO Shipdate (ocean transport only))"
-  },
-  {
    "fieldname": "column_break_vewu",
    "fieldtype": "Column Break"
   },
@@ -318,7 +303,7 @@
    "default": "0",
    "fieldname": "total_confirmed_qty",
    "fieldtype": "Int",
-   "label": "Total Confirmed QTY",
+   "label": "Total Ordered QTY",
    "read_only": 1
   },
   {
@@ -332,7 +317,7 @@
    "default": "0",
    "fieldname": "total_confirmed_amount",
    "fieldtype": "Float",
-   "label": "Total Confirmed Amount",
+   "label": "Total Ordered Amount",
    "read_only": 1
   },
   {
@@ -375,21 +360,26 @@
    "default": "0",
    "fieldname": "total_requested_amount",
    "fieldtype": "Float",
-   "label": "Total Requested Amount",
+   "label": "Total req Amount",
    "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "total_requested_qty",
    "fieldtype": "Int",
-   "label": "Total Requested QTY",
+   "label": "Total req QTY",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_itja",
+   "fieldtype": "Section Break",
+   "hidden": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-01 15:25:13.132485",
+ "modified": "2025-12-09 09:12:00.369416",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",

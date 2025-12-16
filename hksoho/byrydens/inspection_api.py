@@ -35,36 +35,12 @@ def get_po_items(po_name):
     items = frappe.get_all(
         "Purchase Order Item",
         filters={"parent": po_name},
-        fields=["name", "line",  "requested_qty", "article_number", "confirmed_qty"],
+        fields=["name", "line",  "confirmed_qty", "article_number", "article_name"],
         order_by="line asc"
     )
     
     return items
 
-# @frappe.whitelist()
-# def get_po_items_qcstatus(po_name):
-#     """
-#     獲取指定採購訂單的項目，僅返回 qc_update_status 不等於 'Pass' 的項目。
-    
-#     Args:
-#         po_name (str): 採購訂單名稱
-#     Returns:
-#         list: 包含項目詳細信息的列表
-#     """
-#     if not po_name:
-#         frappe.throw(_("請提供有效的採購訂單編號"))
-#     items = frappe.get_all(
-#         "Purchase Order Item",
-#         filters={"parent": po_name, "qc_update_status": ["!=", "Pass"]},
-#         fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty"],
-#         order_by="line asc"
-#     )
-#     if not items and not frappe.has_permission("Purchase Order", "read", po_name):
-#         frappe.throw(
-#             _("You do not have enough permissions to access this resource. Please contact your manager to get access."),
-#             frappe.PermissionError
-#         )
-#     return items
 
 
 @frappe.whitelist()
@@ -96,9 +72,9 @@ def get_po_items_qcstatus(po_name):
         "Purchase Order Item",
         filters={
             "parent": po_name,
-            "qc_update_status": ["!=", "Pass"]
+            "qc_update_status": ["!=", "Passed"]
         },
-        fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty"],
+        fields=["name", "line", "confirmed_qty", "article_number", "article_name"],
         order_by="line asc",
         ignore_permissions=True  # 僅限測試，生產環境應移除
     )
@@ -148,7 +124,7 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     items = frappe.get_all(
         "Purchase Order Item",
         filters={"name": ["in", selected_items]},
-        fields=["name", "line", "requested_qty", "article_number", "article_name", "confirmed_qty", "parent"]
+        fields=["name", "line", "confirmed_qty", "article_number", "article_name", "parent"]
     )
 
     if not items:
@@ -158,10 +134,12 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     existing_items = set()
     for row in inspection_event.po_items:
         if row.po_number and row.po_item:
-            po_item = frappe.get_doc("Purchase Order Item", row.po_item)
+            po_item = frappe.get_doc("Purchase Order Item", {
+                "parent": row.po_number,
+                "line": row.po_item
+            })
             if po_item.line is not None:
                 existing_items.add((row.po_number, po_item.line))
-
     added_count = 0
     skipped_items = []
     # 假設第一個項目的 supplier 適用於所有項目（因為它們來自同一個 PO）
@@ -174,7 +152,7 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
     for item in items:
         if (item.parent, item.line) not in existing_items:
             inspection_event.append("po_items", {
-                "po_item": item.name,  # Link 到 Purchase Order Item
+                "po_item": item.line,  # Link 到 Purchase Order Item
                 "po_number": item.parent,  # 設置 PO 號碼
                 "article_number": item.article_number,  # Link 到 Product
                 "article_name": item.article_name,  # 設置 Article Name

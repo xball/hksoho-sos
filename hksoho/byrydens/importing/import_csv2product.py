@@ -7,6 +7,12 @@ from datetime import datetime
 import logging
 from io import StringIO
 from contextlib import redirect_stdout, redirect_stderr
+from datetime import datetime, timedelta
+
+# 只處理最近 N 天內 UPDATED/INSERTED 的商品
+DAYS_THRESHOLD = 30
+CUTOFF_DATETIME = datetime.now() - timedelta(days=DAYS_THRESHOLD)
+
 
 # ============================ DocType 定義 ============================
 PRODUCT_DOCTYPE = "Product"
@@ -17,11 +23,11 @@ INPUT_DIR = frappe.get_site_config().get("partner_import_input_dir", "/home/ftpu
 PROCEED_DIR = frappe.get_site_config().get("partner_import_proceed_dir", "/home/ftpuser/done")
 IMAGE_INPUT_DIR = frappe.get_site_config().get("partner_import_image_dir", "/home/ftpuser/ftp/img")
 LOG_FILE = frappe.get_site_config().get("product_import_log_file", "/home/frappe/frappe-bench/sites/sos.byrydens.com/logs/product_import.log")
-PRODUCT_FILE = "xpin_products1.txt"
+PRODUCT_FILE = "xpin_products.txt"
 
 # ============================ 日誌設定 ============================
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.CRITICAL, filename=LOG_FILE, filemode='a',
+logging.basicConfig(level=logging.ERROR, filename=LOG_FILE, filemode='a',
                     format='[%(asctime)s] %(levelname)s: %(message)s')
 
 products = {}
@@ -34,7 +40,8 @@ IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.JPG', '.JPEG', '
 # True  → 即使其他資料沒變，只要圖片不同或有新圖就強制更新 Product
 # False → 只有資料或日期有變才更新（標準模式）
 FORCE_UPDATE_IMAGE = False   # ← 改這一行即可控制！建議客戶補圖時開 True
-
+# ====================== 新增：強制更新名稱旗標（這次專用）======================
+FORCE_UPDATE_NAME = False   # ← 改成 True 就強制全部更新 article_name！
 # ============================ Range & Packaging 對照表 ============================
 RANGE_MAPPING = {
     "1": "1 - Rydéns", "2": "2 - Rydéns (no re-buy)", "3": "3 - Components",
@@ -195,7 +202,7 @@ def upload_image_to_frappe(image_path, product_name, article_number):
         return None
 
 # ============================ 欄位變更檢查 ============================
-def has_field_changes(existing, new_data):
+def has_field_changes1(existing, new_data):
     fields = ["article_number", "article_name", "category", "customs_tariff_code",
               "minimum_order_quantity", "production_leadtime_days", "gross_width_mm_innerunit_box",
               "gross_height_mm_innerunit_box", "gross_length_mm_innerunit_box", "gross_weight_kg_innerunit_box",
@@ -208,10 +215,24 @@ def has_field_changes(existing, new_data):
             return True
     return False
 
+def has_field_changes(existing, new_data):
+    fields = ["article_number", "article_name", "category", "customs_tariff_code",
+              "minimum_order_quantity", "production_leadtime_days", "gross_width_mm_innerunit_box",
+              "gross_height_mm_innerunit_box", "gross_length_mm_innerunit_box", "gross_weight_kg_innerunit_box",
+              "gross_cbm_innerunit_box", "units_in_carton_pieces_per_carton", "carton_width_mm_outer_carton",
+              "carton_height_mm_outer_carton", "carton_length_mm_outer_carton", "carton_weight_kg_outer_carton",
+              "carton_cbm_outer_carton", "price", "currency", "designer", "range",
+              "sample_article_number", "classification", "qc_required", "packaging"]
+              # ← 故意移除 primary_image！
+    for f in fields:
+        if str(getattr(existing, f, "")) != str(new_data.get(f, "")):
+            return True
+    return False
+
 # ============================ 讀取 TXT 檔案 ============================
-def import_product_data(file_path):
+def import_product_data1(file_path):
     try:
-        with open(file_path, 'r', encoding='latin1', errors='ignore') as f:
+        with open(file_path, 'r', encoding='cp1252', errors='ignore') as f:
             reader = csv.DictReader(f, delimiter='\t')
             for row in reader:
                 artno = row.get("ARTNO", "").strip()
@@ -267,11 +288,93 @@ def import_product_data(file_path):
         logger.error(f"讀取檔案失敗: {e}")
         return False
 
+def import_product_data(file_path):
+    try:
+        with open(file_path, 'r', encoding='cp1252', errors='ignore') as f:
+            reader = csv.DictReader(f, delimiter='\t')
+            for row in reader:
+                artno = row.get("ARTNO", "").strip()
+                if not artno:
+                    logger.warning("缺少 ARTNO，跳過此列")
+                    continue
+
+                # ===== 新增：依 UPDATED / INSERTED 日期過濾 120 天前的資料 =====
+                updated_raw = (row.get("UPDATED") or row.get("INSERTED") or "").strip()
+                if not updated_raw:
+                    logger.info(f"無 UPDATED/INSERTED 日期，跳過 {artno}")
+                    continue
+
+                try:
+                    updated_dt = datetime.strptime(updated_raw, "%Y-%m-%d")
+                except Exception:
+                    logger.warning(f"UPDATED/INSERTED 日期格式不正確，跳過 {artno}: {updated_raw}")
+                    continue
+
+                # 只處理最近 120 天內的資料，其餘直接略過
+                if updated_dt < CUTOFF_DATETIME:
+                    logger.info(
+                        f"{artno} UPDATED={updated_dt.date()} 早於 {DAYS_THRESHOLD} 天前 "
+                        f"({CUTOFF_DATETIME.date()})，略過"
+                    )
+                    continue
+                # ===== 120 天過濾結束，以下保留你原本的邏輯 =====
+
+                category = validate_product_group(row.get("GROUP"))
+
+                # 尺寸 cm → mm
+                eaw = safe_to_int(row.get("EAWIDTH"), 0, artno, "EAWIDTH") * 10
+                eah = safe_to_int(row.get("EAHEIGHT"), 0, artno, "EAHEIGHT") * 10
+                eal = safe_to_int(row.get("EALENGTH"), 0, artno, "EALENGTH") * 10
+                ctw = safe_to_int(row.get("CTNWIDTH"), 0, artno, "CTNWIDTH") * 10
+                cth = safe_to_int(row.get("CTNHEIGHT"), 0, artno, "CTNHEIGHT") * 10
+                ctl = safe_to_int(row.get("CTNLENGTH"), 0, artno, "CTNLENGTH") * 10
+
+                updated = updated_raw  # 直接用剛才 parse 過的字串
+
+                product_data = {
+                    "article_number": artno,
+                    "article_name": row.get("ARTNAME"),
+                    "category": category,
+                    "customs_tariff_code": row.get("HSCODE"),
+                    "minimum_order_quantity": safe_to_float(row.get("MOQ"), 0.0, artno, "MOQ"),
+                    "production_leadtime_days": safe_to_int(row.get("LEADTIME"), 0, artno, "LEADTIME"),
+                    "gross_width_mm_innerunit_box": eaw,
+                    "gross_height_mm_innerunit_box": eah,
+                    "gross_length_mm_innerunit_box": eal,
+                    "gross_weight_kg_innerunit_box": safe_to_float(row.get("EAWEIGHT"), 0.0, artno, "EAWEIGHT"),
+                    "gross_cbm_innerunit_box": safe_to_float(row.get("EACBM"), 0.0, artno, "EACBM"),
+                    "units_in_carton_pieces_per_carton": safe_to_int(row.get("QTYPERCTN"), 1, artno, "QTYPERCTN"),
+                    "carton_width_mm_outer_carton": ctw,
+                    "carton_height_mm_outer_carton": cth,
+                    "carton_length_mm_outer_carton": ctl,
+                    "carton_weight_kg_outer_carton": safe_to_float(row.get("CTNWEIGHT"), 0.0, artno, "CTNWEIGHT"),
+                    "carton_cbm_outer_carton": safe_to_float(row.get("CTNCBM"), 0.0, artno, "CTNCBM"),
+                    "price": safe_to_float(row.get("PRICE"), 0.0, artno, "PRICE"),
+                    "currency": row.get("CURRENCY"),
+                    "designer": row.get("DESIGNER"),
+                    "range": map_range_value(row.get("CALCTYPE"), artno),
+                    "sample_article_number": row.get("SAMPLEARTNO"),
+                    "classification": row.get("ABCCLASS"),
+                    "qc_required": 1 if row.get("VENDORQC") == "Y" else 0,
+                    "packaging": map_packaging_value(row.get("BOXINFO"), artno),
+                    "updated": updated,
+                    "__image_path": find_real_image_file(row.get("IMAGE"), artno),
+                }
+                products[artno] = product_data
+
+        return True
+    except Exception as e:
+        logger.error(f"讀取檔案失敗: {e}")
+        return False
+
+
 # ============================ 建立或更新 Product ============================
+
+
 def create_or_update_product(data):
     artno = data["article_number"]
     updated_date = format_date(data.pop("updated", None))
-    image_path = data.pop("__image_path", None)  # 取出圖片路徑
+    image_path = data.pop("__image_path", None)  # 來自 TXT 的 IMAGE 欄位
 
     if not updated_date:
         logger.warning(f"無有效日期，跳過 {artno}")
@@ -280,56 +383,92 @@ def create_or_update_product(data):
     exists = check_product_exists(artno)
     product = frappe.get_doc(PRODUCT_DOCTYPE, {"article_number": artno}) if exists else frappe.new_doc(PRODUCT_DOCTYPE)
 
-    if exists and not FORCE_UPDATE_IMAGE and updated_date <= product.modified:
-        logger.info(f"日期未更新且非強制圖片模式，跳過 {artno}")
-        return False, "日期未更新"
+    # ==============================================
+    # 1. 判斷是否真的需要存檔
+    # ==============================================
+    data_changed = False          # 一般欄位是否有變
+    name_changed = False          # 名稱是否真的不同（僅在強制模式下使用）
+    image_needs_update = False    # 圖片是否要處理
 
+    # --- 圖片邏輯 ---
+    current_image = getattr(product, "primary_image", None) or ""
 
-    current_img = product.primary_image if exists else None
-    # if (current_img):
-    #     return False, "已有主圖，不更新"    
+    if FORCE_UPDATE_IMAGE:
+        image_needs_update = bool(image_path)  # 強制覆蓋：只要有圖就換
+    else:
+        image_needs_update = bool(image_path) and not current_image.strip()  # 正常：沒圖才補
 
-    image_updated = False
-    new_img_url = None
+    # --- 名稱強制更新模式 ---
+    if FORCE_UPDATE_NAME:
+        new_name = data.get("article_name", "").strip()
+        old_name = (getattr(product, "article_name", "") or "").strip()
+        name_changed = (new_name != old_name and new_name)  # 有差異且新名稱不為空
+        # 注意：此模式下「其他欄位完全不比較」
+    else:
+        # 正常模式：比對所有欄位（不含 primary_image）
+        data_changed = not exists or has_field_changes(product, data)
+        name_changed = False  # 不特別處理
 
-    # 先儲存 Product（確保有 name）
-    need_save = not exists or has_field_changes(product, data) or (FORCE_UPDATE_IMAGE and image_path)
+    # 最終是否需要 save？
+    need_save = data_changed or name_changed or image_needs_update
 
     if not need_save:
-        logger.info(f"無變更且非強制圖片，跳過 {artno}")
+        logger.info(f"無任何變更需求，跳過 {artno}")
         return False, "無變更"
 
+    # ==============================================
+    # 2. 開始更新
+    # ==============================================
     try:
-        product.update(data)
+        # --- 只更新真正需要的部分 ---
+        if FORCE_UPDATE_NAME and name_changed:
+            # 極簡模式：只改名稱，其他完全不碰
+            product.article_name = new_name
+            logger.info(f"強制更新名稱 → {artno}: 『{old_name}』→『{new_name}』")
+        else:
+            # 正常模式：更新所有變動欄位
+            product.update(data)
+            if not exists:
+                logger.info(f"新建 Product {artno}")
+
         product.save(ignore_permissions=True)
 
-        # 上傳圖片（現在 product.name 一定存在）
-        if image_path:
-            new_img_url = upload_image_to_frappe(image_path, product.name, artno)
-            if new_img_url and new_img_url != current_img:
-                product.primary_image = new_img_url
+        # --- 圖片處理 ---
+        if image_needs_update and image_path:
+            new_url = upload_image_to_frappe(image_path, product.name, artno)
+            if new_url:
+                product.primary_image = new_url
                 product.save(ignore_permissions=True)
-                image_updated = True
+                action = "強制覆蓋主圖" if FORCE_UPDATE_IMAGE else "補上主圖（原無圖）"
+                logger.info(f"{action} → {artno}: {new_url}")
 
-        # 正確的 add_comment 方式
-        comment = f"匯入 TXT - {'新建' if not exists else '更新'}"
-        if image_updated: comment += "，主圖已更新"
+        # --- Comment 記錄（精準描述本次做了什麼）---
+        parts = ["匯入 TXT"]
+        if not exists:
+            parts.append("新建")
+        elif FORCE_UPDATE_NAME and name_changed:
+            parts.append("僅更新名稱")
+        elif data_changed:
+            parts.append("更新資料")
+
+        if image_needs_update and image_path:
+            parts.append("強制覆蓋主圖" if FORCE_UPDATE_IMAGE else "補上主圖")
+
         frappe.get_doc({
             "doctype": "Comment",
             "comment_type": "Info",
             "reference_doctype": PRODUCT_DOCTYPE,
             "reference_name": product.name,
-            "comment_by": "Administrator",
-            "content": f"[{datetime.now():%Y-%m-%d %H:%M:%S}] {comment}"
+            "content": f"[{datetime.now():%Y-%m-%d %H:%M:%S}] {'，'.join(parts)}"
         }).insert(ignore_permissions=True)
 
-        frappe.db.commit()
-        logger.info(f"成功處理 {artno} ({product.name}){'，主圖已更新' if image_updated else ''}")
+        #frappe.db.commit()
+        logger.info(f"成功處理 {artno} ({product.name})")
         return True, "成功"
+
     except Exception as e:
         logger.error(f"處理失敗 {artno}: {e}")
         return False, str(e)
-
 # ============================ 主函數 ============================
 def execute():
     global log_buffer

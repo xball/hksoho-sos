@@ -2,17 +2,17 @@ import frappe
 from frappe import _
 
 def execute(filters=None):
-    # 使用您系統真正的欄位：requested_qty
+    # 使用您系統真正的欄位：confirmed_qty
     data = frappe.db.sql("""
         SELECT 
             YEAR(po.po_shipdate) AS year,
             MONTH(po.po_shipdate) AS month_num,
-            SUM((item.requested_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS due_amount
+            SUM((item.confirmed_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS due_amount
         FROM `tabPurchase Order` po
         JOIN `tabPurchase Order Item` item ON item.parent = po.name
         WHERE po.po_shipdate IS NOT NULL
-          AND item.requested_qty > COALESCE(item.booked_qty, 0)
-          AND item.requested_qty > 0
+          AND item.confirmed_qty > COALESCE(item.booked_qty, 0)
+          AND item.confirmed_qty > 0
           AND item.unit_price > 0
         GROUP BY YEAR(po.po_shipdate), MONTH(po.po_shipdate)
         HAVING due_amount > 0
@@ -22,7 +22,7 @@ def execute(filters=None):
     if not data:
         return [
             {"label": "訊息", "fieldname": "msg", "fieldtype": "Data", "width": 600}
-        ], [{"msg": "目前沒有任何未出貨訂單（requested_qty > booked_qty）"}]
+        ], [{"msg": "目前沒有任何未出貨訂單（confirmed_qty > booked_qty）"}]
 
     rows = []
     total = 0

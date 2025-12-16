@@ -8,6 +8,7 @@ from frappe.desk.form.utils import add_comment
 import logging
 from io import StringIO
 from contextlib import redirect_stdout, redirect_stderr
+from datetime import datetime, timedelta 
 
 # DocType 定義
 PO_DOCTYPE = "Purchase Order"
@@ -20,7 +21,7 @@ LOG_FILE = frappe.get_site_config().get("po_import_log_file", "/home/frappe/frap
 
 # 設置日誌
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, filename=LOG_FILE, filemode='a', format='[%(asctime)s] %(levelname)s: %(message)s')
+logging.basicConfig(level=logging.ERROR, filename=LOG_FILE, filemode='a', format='[%(asctime)s] %(levelname)s: %(message)s')
 
 # 儲存 PO 和 PO 項目的資料結構
 purchase_orders = {}
@@ -109,7 +110,7 @@ def import_po_data(file_path):
                     item_data = {
                         "line": row[2],
                         "article_number": row[3],
-                        "requested_qty": int(row[4]) if row[4] else 0,
+                        "confirmed_qty": int(row[4]) if row[4] else 0,
                         "article_name": row[6],
                         "supplier_art_number": row[7],
                         "unit_price": float(row[8]) if row[8] else 0,
@@ -152,12 +153,89 @@ def create_purchase_order(po_data):
     partner = validate_link_field("Partner", "name", supplier_code)
     qc_required = 1 if partner and frappe.get_value("Partner", partner, "quality_control") == "Always Requested" else 0
 
-    # 獲取任意 PO 項目的 requested_eta 作為 po_shipdate
+###############################################
+
+    # 先從 supplier Partner 取 origin_country / origin_port
+    origin_country = None
+    origin_port_location = None
+    destination_port_location = None
+
+    # 1) Supplier → origin_country & origin_port.location
+    if supplier_code:
+        # 這裡 supplier_code 已經是 Partner.name（前面 validate_link_field 回傳的 exists 值）
+        partner_doc = frappe.get_doc("Partner", supplier_code)
+        origin_country = partner_doc.origin_country
+
+        if partner_doc.origin_port:
+            # 取 Load-Dest Port.location
+            origin_port_location = frappe.db.get_value(
+                "Load-Dest Port",
+                partner_doc.origin_port,
+                "location"
+            )
+
+    # 2) Buyer → destination_port.location
+    # po_data["buyer_code"] 你目前沒帶，如果有 Buyer 代碼，這裡要先從 CSV 塞進 po_data 才用得到
+    buyer_code = po_data.get("buyer_code")
+    if buyer_code:
+        buyer_partner = validate_link_field("Partner", "name", buyer_code)
+        if buyer_partner:
+            buyer_doc = frappe.get_doc("Partner", buyer_partner)
+            if buyer_doc.destination_port:
+                destination_port_location = frappe.db.get_value(
+                    "Load-Dest Port",
+                    buyer_doc.destination_port,
+                    "location"
+                )
+
+    # === 先處理每一個 PO item 的日期 ===
+    for item in po_data["items"]:
+        if item.get("requested_finish_date"):
+            try:
+                finish_str = format_date(item["requested_finish_date"])
+                if finish_str:
+                    finish_date = datetime.strptime(finish_str, "%Y-%m-%d").date()
+                    req_shipdate = finish_date + timedelta(days=14)
+                    item["requested_shipdate"] = req_shipdate.strftime("%Y-%m-%d")
+
+                    req_eta_date = req_shipdate + timedelta(days=60)
+                    item["requested_eta"] = req_eta_date.strftime("%Y-%m-%d")
+            except Exception as e:
+                msg = f"計算項目日期失敗 (line {item.get('line')}): {e}"
+                logger.warning(msg)
+                print(msg)
+
+    # === po_shipdate 仍然用「第一個有 requested_eta 的項目 - 60 天」 ===
     po_shipdate = None
     for item in po_data["items"]:
-        if item["requested_eta"]:
-            po_shipdate = format_date(item["requested_eta"])
-            break
+        if item.get("requested_eta"):
+            try:
+                eta_str = format_date(item["requested_eta"])
+                if eta_str:
+                    eta_date = datetime.strptime(eta_str, "%Y-%m-%d").date()
+                    po_shipdate_date = eta_date - timedelta(days=60)
+                    po_shipdate = po_shipdate_date.strftime("%Y-%m-%d")
+                    break
+            except Exception as e:
+                msg = f"計算 po_shipdate 時發生錯誤 (requested_eta={item.get('requested_eta')}): {e}"
+                logger.warning(msg)
+                print(msg)
+
+    # === Requested DC ETA = PO ShipDate + 60 天（與前端 refresh 規則一致） ===
+    requested_dc_eta = None
+    if po_shipdate:
+        try:
+            ship_date = datetime.strptime(po_shipdate, "%Y-%m-%d").date()
+            dc_eta_date = ship_date + timedelta(days=60)
+            requested_dc_eta = dc_eta_date.strftime("%Y-%m-%d")
+        except Exception as e:
+            msg = f"計算 requested_dc_eta 時發生錯誤 (po_shipdate={po_shipdate}): {e}"
+            logger.warning(msg)
+            print(msg)
+
+###############################################
+
+
 
     updated_fields = []
     action = "Created"
@@ -167,6 +245,7 @@ def create_purchase_order(po_data):
         po = frappe.get_doc(PO_DOCTYPE, {"po_number": po_data["po_number"]})
         # 檢查工作流程狀態
         workflow_state = frappe.get_value(PO_DOCTYPE, po.name, "workflow_state")
+        # if workflow_state not in ["Draft", "Submitted", "Supplier Confirmed"]:
         if workflow_state not in ["Draft", "Submitted"]:
             msg = f"採購訂單 {po_data['po_number']} 狀態為 {workflow_state}，無法更新"
             logger.warning(msg)
@@ -197,7 +276,11 @@ def create_purchase_order(po_data):
         "order_type": order_type,
         "purpose": po_data["purpose"],
         "qc_requested": qc_required,
-        "po_shipdate": po_shipdate
+        "po_shipdate": po_shipdate,
+        "origin_country": origin_country,                 
+        "origin_port": origin_port_location,              
+        "destination_port": destination_port_location ,         
+        "requested_dc_eta": requested_dc_eta
     }
 
     if po_exists:
@@ -209,12 +292,13 @@ def create_purchase_order(po_data):
     else:
         for field, value in po_fields.items():
             setattr(po, field, value)
-
+    logger.info(f"Going 處理子表")
     # 處理子表
     existing_items = {item.line: item for item in po.po_items if item.line} if po_exists else {}
     new_items = []
     for item in po_data["items"]:
         article_number = validate_link_field("Product", "name", item["article_number"])
+        logger.info(f"detect article_number: {item['article_number']}")
         if not article_number:
             msg = f"無效的 article_number: {item['article_number']}，跳過項目"
             logger.warning(msg)
@@ -223,12 +307,13 @@ def create_purchase_order(po_data):
 
         item_data = {
             "article_number": article_number,
-            "requested_qty": item["requested_qty"],
+            "confirmed_qty": item["confirmed_qty"],
             "unit_price": item["unit_price"],
             "price_currency": item["price_currency"],
             "article_name": item["article_name"],
             "short_description": "\n".join(item["short_description"]),
             "requested_finish_date": format_date(item["requested_finish_date"]),
+            "requested_shipdate": format_date(item["requested_shipdate"]),        
             "requested_eta": format_date(item["requested_eta"]),
             "line": item["line"],
             "supplier_art_number": item["supplier_art_number"],
@@ -247,6 +332,7 @@ def create_purchase_order(po_data):
             new_items.append(item_data)
 
     po.set("po_items", new_items)
+    logger.info(f"after po.set")
 
     try:
         po.save(ignore_permissions=True)
@@ -378,3 +464,57 @@ def execute():
         if error_occurred:
             message += "\n\n詳細錯誤:\n" + "\n".join(error_messages)
         # send_notification(subject, message)
+        
+
+@frappe.whitelist()
+def reload_single_po_from_txt(po_number):
+    """
+    從 INPUT_DIR 找出含有此 po_number 的 po*.txt，重新載入該 PO。
+    po_number 由前端 (PO 表單) 傳入。
+    """
+    po_number = (po_number or "").strip()
+    if not po_number:
+        frappe.throw("PO Number is empty.")
+
+    # 1. 找到所有 po*.txt
+    file_pattern = os.path.join(PROCEED_DIR, "po*.txt")
+    files = glob.glob(file_pattern)
+
+    if not files:
+        frappe.throw(f"No po*.txt file found in {PROCEED_DIR}.")
+
+    matched_file = None
+
+    # 2. 掃描每個檔案，看裡面是否包含這個 po_number (01 行的欄位)
+    for file_path in files:
+        purchase_orders.clear()
+        import_po_data(file_path)   # 這會把所有 PO 放進 purchase_orders
+
+        if po_number in purchase_orders:
+            matched_file = file_path
+            break
+
+    if not matched_file:
+        frappe.throw(f"PO Number {po_number} not found in any po*.txt under {PROCEED_DIR}.")
+
+    # 3. 用找到的檔案 + 對應的 po_number 重新建立 / 更新 PO
+    po_data = purchase_orders.get(po_number)
+    if not po_data:
+        frappe.throw(f"PO data for {po_number} not parsed correctly from {matched_file}.")
+
+    success, msg = create_purchase_order(po_data)
+    if not success:
+        frappe.throw(f"Reload PO failed: {msg}")
+    
+    # 取得實際 PO 名稱（可能不是 po_number 本身）
+    po_name = frappe.db.get_value(PO_DOCTYPE, {"po_number": po_number}, "name")
+
+    # 在 Activity Log / Comments 加一筆紀錄
+    if po_name:
+        comment = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Reload PO from TXT file ({os.path.basename(matched_file)}) via manual button."
+        add_activity_message(PO_DOCTYPE, po_name, comment, 'Info')
+    
+    return {
+        "message": f"PO {po_number} reloaded from {os.path.basename(matched_file)} successfully.",
+        "file": os.path.basename(matched_file)
+    }

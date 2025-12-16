@@ -7,22 +7,23 @@
  "engine": "InnoDB",
  "field_order": [
   "supplier",
-  "purchase_order",
-  "purchase_order_line",
-  "article_number",
-  "article_name",
-  "order_qty",
-  "column_break_pueh",
   "inspection_date",
   "inspector",
+  "article_number",
+  "article_name",
+  "purchase_order_line",
+  "purchase_order",
+  "column_break_pueh",
+  "order_qty",
   "number_of_inspection",
   "inspected_qty",
   "failed_qty",
   "aql_qty",
   "full_inspection",
   "result",
-  "notes",
   "need_reinspection",
+  "section_break_arfa",
+  "notes",
   "section_break_rezk",
   "template",
   "inspection_results",
@@ -39,6 +40,8 @@
   {
    "fieldname": "supplier",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Supplier",
    "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
    "options": "Partner"
@@ -57,7 +60,6 @@
    "fieldtype": "Data",
    "ignore_user_permissions": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Line",
    "read_only": 1
   },
@@ -78,6 +80,7 @@
   {
    "fieldname": "order_qty",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Order Qty"
   },
   {
@@ -87,44 +90,54 @@
   {
    "fieldname": "inspection_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Inspection Date"
   },
   {
    "fieldname": "inspector",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Inspector",
    "options": "User"
   },
   {
    "fieldname": "number_of_inspection",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Number of Inspection"
   },
   {
    "fieldname": "inspected_qty",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Inspected Qty"
   },
   {
    "fieldname": "failed_qty",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Failed Qty"
   },
   {
    "fieldname": "aql_qty",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "AQL Qty"
   },
   {
    "default": "0",
    "fieldname": "full_inspection",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Full Inspection"
   },
   {
    "fieldname": "result",
    "fieldtype": "Select",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Result",
    "options": "Pass\nFailure\nNA"
   },
@@ -137,6 +150,7 @@
    "default": "0",
    "fieldname": "need_reinspection",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Need reinspection"
   },
   {
@@ -216,12 +230,16 @@
    "print_hide": 1,
    "read_only": 1,
    "report_hide": 1
+  },
+  {
+   "fieldname": "section_break_arfa",
+   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-24 08:04:05.083982",
+ "modified": "2025-12-11 15:25:59.080428",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Inspection",

@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"tOHy-CzUkd\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Purchase Orders</span>\",\"col\":12}},{\"id\":\"5p4ji7vi3Q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Orders\",\"col\":3}},{\"id\":\"_bHKnS7txc\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item inspection wizard\",\"col\":3}},{\"id\":\"lkJ6PDb22B\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection List\",\"col\":3}},{\"id\":\"Cuqjfhs47U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event\",\"col\":3}},{\"id\":\"JtrMhrPR-B\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Report</b></span>\",\"col\":12}},{\"id\":\"bKDb7WbZc-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Undelivered Items\",\"col\":3}}]",
+ "content": "[{\"id\":\"tOHy-CzUkd\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Purchase Orders</span>\",\"col\":12}},{\"id\":\"5p4ji7vi3Q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Orders\",\"col\":3}},{\"id\":\"gqkYwFYcl1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"PO Detail\",\"col\":3}},{\"id\":\"L1u4d28vCc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection</b></span>\",\"col\":12}},{\"id\":\"_bHKnS7txc\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item inspection wizard\",\"col\":3}},{\"id\":\"lkJ6PDb22B\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection List\",\"col\":3}},{\"id\":\"l78EDrkWR_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Detail\",\"col\":3}},{\"id\":\"nsfzxClEQg\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection Event</b></span>\",\"col\":12}},{\"id\":\"Cuqjfhs47U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event\",\"col\":3}},{\"id\":\"crCPUHG3ee\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event Detail\",\"col\":3}},{\"id\":\"JtrMhrPR-B\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Report</b></span>\",\"col\":12}},{\"id\":\"bKDb7WbZc-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Undelivered Items\",\"col\":3}}]",
  "creation": "2025-08-29 04:28:56.421180",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Purchase Orders",
  "links": [],
- "modified": "2025-09-24 05:40:51.573175",
+ "modified": "2025-12-12 02:08:52.806290",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Orders",
@@ -46,9 +46,25 @@
   {
    "color": "Grey",
    "doc_view": "List",
+   "label": "Inspection Event Detail",
+   "link_to": "Inspection Event details",
+   "report_ref_doctype": "Inspection Event",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
    "label": "Item inspection wizard",
    "type": "URL",
    "url": "https://sos.byrydens.com/item-inspection-wizard/new"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "PO Detail",
+   "link_to": "PO detail",
+   "report_ref_doctype": "Purchase Order",
+   "type": "Report"
   },
   {
    "color": "Grey",
@@ -64,6 +80,14 @@
    "label": "Undelivered Items",
    "link_to": "Undelivered Items",
    "report_ref_doctype": "Purchase Order",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Inspection Detail",
+   "link_to": "Inspection Detail",
+   "report_ref_doctype": "Inspection",
    "type": "Report"
   },
   {

@@ -1,44 +1,219 @@
 @media (min-width: 1200px) {
-    body .container, body .container-sm, body .container-md, body .container-lg, body .container-xl, body .container-fluid {
-        width: 95%;
-        max-width: 95%;
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-    body .layout-main-section-wrapper {
-        width: 95%;
-        max-width: 95%;
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-    body .layout-side-section, body .sidebar {
-        margin-left: 20px; /* 提高特異性，無需 !important */
-        padding-left: 10px;
-    }
-    
-    /* .navbar-brand img, .brand-logo 
-    {
-        width: 150px !important; 
-        height: auto !important; 
-        max-width: none !important; 
-    } */
-    
-    .for-login .page-card-head img {
-        width: 300px !important; /* 調整為您想要的寬度 */
-        height: auto !important; /* 保持比例 */
-        max-height: none !important;
-    }
+  body .container, body .container-sm, body .container-md, body .container-lg, body .container-xl, body .container-fluid {
+      width: 95%;
+      max-width: 95%;
+      padding-left: 20px;
+      padding-right: 20px;
+  }
+  body .layout-main-section-wrapper {
+      width: 95%;
+      max-width: 95%;
+      padding-left: 20px;
+      padding-right: 20px;
+  }
+  body .layout-side-section, body .sidebar {
+      margin-left: 20px; /* 提高特異性，無需 !important */
+      padding-left: 10px;
+  }
+  
+  /* .navbar-brand img, .brand-logo 
+  {
+      width: 150px !important; 
+      height: auto !important; 
+      max-width: none !important; 
+  } */
+  
+  .for-login .page-card-head img {
+      width: 300px !important; /* 調整為您想要的寬度 */
+      height: auto !important; /* 保持比例 */
+      max-height: none !important;
+  }
 
 }
 
 .frappe-control.data-table {
-    overflow-x: auto;
-    white-space: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 @page {
-    @bottom-right {
-        content: "Page: " counter(page) " / " counter(pages);
-        font-size: 10px;
-    }
+  @bottom-right {
+      content: "Page: " counter(page) " / " counter(pages);
+      font-size: 10px;
+  }
+}
+
+/* ==================== 追加：側邊欄純黑 + 頂部白底（2025最新必成功版）=================== */
+
+/* 頂部頁面標題列 → 白底黑字 */
+.page-head,
+.page-head-content {
+  background-color: #ffffff !important;
+}
+.page-head .title-text,
+.page-head .title-area .title-text,
+.page-head .indicator-pill,
+.page-head * {
+  color: #000000 !important;
+}
+
+/* 側邊欄強制純黑底 */
+.layout-side-section,
+.desk-sidebar,
+.standard-sidebar-section {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+/* 側邊欄所有文字強制白色 */
+.layout-side-section .sidebar-item-label,
+.layout-side-section .section-title,
+.layout-side-section a,
+.layout-side-section .standard-sidebar-label,
+.desk-sidebar *,
+.desk-sidebar .sidebar-item-label {
+  color: #ffffff !important;
+}
+
+/* 選單 hover 與選取時深灰高亮（更好看） */
+.standard-sidebar-item:hover,
+.standard-sidebar-item.selected,
+.desk-sidebar .nav-link:hover,
+.desk-sidebar .selected .nav-link {
+  background-color: #1e1e1e !important;
+  border-radius: 6px !important;
+}
+
+/* 頂部頁面標題列 */
+div.row.flex.align-center.page-head-content.justify-between {
+background-color: #ffffff;
+color: #000000;
+}
+
+/* 側邊欄 */
+div.col-lg-2.layout-side-section {
+background-color: #000000;
+color: #ffffff;
+}
+div.col-lg-2.layout-side-section .sidebar-item-label,
+div.col-lg-2.layout-side-section .standard-sidebar-label,
+div.col-lg-2.layout-side-section a {
+color: #ffffff;
+}
+a.item-anchor {
+background-color: #000000;
+}
+button.btn-reset.standard-sidebar-label {
+background-color: #000000;
+color: #ffffff;
+text-align: left;
+text-transform: none;
+text-decoration: none;
+font-weight: 900;
+font-style: normal;
+}
+
+/* 登入頁本體 */
+html body {
+background-color: #ffffff;
+}
+div.login-content.page-card {
+background-color: #000000;
+}
+button.btn.btn-sm.btn-primary.btn-block.btn-login {
+background-color: #ffffff;
+color: #000000;
+}
+
+/* 登入頁內文字連結 */
+.for-login div p a {
+color: #f3f3f3;
+}
+
+/* 列表側邊欄的按鈕與 tag */
+a.btn.btn-default.btn-sm.list-sidebar-button {
+background-color: #434343;
+color: #ffffff;
+}
+li.sidebar-label,
+a.list-tag-preview,
+a.add-group-by {
+color: #ffffff;
+}
+
+button.btn.btn-primary.btn-sm.primary-action {
+background-color: #000000;
+color: #ffffff;
+}
+/* 側邊欄圖示顏色強制白色（適用於 Octicons 或類似字型圖示） */
+.layout-side-section .octicon,
+.desk-sidebar .octicon,
+.standard-sidebar-item .octicon {
+  color: #ffffff !important;  /* 白色，讓黑底上可見 */
+}
+
+/* 如果圖示是 SVG 格式，調整 fill 顏色 */
+.layout-side-section svg,
+.desk-sidebar svg,
+.standard-sidebar-item svg path,
+.standard-sidebar-item svg g {
+  fill: #ffffff !important;  /* 填充顏色設為白色 */
+  stroke: #ffffff !important;  /* 邊框顏色設為白色，如果有 */
+}
+
+/* 選單項目中的圖示 hover 與選取狀態（可選，增加互動性） */
+.standard-sidebar-item:hover .octicon,
+.standard-sidebar-item.selected .octicon,
+.desk-sidebar .nav-link:hover .octicon,
+.desk-sidebar .selected .nav-link .octicon {
+  color: #ffffff !important;  /* 保持白色 */
+}
+
+/* 如果有其他圖示類別（如 Font Awesome），追加此規則 */
+.layout-side-section .fa,
+.desk-sidebar .fa {
+  color: #ffffff !important;
+}
+
+/* 更新：調整按鈕、文字與輸入顏色 */
+button.btn.btn-primary.btn-sm.primary-action {
+  color: #ffffff;
+  background-color: #eceff1;
+}
+
+button.btn.btn-primary.btn-sm {
+  background-color: #eceff1;
+}
+
+li.created-by {
+  color: #ffffff;
+}
+
+li.modified-by {
+  color: #ffffff;
+}
+
+input.input-with-feedback.form-control.input-xs {
+  background-color: #eceff1;
+}
+
+li.sidebar-label {
+  color: #ffffff;
+}
+
+a.btn.btn-default.btn-sm.list-sidebar-button {
+  background-color: #272626;
+}
+
+button.btn.btn-primary.btn-sm.btn-modal-primary {
+  background-color: #000000;
+}
+
+/* 追加：調整下拉選單顏色 */
+div.dropdown-item {
+  background-color: #9e9e9e;
+}
+
+div.dropdown-list {
+  background-color: #263238;
 }
