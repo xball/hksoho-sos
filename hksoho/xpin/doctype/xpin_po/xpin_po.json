@@ -1,0 +1,353 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:po_number",
+ "creation": "2025-12-26 18:47:37.787410",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "details_tab",
+  "section_break_k4ni",
+  "po_number",
+  "buyer",
+  "supplier",
+  "dc",
+  "origin_country",
+  "origin_port",
+  "destination_port",
+  "purchaser",
+  "responsible",
+  "order_type",
+  "purpose",
+  "po_status",
+  "delivery_status",
+  "payment_terms",
+  "delivery_terms",
+  "delivery_mode",
+  "equipment",
+  "requested_forwarder",
+  "booking_status",
+  "qc_status",
+  "consolidation",
+  "transport_time",
+  "routing",
+  "order_placed",
+  "finish_date",
+  "po_ship_date",
+  "sent_to_supplier",
+  "supplier_confirmed",
+  "production_started",
+  "requested_inspection",
+  "booking_received",
+  "requested_dc_eta",
+  "calculated_dc_eta",
+  "available_at_wh",
+  "delivered",
+  "loading_place",
+  "supplier_address",
+  "buyer_address",
+  "delivery_address",
+  "html_filename",
+  "viewer_tab",
+  "html_viewer",
+  "items_tab",
+  "items",
+  "attached_docs"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_k4ni",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "label": "PO Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "buyer",
+   "fieldtype": "Data",
+   "label": "Buyer"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier"
+  },
+  {
+   "fieldname": "dc",
+   "fieldtype": "Data",
+   "label": "DC"
+  },
+  {
+   "fieldname": "origin_country",
+   "fieldtype": "Data",
+   "label": "Origin Country"
+  },
+  {
+   "fieldname": "origin_port",
+   "fieldtype": "Data",
+   "label": "Origin Port"
+  },
+  {
+   "fieldname": "destination_port",
+   "fieldtype": "Data",
+   "label": "Destination Port"
+  },
+  {
+   "fieldname": "purchaser",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Purchaser"
+  },
+  {
+   "fieldname": "responsible",
+   "fieldtype": "Data",
+   "label": "Responsible"
+  },
+  {
+   "fieldname": "order_type",
+   "fieldtype": "Data",
+   "label": "Order Type"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Purpose"
+  },
+  {
+   "fieldname": "po_status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "PO Status"
+  },
+  {
+   "fieldname": "delivery_status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Delivery Status"
+  },
+  {
+   "fieldname": "payment_terms",
+   "fieldtype": "Data",
+   "label": "Payment Terms"
+  },
+  {
+   "fieldname": "delivery_terms",
+   "fieldtype": "Data",
+   "label": "delivery_terms"
+  },
+  {
+   "fieldname": "delivery_mode",
+   "fieldtype": "Data",
+   "label": "Delivery Mode"
+  },
+  {
+   "fieldname": "equipment",
+   "fieldtype": "Data",
+   "label": "Equipment"
+  },
+  {
+   "fieldname": "requested_forwarder",
+   "fieldtype": "Data",
+   "label": "Requested Forwarder"
+  },
+  {
+   "fieldname": "booking_status",
+   "fieldtype": "Data",
+   "label": "Booking Status"
+  },
+  {
+   "fieldname": "qc_status",
+   "fieldtype": "Data",
+   "label": "QC Status"
+  },
+  {
+   "fieldname": "consolidation",
+   "fieldtype": "Data",
+   "label": "Consolidation"
+  },
+  {
+   "fieldname": "transport_time",
+   "fieldtype": "Data",
+   "label": "Transport Time"
+  },
+  {
+   "fieldname": "routing",
+   "fieldtype": "Data",
+   "label": "Routing"
+  },
+  {
+   "fieldname": "order_placed",
+   "fieldtype": "Date",
+   "label": "Order Placed"
+  },
+  {
+   "fieldname": "finish_date",
+   "fieldtype": "Date",
+   "label": "Finish Date"
+  },
+  {
+   "fieldname": "po_ship_date",
+   "fieldtype": "Date",
+   "label": "PO Ship Date"
+  },
+  {
+   "fieldname": "sent_to_supplier",
+   "fieldtype": "Date",
+   "label": "Sent To Supplier"
+  },
+  {
+   "fieldname": "supplier_confirmed",
+   "fieldtype": "Date",
+   "label": "Supplier Confirmed"
+  },
+  {
+   "fieldname": "production_started",
+   "fieldtype": "Date",
+   "label": "Production Started"
+  },
+  {
+   "fieldname": "requested_inspection",
+   "fieldtype": "Date",
+   "label": "Requested Inspection"
+  },
+  {
+   "fieldname": "booking_received",
+   "fieldtype": "Date",
+   "label": "Booking Received"
+  },
+  {
+   "fieldname": "requested_dc_eta",
+   "fieldtype": "Date",
+   "label": "Requested DC ETA"
+  },
+  {
+   "fieldname": "calculated_dc_eta",
+   "fieldtype": "Date",
+   "label": "Calculated DC ETA"
+  },
+  {
+   "fieldname": "available_at_wh",
+   "fieldtype": "Date",
+   "label": "Available at WH"
+  },
+  {
+   "fieldname": "loading_place",
+   "fieldtype": "Small Text",
+   "label": "Loading Place"
+  },
+  {
+   "fieldname": "supplier_address",
+   "fieldtype": "Small Text",
+   "label": "Supplier Address"
+  },
+  {
+   "fieldname": "buyer_address",
+   "fieldtype": "Small Text",
+   "label": "Buyer Address"
+  },
+  {
+   "fieldname": "delivery_address",
+   "fieldtype": "Small Text",
+   "label": "Delivery Address"
+  },
+  {
+   "fieldname": "html_filename",
+   "fieldtype": "Data",
+   "label": "html_filename"
+  },
+  {
+   "fieldname": "items_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "More"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "items",
+   "options": "xpin_po_items"
+  },
+  {
+   "fieldname": "attached_docs",
+   "fieldtype": "Table",
+   "label": "attached_docs",
+   "options": "xpin_po_doc"
+  },
+  {
+   "fieldname": "viewer_tab",
+   "fieldtype": "Tab Break",
+   "label": "Viewer"
+  },
+  {
+   "fieldname": "html_viewer",
+   "fieldtype": "HTML",
+   "label": "Html Viewer"
+  },
+  {
+   "fieldname": "details_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Details"
+  },
+  {
+   "fieldname": "delivered",
+   "fieldtype": "Date",
+   "label": "Delivered"
+  }
+ ],
+ "grid_page_length": 50,
+ "links": [],
+ "modified": "2025-12-27 08:17:27.439540",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_po",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

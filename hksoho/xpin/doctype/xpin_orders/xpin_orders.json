@@ -1,0 +1,639 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:ordernr",
+ "creation": "2025-12-23 08:57:55.389097",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_yzzd",
+  "ordernr",
+  "ponr",
+  "odate",
+  "cdate",
+  "agentid",
+  "buyerid",
+  "supplierid",
+  "custid",
+  "edate",
+  "baddr",
+  "saddr",
+  "dvyaddr",
+  "lplace",
+  "dvyterm",
+  "paytermcode",
+  "status",
+  "currency",
+  "rate",
+  "s_currency",
+  "s_rate",
+  "chtime",
+  "chuser",
+  "dvytime",
+  "routing",
+  "leadtime",
+  "dctime",
+  "dvytype",
+  "dvysize",
+  "dvynum",
+  "dtstamp",
+  "po_shipdate",
+  "po_dcdate",
+  "prod_started",
+  "exfactorydate",
+  "consolidation",
+  "consolidationdays_default",
+  "modelid",
+  "purchaser",
+  "coordinator",
+  "responsible",
+  "dc",
+  "loadport",
+  "destport",
+  "pol",
+  "pod",
+  "origincc",
+  "destcountrycode",
+  "itemnum",
+  "sumqty",
+  "readytoship",
+  "qaccepted",
+  "qrejected",
+  "early_etd",
+  "latest_etd",
+  "sumcbm",
+  "bkd_inspection",
+  "planned_inspection",
+  "qcrequested",
+  "qcstatus",
+  "qcdate",
+  "qcinspector",
+  "qcinspectedby",
+  "qccancelled",
+  "qccancelledby",
+  "bomlistrequired",
+  "bomlistreceived",
+  "bomlistreceivedyn",
+  "bkg_status",
+  "bkg_received",
+  "canceldate",
+  "cancelledby",
+  "cancelreason",
+  "supplierdeliverto",
+  "confirmblocked",
+  "shortdesc",
+  "booking_required",
+  "booking_mode",
+  "sent_to_supplier",
+  "sum_bkdqty",
+  "sum_dvyqty",
+  "num_comments",
+  "prior",
+  "comments",
+  "po_status",
+  "st_updated",
+  "forwarderid",
+  "forwarder",
+  "po_status_exported",
+  "firstconfirmed",
+  "confirmed_at",
+  "confirmed_by",
+  "confirmed_userid",
+  "purpose",
+  "ordertype",
+  "supplier_name",
+  "remarks",
+  "commission_base",
+  "sum_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_yzzd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ordernr",
+   "fieldtype": "Data",
+   "label": "ordernr",
+   "unique": 1
+  },
+  {
+   "fieldname": "ponr",
+   "fieldtype": "Data",
+   "label": "ponr"
+  },
+  {
+   "fieldname": "odate",
+   "fieldtype": "Date",
+   "label": "odate"
+  },
+  {
+   "fieldname": "cdate",
+   "fieldtype": "Date",
+   "label": "cdate"
+  },
+  {
+   "fieldname": "agentid",
+   "fieldtype": "Link",
+   "label": "agentid",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "buyerid",
+   "fieldtype": "Link",
+   "label": "buyerid",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "supplierid",
+   "fieldtype": "Link",
+   "label": "supplierid",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "custid",
+   "fieldtype": "Link",
+   "label": "custid",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "edate",
+   "fieldtype": "Date",
+   "label": "edate"
+  },
+  {
+   "fieldname": "baddr",
+   "fieldtype": "Text",
+   "label": "baddr"
+  },
+  {
+   "fieldname": "saddr",
+   "fieldtype": "Text",
+   "label": "saddr"
+  },
+  {
+   "fieldname": "dvyaddr",
+   "fieldtype": "Text",
+   "label": "dvyaddr"
+  },
+  {
+   "fieldname": "lplace",
+   "fieldtype": "Text",
+   "label": "lplace"
+  },
+  {
+   "fieldname": "dvyterm",
+   "fieldtype": "Data",
+   "label": "dvyterm"
+  },
+  {
+   "fieldname": "paytermcode",
+   "fieldtype": "Link",
+   "label": "paytermcode",
+   "options": "Payment Term"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "status"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "currency"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "rate"
+  },
+  {
+   "fieldname": "s_currency",
+   "fieldtype": "Data",
+   "label": "s_currency"
+  },
+  {
+   "fieldname": "s_rate",
+   "fieldtype": "Float",
+   "label": "s_rate"
+  },
+  {
+   "fieldname": "chtime",
+   "fieldtype": "Date",
+   "label": "chtime"
+  },
+  {
+   "fieldname": "chuser",
+   "fieldtype": "Data",
+   "label": "chuser"
+  },
+  {
+   "fieldname": "dvytime",
+   "fieldtype": "Int",
+   "label": "dvytime"
+  },
+  {
+   "fieldname": "routing",
+   "fieldtype": "Int",
+   "label": "routing"
+  },
+  {
+   "fieldname": "leadtime",
+   "fieldtype": "Int",
+   "label": "leadtime"
+  },
+  {
+   "fieldname": "dctime",
+   "fieldtype": "Int",
+   "label": "dctime"
+  },
+  {
+   "fieldname": "dvytype",
+   "fieldtype": "Data",
+   "label": "dvytype"
+  },
+  {
+   "fieldname": "dvysize",
+   "fieldtype": "Data",
+   "label": "dvysize"
+  },
+  {
+   "fieldname": "dvynum",
+   "fieldtype": "Int",
+   "label": "dvynum"
+  },
+  {
+   "fieldname": "dtstamp",
+   "fieldtype": "Date",
+   "label": "dtstamp"
+  },
+  {
+   "fieldname": "po_shipdate",
+   "fieldtype": "Date",
+   "label": "po_shipdate"
+  },
+  {
+   "fieldname": "po_dcdate",
+   "fieldtype": "Date",
+   "label": "po_dcdate"
+  },
+  {
+   "fieldname": "prod_started",
+   "fieldtype": "Data",
+   "label": "prod_started"
+  },
+  {
+   "fieldname": "exfactorydate",
+   "fieldtype": "Date",
+   "label": "exfactorydate"
+  },
+  {
+   "fieldname": "consolidation",
+   "fieldtype": "Int",
+   "label": "consolidation"
+  },
+  {
+   "fieldname": "consolidationdays_default",
+   "fieldtype": "Int",
+   "label": "consolidationdays_default"
+  },
+  {
+   "fieldname": "modelid",
+   "fieldtype": "Int",
+   "label": "modelid"
+  },
+  {
+   "fieldname": "purchaser",
+   "fieldtype": "Data",
+   "label": "purchaser"
+  },
+  {
+   "fieldname": "coordinator",
+   "fieldtype": "Data",
+   "label": "coordinator"
+  },
+  {
+   "fieldname": "responsible",
+   "fieldtype": "Data",
+   "label": "responsible"
+  },
+  {
+   "fieldname": "dc",
+   "fieldtype": "Data",
+   "label": "dc"
+  },
+  {
+   "fieldname": "loadport",
+   "fieldtype": "Data",
+   "label": "loadport"
+  },
+  {
+   "fieldname": "destport",
+   "fieldtype": "Data",
+   "label": "destport"
+  },
+  {
+   "fieldname": "pol",
+   "fieldtype": "Data",
+   "label": "pol"
+  },
+  {
+   "fieldname": "pod",
+   "fieldtype": "Data",
+   "label": "pod"
+  },
+  {
+   "fieldname": "origincc",
+   "fieldtype": "Data",
+   "label": "origincc"
+  },
+  {
+   "fieldname": "destcountrycode",
+   "fieldtype": "Data",
+   "label": "destcountrycode"
+  },
+  {
+   "fieldname": "itemnum",
+   "fieldtype": "Int",
+   "label": "itemnum"
+  },
+  {
+   "fieldname": "sumqty",
+   "fieldtype": "Int",
+   "label": "sumqty"
+  },
+  {
+   "fieldname": "readytoship",
+   "fieldtype": "Int",
+   "label": "readytoship"
+  },
+  {
+   "fieldname": "qaccepted",
+   "fieldtype": "Int",
+   "label": "qaccepted"
+  },
+  {
+   "fieldname": "qrejected",
+   "fieldtype": "Int",
+   "label": "qrejected"
+  },
+  {
+   "fieldname": "early_etd",
+   "fieldtype": "Date",
+   "label": "early_etd"
+  },
+  {
+   "fieldname": "latest_etd",
+   "fieldtype": "Date",
+   "label": "latest_etd"
+  },
+  {
+   "fieldname": "sumcbm",
+   "fieldtype": "Float",
+   "label": "sumcbm"
+  },
+  {
+   "fieldname": "bkd_inspection",
+   "fieldtype": "Date",
+   "label": "bkd_inspection"
+  },
+  {
+   "fieldname": "planned_inspection",
+   "fieldtype": "Date",
+   "label": "planned_inspection"
+  },
+  {
+   "fieldname": "qcrequested",
+   "fieldtype": "Data",
+   "label": "qcrequested"
+  },
+  {
+   "fieldname": "qcstatus",
+   "fieldtype": "Data",
+   "label": "qcstatus"
+  },
+  {
+   "fieldname": "qcdate",
+   "fieldtype": "Date",
+   "label": "qcdate"
+  },
+  {
+   "fieldname": "qcinspector",
+   "fieldtype": "Data",
+   "label": "qcinspector"
+  },
+  {
+   "fieldname": "qcinspectedby",
+   "fieldtype": "Data",
+   "label": "qcinspectedby"
+  },
+  {
+   "fieldname": "qccancelled",
+   "fieldtype": "Date",
+   "label": "qccancelled"
+  },
+  {
+   "fieldname": "qccancelledby",
+   "fieldtype": "Data",
+   "label": "qccancelledby"
+  },
+  {
+   "fieldname": "bomlistrequired",
+   "fieldtype": "Data",
+   "label": "bomlistrequired"
+  },
+  {
+   "fieldname": "bomlistreceived",
+   "fieldtype": "Data",
+   "label": "bomlistreceived"
+  },
+  {
+   "fieldname": "bomlistreceivedyn",
+   "fieldtype": "Data",
+   "label": "bomlistreceivedyn"
+  },
+  {
+   "fieldname": "bkg_status",
+   "fieldtype": "Data",
+   "label": "bkg_status"
+  },
+  {
+   "fieldname": "bkg_received",
+   "fieldtype": "Date",
+   "label": "bkg_received"
+  },
+  {
+   "fieldname": "canceldate",
+   "fieldtype": "Date",
+   "label": "canceldate"
+  },
+  {
+   "fieldname": "cancelledby",
+   "fieldtype": "Data",
+   "label": "cancelledby"
+  },
+  {
+   "fieldname": "cancelreason",
+   "fieldtype": "Data",
+   "label": "cancelreason"
+  },
+  {
+   "fieldname": "supplierdeliverto",
+   "fieldtype": "Data",
+   "label": "supplierDeliverTo"
+  },
+  {
+   "fieldname": "confirmblocked",
+   "fieldtype": "Data",
+   "label": "confirmBlocked"
+  },
+  {
+   "fieldname": "shortdesc",
+   "fieldtype": "Text",
+   "label": "shortdesc"
+  },
+  {
+   "fieldname": "booking_required",
+   "fieldtype": "Int",
+   "label": "booking_required"
+  },
+  {
+   "fieldname": "booking_mode",
+   "fieldtype": "Data",
+   "label": "booking_mode"
+  },
+  {
+   "fieldname": "sent_to_supplier",
+   "fieldtype": "Data",
+   "label": "sent_to_supplier"
+  },
+  {
+   "fieldname": "sum_bkdqty",
+   "fieldtype": "Int",
+   "label": "sum_bkdqty"
+  },
+  {
+   "fieldname": "sum_dvyqty",
+   "fieldtype": "Int",
+   "label": "sum_dvyqty"
+  },
+  {
+   "fieldname": "num_comments",
+   "fieldtype": "Int",
+   "label": "num_comments"
+  },
+  {
+   "fieldname": "prior",
+   "fieldtype": "Int",
+   "label": "prior"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Text",
+   "label": "comments"
+  },
+  {
+   "fieldname": "po_status",
+   "fieldtype": "Data",
+   "label": "po_status"
+  },
+  {
+   "fieldname": "st_updated",
+   "fieldtype": "Date",
+   "label": "st_updated"
+  },
+  {
+   "fieldname": "forwarderid",
+   "fieldtype": "Data",
+   "label": "forwarderid"
+  },
+  {
+   "fieldname": "forwarder",
+   "fieldtype": "Data",
+   "label": "forwarder"
+  },
+  {
+   "fieldname": "po_status_exported",
+   "fieldtype": "Data",
+   "label": "po_status_exported"
+  },
+  {
+   "fieldname": "firstconfirmed",
+   "fieldtype": "Data",
+   "label": "firstconfirmed"
+  },
+  {
+   "fieldname": "confirmed_at",
+   "fieldtype": "Data",
+   "label": "confirmed_at"
+  },
+  {
+   "fieldname": "confirmed_by",
+   "fieldtype": "Data",
+   "label": "confirmed_by"
+  },
+  {
+   "fieldname": "confirmed_userid",
+   "fieldtype": "Data",
+   "label": "confirmed_userid"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "purpose"
+  },
+  {
+   "fieldname": "ordertype",
+   "fieldtype": "Int",
+   "label": "ordertype"
+  },
+  {
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "label": "supplier_name"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Text",
+   "label": "remarks"
+  },
+  {
+   "fieldname": "commission_base",
+   "fieldtype": "Data",
+   "label": "commission_base"
+  },
+  {
+   "fieldname": "sum_amount",
+   "fieldtype": "Float",
+   "label": "sum_amount"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-23 10:22:10.914311",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_orders",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

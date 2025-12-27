@@ -82,6 +82,7 @@
    "fieldname": "article_name",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Article Name",
    "reqd": 1
   },
@@ -362,7 +363,7 @@
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-13 02:12:42.920691",
+ "modified": "2025-12-17 03:15:46.611296",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

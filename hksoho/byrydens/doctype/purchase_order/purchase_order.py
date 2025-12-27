@@ -16,6 +16,7 @@ FIELDS_TO_CHECK = ['po_status']
 ITEM_FIELDS_TO_CHECK = ['article_number', 'line', 'article_name', 'unit_price', 'confirmed_qty', 'requested_qty', 'confirmed_shipdate']
 LOGGER_NAME = "purchase_order_export"
 
+
 def write_debug_log(message):
     """
     寫入除錯日誌到指定的 DEBUG_FILE。
@@ -33,6 +34,7 @@ class PurchaseOrder(Document):
         在驗證前計算總確認數量、總確認金額、總預訂數量和總預訂金額。
         """
         logger = frappe.logger(LOGGER_NAME)
+        
         try:
             write_debug_log(f"validate triggered for PO: {self.name}")
             logger.info(f"validate triggered for Purchase Order: {self.name}")
@@ -42,12 +44,19 @@ class PurchaseOrder(Document):
             tconf_amt = 0.0
             tbook_qty = 0
             tbook_amt = 0.0
+            actualfinishdate = self.actual_finish_date
+            write_debug_log(f"set item {actualfinishdate}")
+            if actualfinishdate:
+                for item in self.po_items:
+                    write_debug_log(f"set item {item.idx} actual_finishdate")
+                    item.actual_finishdate = actualfinishdate
+            write_debug_log(f" ###2 validate triggered for PO: {self.name}")
             for item in self.po_items:
                 uprice = item.unit_price
                 uconf_qty = item.confirmed_qty
                 ubook_qty = item.booked_qty
                 ureq_qty = item.requested_qty
-                
+
                 if uprice is None or uconf_qty is None:	
                     item.amount = 0.0
                 else:

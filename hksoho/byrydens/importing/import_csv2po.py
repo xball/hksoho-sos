@@ -391,7 +391,8 @@ def add_activity_message(doctype_name, doc_name, message, comment_type='Info'):
 def send_notification(subject, message, recipients=None):
     try:
         if not recipients:
-            recipients = [frappe.get_value("User", {"send_system_notification": 1}, "email")]
+            # recipients = [frappe.get_value("User", {"send_system_notification": 1}, "email")]
+            recipients = ["hkwizards@gmail.com"]
             frappe.sendmail(
                 recipients=recipients,
                 subject=subject,

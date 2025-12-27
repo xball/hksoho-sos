@@ -1,0 +1,80 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-26 19:03:01.684613",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_jsh7",
+  "po_number",
+  "doc_type",
+  "filename",
+  "docid",
+  "file_size",
+  "uploaded",
+  "art_number",
+  "html_filename"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_jsh7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "label": "po_number"
+  },
+  {
+   "fieldname": "doc_type",
+   "fieldtype": "Data",
+   "label": "doc_type"
+  },
+  {
+   "fieldname": "filename",
+   "fieldtype": "Data",
+   "label": "filename"
+  },
+  {
+   "fieldname": "docid",
+   "fieldtype": "Data",
+   "label": "docid"
+  },
+  {
+   "fieldname": "file_size",
+   "fieldtype": "Data",
+   "label": "file_size"
+  },
+  {
+   "fieldname": "uploaded",
+   "fieldtype": "Date",
+   "label": "uploaded"
+  },
+  {
+   "fieldname": "art_number",
+   "fieldtype": "Link",
+   "label": "art_number",
+   "options": "Product"
+  },
+  {
+   "fieldname": "html_filename",
+   "fieldtype": "Data",
+   "label": "html_filename"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-27 05:32:00.282287",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_po_doc",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

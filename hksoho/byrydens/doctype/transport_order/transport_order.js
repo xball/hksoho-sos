@@ -78,7 +78,7 @@ frappe.ui.form.on('Transport Order', {
                 args: {
                     doctype: 'Purchase Order',
                     filters: {
-                        workflow_state: 'Ready to Ship' // Only show POs with workflow_state 'Ready to Ship'
+                        workflow_state: ['in', ['Ready to Ship', 'Partial Shipout']]
                     },
                     fields: ['name'],
                     limit_page_length: 100

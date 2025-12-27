@@ -1,0 +1,261 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:id",
+ "creation": "2025-12-26 12:59:23.706694",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_gnxw",
+  "form_viewer",
+  "data_tab",
+  "column_break_mxyc",
+  "id",
+  "supplier",
+  "po_number",
+  "article_number",
+  "article_name",
+  "category",
+  "inspection_date",
+  "inspector",
+  "inspection_no",
+  "order_qty",
+  "inspected_qty",
+  "color",
+  "failed_qty",
+  "hours_taken",
+  "aql_qty",
+  "full_inspection",
+  "status",
+  "result",
+  "comments",
+  "source_file",
+  "section_break_qyiv",
+  "test"
+ ],
+ "fields": [
+  {
+   "fieldname": "id",
+   "fieldtype": "Int",
+   "label": "ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier",
+   "options": "Partner",
+   "read_only": 1
+  },
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "PO Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "article_number",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Article Number",
+   "options": "Product",
+   "read_only": 1
+  },
+  {
+   "fieldname": "article_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Article Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Category",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspection_date",
+   "fieldtype": "Date",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Inspection Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspector",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Inspector",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspection_no",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Inspection No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "order_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Order Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspected_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Inspected Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Color",
+   "read_only": 1
+  },
+  {
+   "fieldname": "failed_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Failed Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hours_taken",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Hours Taken",
+   "read_only": 1
+  },
+  {
+   "fieldname": "aql_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "AQL Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "full_inspection",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Inspection",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Status"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Data",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Result"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Text",
+   "label": "Comments",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_file",
+   "fieldtype": "Data",
+   "label": "Source File"
+  },
+  {
+   "fieldname": "section_break_qyiv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "form_viewer",
+   "fieldtype": "HTML",
+   "label": "Form_Viewer"
+  },
+  {
+   "fieldname": "column_break_mxyc",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "data_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Data"
+  },
+  {
+   "fieldname": "test",
+   "fieldtype": "Data",
+   "label": "test"
+  },
+  {
+   "fieldname": "section_break_gnxw",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-26 16:49:20.327671",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_inspection_items",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1
+  }
+ ],
+ "route": "General",
+ "row_format": "Dynamic",
+ "sort_field": "inspection_date",
+ "sort_order": "DESC",
+ "states": []
+}

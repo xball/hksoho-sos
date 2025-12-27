@@ -1,0 +1,170 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:id",
+ "creation": "2025-12-22 17:50:13.955633",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_imbx",
+  "id",
+  "inspectionid",
+  "itemid",
+  "numinspection",
+  "section",
+  "linenumber",
+  "sublevel1",
+  "sublevel2",
+  "description",
+  "result",
+  "errorcode",
+  "cause_for_reinspection",
+  "cause_for_remark",
+  "notes",
+  "value",
+  "valueextra",
+  "inserted",
+  "insertby",
+  "updated",
+  "updateby"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_imbx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "inspectionid",
+   "fieldtype": "Data",
+   "label": "Inspection ID"
+  },
+  {
+   "fieldname": "itemid",
+   "fieldtype": "Data",
+   "label": "Item ID"
+  },
+  {
+   "fieldname": "numinspection",
+   "fieldtype": "Int",
+   "label": "Num Inspection"
+  },
+  {
+   "fieldname": "section",
+   "fieldtype": "Data",
+   "label": "Section"
+  },
+  {
+   "fieldname": "linenumber",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Line Number"
+  },
+  {
+   "fieldname": "sublevel1",
+   "fieldtype": "Int",
+   "label": "Sublevel1"
+  },
+  {
+   "fieldname": "sublevel2",
+   "fieldtype": "Int",
+   "label": "Sublevel2"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Result",
+   "options": "xpin_inspection_results"
+  },
+  {
+   "fieldname": "errorcode",
+   "fieldtype": "Int",
+   "label": "Error Code"
+  },
+  {
+   "fieldname": "cause_for_reinspection",
+   "fieldtype": "Data",
+   "label": "Cause for Reinspection"
+  },
+  {
+   "fieldname": "cause_for_remark",
+   "fieldtype": "Data",
+   "label": "Cause for Remark"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Data",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "value",
+   "fieldtype": "Data",
+   "label": "Value"
+  },
+  {
+   "fieldname": "valueextra",
+   "fieldtype": "Data",
+   "label": "Value Extra"
+  },
+  {
+   "fieldname": "inserted",
+   "fieldtype": "Date",
+   "label": "Inserted"
+  },
+  {
+   "fieldname": "insertby",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Insertby"
+  },
+  {
+   "fieldname": "updated",
+   "fieldtype": "Date",
+   "label": "Updated"
+  },
+  {
+   "fieldname": "updateby",
+   "fieldtype": "Data",
+   "label": "Updateby"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-22 18:49:39.434461",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_inspection_data",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

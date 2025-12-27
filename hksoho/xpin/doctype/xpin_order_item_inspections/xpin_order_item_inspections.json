@@ -1,0 +1,227 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:id",
+ "creation": "2025-12-17 10:20:24.400578",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_nega",
+  "id",
+  "itemid",
+  "numinspection",
+  "iteminspection",
+  "inspectiondate",
+  "inspector",
+  "fullinspection",
+  "inspectionhours",
+  "createdby",
+  "created",
+  "updatedby",
+  "updated",
+  "result",
+  "withremarks",
+  "action",
+  "failreasons",
+  "qtyinspected",
+  "qtyaccepted",
+  "qtyrejected",
+  "qtyblocked",
+  "qtyfailed",
+  "aql",
+  "comment",
+  "formcreated",
+  "closed",
+  "signed",
+  "signedby",
+  "signdate"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_nega",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "itemid",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item ID"
+  },
+  {
+   "fieldname": "numinspection",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Number of Inspection"
+  },
+  {
+   "fieldname": "iteminspection",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Inspection"
+  },
+  {
+   "fieldname": "inspectiondate",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Inspection Date"
+  },
+  {
+   "fieldname": "inspector",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Inspector"
+  },
+  {
+   "default": "0",
+   "fieldname": "fullinspection",
+   "fieldtype": "Check",
+   "label": "Full inspection"
+  },
+  {
+   "fieldname": "inspectionhours",
+   "fieldtype": "Float",
+   "label": "Inspection in hour"
+  },
+  {
+   "fieldname": "createdby",
+   "fieldtype": "Data",
+   "label": "Created by"
+  },
+  {
+   "fieldname": "created",
+   "fieldtype": "Date",
+   "label": "Created"
+  },
+  {
+   "fieldname": "updatedby",
+   "fieldtype": "Data",
+   "label": "Updated by"
+  },
+  {
+   "fieldname": "updated",
+   "fieldtype": "Date",
+   "label": "Updated"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Link",
+   "label": "Result",
+   "options": "xpin_inspection_results"
+  },
+  {
+   "default": "0",
+   "fieldname": "withremarks",
+   "fieldtype": "Check",
+   "label": "With Remarks"
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Link",
+   "label": "Action",
+   "options": "xpin_inspection_actions"
+  },
+  {
+   "fieldname": "failreasons",
+   "fieldtype": "Data",
+   "label": "Fail Reasons"
+  },
+  {
+   "fieldname": "qtyinspected",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty Inspected"
+  },
+  {
+   "fieldname": "qtyaccepted",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty Accepted"
+  },
+  {
+   "fieldname": "qtyrejected",
+   "fieldtype": "Int",
+   "label": "Qty Rejected"
+  },
+  {
+   "fieldname": "qtyblocked",
+   "fieldtype": "Int",
+   "label": "Qty blocked"
+  },
+  {
+   "fieldname": "qtyfailed",
+   "fieldtype": "Int",
+   "label": "Qty Failed"
+  },
+  {
+   "fieldname": "aql",
+   "fieldtype": "Int",
+   "label": "Qty AQL"
+  },
+  {
+   "fieldname": "comment",
+   "fieldtype": "Text",
+   "label": "Comment"
+  },
+  {
+   "fieldname": "formcreated",
+   "fieldtype": "Data",
+   "label": "Form Created"
+  },
+  {
+   "default": "0",
+   "fieldname": "closed",
+   "fieldtype": "Check",
+   "label": "Closed"
+  },
+  {
+   "default": "0",
+   "fieldname": "signed",
+   "fieldtype": "Check",
+   "label": "Signed"
+  },
+  {
+   "fieldname": "signedby",
+   "fieldtype": "Data",
+   "label": "Signed by"
+  },
+  {
+   "fieldname": "signdate",
+   "fieldtype": "Date",
+   "label": "Sign Date"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-23 03:56:18.432429",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_order_item_inspections",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

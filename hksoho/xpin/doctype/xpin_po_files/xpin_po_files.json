@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:id",
+ "creation": "2025-12-24 18:25:37.231912",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_kcd1",
+  "id",
+  "doc_id",
+  "po_number",
+  "filename",
+  "column_break_zkdx",
+  "file_type",
+  "uploadby",
+  "uploaded",
+  "section_break_cpcy",
+  "filelink"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_kcd1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "filename",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "filename",
+   "read_only": 1
+  },
+  {
+   "fieldname": "filelink",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "filelink",
+   "read_only": 1
+  },
+  {
+   "fieldname": "uploadby",
+   "fieldtype": "Data",
+   "label": "uploadby",
+   "read_only": 1
+  },
+  {
+   "fieldname": "file_type",
+   "fieldtype": "Data",
+   "label": "file type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "doc_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Doc ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "PO Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "uploaded",
+   "fieldtype": "Date",
+   "label": "uploaded",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_zkdx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_cpcy",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-27 08:40:31.783982",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_po_files",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "route": "General",
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -11,6 +11,7 @@
   "po_placed",
   "po_shipdate",
   "requested_dc_eta",
+  "actual_finish_date",
   "buyer",
   "supplier",
   "customer",
@@ -103,6 +104,7 @@
    "fieldname": "supplier",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Supplier",
    "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
    "options": "Partner"
@@ -374,12 +376,17 @@
    "fieldname": "section_break_itja",
    "fieldtype": "Section Break",
    "hidden": 1
+  },
+  {
+   "fieldname": "actual_finish_date",
+   "fieldtype": "Date",
+   "label": "Actual Finish Date"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-09 09:12:00.369416",
+ "modified": "2025-12-20 08:06:47.399048",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",

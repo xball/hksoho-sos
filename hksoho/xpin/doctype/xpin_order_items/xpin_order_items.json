@@ -1,0 +1,497 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:itemid",
+ "creation": "2025-12-23 15:58:05.010955",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_49hq",
+  "itemid",
+  "ordernr",
+  "itemnr",
+  "artnr",
+  "qty",
+  "cfdqty",
+  "cancelledqty",
+  "artname",
+  "uom",
+  "uprice",
+  "ordered",
+  "splitfrom",
+  "splitreason",
+  "chtime",
+  "chuser",
+  "sprice",
+  "cbm",
+  "netkg",
+  "grosskg",
+  "colli",
+  "boxnumber",
+  "ctnpcs",
+  "ctns_on_pallet",
+  "changed",
+  "ucurr",
+  "scurr",
+  "urate",
+  "srate",
+  "frate",
+  "uprice1",
+  "sprice1",
+  "qccomment",
+  "qcuser",
+  "qcinspector1",
+  "qcbooked1",
+  "qcinspector2",
+  "qcbooked2",
+  "shipready",
+  "qcdate",
+  "rtsdate",
+  "inspected_qty",
+  "inspectedby",
+  "qcaccepted",
+  "qcrejected",
+  "qcresult",
+  "qccreated",
+  "qccreatedby",
+  "qcupdated",
+  "orderdate",
+  "cfddate",
+  "dvydate",
+  "dvydatechangereason",
+  "dvydatesubreason",
+  "dvydatechangereasonother",
+  "hs_origin",
+  "agr_requestedshipdate",
+  "catcode",
+  "insertby",
+  "inserted",
+  "updateby",
+  "updated",
+  "linedescription",
+  "sum_bkdqty",
+  "sum_dvyqty",
+  "artnr_vendor",
+  "finishdate",
+  "finishdate_actual",
+  "finishdate_changereason",
+  "dcdate",
+  "sum_delivered",
+  "sum_updated",
+  "itemtype",
+  "qcdocrequested",
+  "reorder",
+  "uprice_changed_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_49hq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "itemid",
+   "fieldtype": "Data",
+   "label": "itemid",
+   "unique": 1
+  },
+  {
+   "fieldname": "ordernr",
+   "fieldtype": "Data",
+   "label": "ordernr"
+  },
+  {
+   "fieldname": "itemnr",
+   "fieldtype": "Data",
+   "label": "itemnr"
+  },
+  {
+   "fieldname": "artnr",
+   "fieldtype": "Data",
+   "label": "artnr"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "label": "qty"
+  },
+  {
+   "fieldname": "cfdqty",
+   "fieldtype": "Int",
+   "label": "cfdqty"
+  },
+  {
+   "fieldname": "cancelledqty",
+   "fieldtype": "Int",
+   "label": "cancelledqty"
+  },
+  {
+   "fieldname": "artname",
+   "fieldtype": "Data",
+   "label": "artname"
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Data",
+   "label": "uom"
+  },
+  {
+   "fieldname": "uprice",
+   "fieldtype": "Float",
+   "label": "uprice"
+  },
+  {
+   "fieldname": "ordered",
+   "fieldtype": "Int",
+   "label": "ordered"
+  },
+  {
+   "fieldname": "splitfrom",
+   "fieldtype": "Data",
+   "label": "splitfrom"
+  },
+  {
+   "fieldname": "splitreason",
+   "fieldtype": "Data",
+   "label": "splitreason"
+  },
+  {
+   "fieldname": "chtime",
+   "fieldtype": "Date",
+   "label": "chtime"
+  },
+  {
+   "fieldname": "chuser",
+   "fieldtype": "Data",
+   "label": "chuser"
+  },
+  {
+   "fieldname": "sprice",
+   "fieldtype": "Float",
+   "label": "sprice"
+  },
+  {
+   "fieldname": "cbm",
+   "fieldtype": "Float",
+   "label": "cbm"
+  },
+  {
+   "fieldname": "netkg",
+   "fieldtype": "Float",
+   "label": "netkg"
+  },
+  {
+   "fieldname": "grosskg",
+   "fieldtype": "Float",
+   "label": "grosskg"
+  },
+  {
+   "fieldname": "colli",
+   "fieldtype": "Int",
+   "label": "colli"
+  },
+  {
+   "fieldname": "boxnumber",
+   "fieldtype": "Int",
+   "label": "boxnumber"
+  },
+  {
+   "fieldname": "ctnpcs",
+   "fieldtype": "Int",
+   "label": "ctnpcs"
+  },
+  {
+   "fieldname": "ctns_on_pallet",
+   "fieldtype": "Int",
+   "label": "ctns_on_pallet"
+  },
+  {
+   "fieldname": "changed",
+   "fieldtype": "Data",
+   "label": "changed"
+  },
+  {
+   "fieldname": "ucurr",
+   "fieldtype": "Data",
+   "label": "ucurr"
+  },
+  {
+   "fieldname": "scurr",
+   "fieldtype": "Data",
+   "label": "scurr"
+  },
+  {
+   "fieldname": "urate",
+   "fieldtype": "Float",
+   "label": "urate"
+  },
+  {
+   "fieldname": "srate",
+   "fieldtype": "Float",
+   "label": "srate"
+  },
+  {
+   "fieldname": "frate",
+   "fieldtype": "Float",
+   "label": "frate"
+  },
+  {
+   "fieldname": "uprice1",
+   "fieldtype": "Float",
+   "label": "uprice1"
+  },
+  {
+   "fieldname": "sprice1",
+   "fieldtype": "Float",
+   "label": "sprice1"
+  },
+  {
+   "fieldname": "qccomment",
+   "fieldtype": "Text",
+   "label": "qccomment"
+  },
+  {
+   "fieldname": "qcuser",
+   "fieldtype": "Data",
+   "label": "qcuser"
+  },
+  {
+   "fieldname": "qcinspector1",
+   "fieldtype": "Data",
+   "label": "qcinspector1"
+  },
+  {
+   "fieldname": "qcbooked1",
+   "fieldtype": "Data",
+   "label": "qcbooked1"
+  },
+  {
+   "fieldname": "qcinspector2",
+   "fieldtype": "Data",
+   "label": "qcinspector2"
+  },
+  {
+   "fieldname": "qcbooked2",
+   "fieldtype": "Data",
+   "label": "qcbooked2"
+  },
+  {
+   "fieldname": "shipready",
+   "fieldtype": "Data",
+   "label": "shipready"
+  },
+  {
+   "fieldname": "qcdate",
+   "fieldtype": "Date",
+   "label": "qcdate"
+  },
+  {
+   "fieldname": "rtsdate",
+   "fieldtype": "Date",
+   "label": "rtsdate"
+  },
+  {
+   "fieldname": "inspected_qty",
+   "fieldtype": "Int",
+   "label": "inspected_qty"
+  },
+  {
+   "fieldname": "inspectedby",
+   "fieldtype": "Data",
+   "label": "inspectedby"
+  },
+  {
+   "fieldname": "qcaccepted",
+   "fieldtype": "Int",
+   "label": "qcaccepted"
+  },
+  {
+   "fieldname": "qcrejected",
+   "fieldtype": "Int",
+   "label": "qcrejected"
+  },
+  {
+   "fieldname": "qcresult",
+   "fieldtype": "Link",
+   "label": "qcresult",
+   "options": "xpin_inspection_results"
+  },
+  {
+   "fieldname": "qccreated",
+   "fieldtype": "Date",
+   "label": "qccreated"
+  },
+  {
+   "fieldname": "qccreatedby",
+   "fieldtype": "Data",
+   "label": "qccreatedby"
+  },
+  {
+   "fieldname": "qcupdated",
+   "fieldtype": "Date",
+   "label": "qcupdated"
+  },
+  {
+   "fieldname": "orderdate",
+   "fieldtype": "Date",
+   "label": "orderdate"
+  },
+  {
+   "fieldname": "cfddate",
+   "fieldtype": "Date",
+   "label": "cfddate"
+  },
+  {
+   "fieldname": "dvydate",
+   "fieldtype": "Date",
+   "label": "dvydate"
+  },
+  {
+   "fieldname": "dvydatechangereason",
+   "fieldtype": "Int",
+   "label": "dvydatechangereason"
+  },
+  {
+   "fieldname": "dvydatesubreason",
+   "fieldtype": "Int",
+   "label": "dvydatesubreason"
+  },
+  {
+   "fieldname": "dvydatechangereasonother",
+   "fieldtype": "Text",
+   "label": "dvydatechangereasonother"
+  },
+  {
+   "fieldname": "hs_origin",
+   "fieldtype": "Data",
+   "label": "hs_origin"
+  },
+  {
+   "fieldname": "agr_requestedshipdate",
+   "fieldtype": "Date",
+   "label": "agr_requestedshipdate"
+  },
+  {
+   "fieldname": "catcode",
+   "fieldtype": "Data",
+   "label": "catcode"
+  },
+  {
+   "fieldname": "insertby",
+   "fieldtype": "Data",
+   "label": "insertby"
+  },
+  {
+   "fieldname": "inserted",
+   "fieldtype": "Date",
+   "label": "inserted"
+  },
+  {
+   "fieldname": "updateby",
+   "fieldtype": "Data",
+   "label": "updateby"
+  },
+  {
+   "fieldname": "updated",
+   "fieldtype": "Date",
+   "label": "updated"
+  },
+  {
+   "fieldname": "linedescription",
+   "fieldtype": "Text",
+   "label": "linedescription"
+  },
+  {
+   "fieldname": "sum_bkdqty",
+   "fieldtype": "Int",
+   "label": "sum_bkdqty"
+  },
+  {
+   "fieldname": "sum_dvyqty",
+   "fieldtype": "Int",
+   "label": "sum_dvyqty"
+  },
+  {
+   "fieldname": "artnr_vendor",
+   "fieldtype": "Data",
+   "label": "artnr_vendor"
+  },
+  {
+   "fieldname": "finishdate",
+   "fieldtype": "Date",
+   "label": "finishdate"
+  },
+  {
+   "fieldname": "finishdate_actual",
+   "fieldtype": "Date",
+   "label": "finishdate_actual"
+  },
+  {
+   "fieldname": "finishdate_changereason",
+   "fieldtype": "Data",
+   "label": "finishdate_changereason"
+  },
+  {
+   "fieldname": "dcdate",
+   "fieldtype": "Date",
+   "label": "dcdate"
+  },
+  {
+   "fieldname": "sum_delivered",
+   "fieldtype": "Int",
+   "label": "sum_delivered"
+  },
+  {
+   "fieldname": "sum_updated",
+   "fieldtype": "Date",
+   "label": "sum_updated"
+  },
+  {
+   "fieldname": "itemtype",
+   "fieldtype": "Data",
+   "label": "itemtype"
+  },
+  {
+   "fieldname": "qcdocrequested",
+   "fieldtype": "Data",
+   "label": "qcdocrequested"
+  },
+  {
+   "fieldname": "reorder",
+   "fieldtype": "Data",
+   "label": "reorder"
+  },
+  {
+   "fieldname": "uprice_changed_at",
+   "fieldtype": "Date",
+   "label": "uprice_changed_at"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-23 16:37:21.600969",
+ "modified_by": "Administrator",
+ "module": "xpin",
+ "name": "xpin_order_items",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

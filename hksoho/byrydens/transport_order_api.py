@@ -11,7 +11,7 @@ def get_po_items(po_name, filters=None):
     try:
         # Check if the Purchase Order has workflow_state = 'Ready to Ship'
         po = frappe.get_doc("Purchase Order", po_name)
-        if po.workflow_state != "Ready to Ship":
+        if po.workflow_state != "Ready to Ship" and po.workflow_state != 'Partial Shipout':
             frappe.msgprint({
                 "title": "No Data",
                 "message": f"The Purchase Order {po_name} does not have workflow_state 'Ready to Ship'.",
