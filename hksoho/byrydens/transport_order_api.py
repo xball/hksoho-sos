@@ -78,6 +78,9 @@ def update_to_line_invoice(to_name, po_number, invoice_data):
         dict: Result message indicating success or failure
     """
     try:
+        if not frappe.has_permission("Transport Order", "write", to_name):
+            frappe.throw(_("You do not have permission to update this Transport Order."), frappe.PermissionError)
+
         # Parse invoice_data if it's a string
         if isinstance(invoice_data, str):
             invoice_data = json.loads(invoice_data)
@@ -127,8 +130,7 @@ def update_to_line_invoice(to_name, po_number, invoice_data):
             frappe.throw(_("No items found matching the selected Purchase Order: {0}").format(po_number))
 
         # Save Transport Order
-        to_doc.save(ignore_permissions=True)
-        frappe.db.commit()
+        to_doc.save()
 
         return {
             "status": "success",
@@ -143,38 +145,39 @@ def update_to_line_invoice(to_name, po_number, invoice_data):
             "status": "error",
             "message": f"Failed to update invoice details: {error_message}"
         }
-        
-import frappe
+
 from datetime import timedelta
 import logging
 
-# 設定自訂 log file（會寫在 sites 目錄下，每個 site 獨立）
-logger = logging.getLogger('update_vessel_dates')
+logger = logging.getLogger("update_vessel_dates")
 logger.setLevel(logging.DEBUG)
 
-# 避免重複添加 handler
 if not logger.handlers:
-    log_file = frappe.get_site_path('logs', 'update_vessel_dates.log')
+    log_file = frappe.get_site_path("logs", "update_vessel_dates.log")
     handler = logging.FileHandler(log_file)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
- 
 
 @frappe.whitelist()
 def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=None,
                         dest_port_free_days=0, to_name=None):
+    if not frappe.has_permission("Vessels Time Table", "write", vessel_name):
+        frappe.throw(_("You do not have permission to update this vessel schedule."), frappe.PermissionError)
+    if to_name and not frappe.has_permission("Transport Order", "write", to_name):
+        frappe.throw(_("You do not have permission to update this Transport Order."), frappe.PermissionError)
+
     logger.debug("=== update_vessel_dates 開始執行 ===")
     logger.debug(f"Vessel: {vessel_name} | TO: {to_name} | ETA Date: {eta_date}")
 
     # 1. 更新 Vessels Time Table
-    vessel_doc = frappe.get_doc('Vessels Time Table', vessel_name)
+    vessel_doc = frappe.get_doc("Vessels Time Table", vessel_name)
     vessel_doc.cfs_close = cfs_close
     vessel_doc.etd_date = etd_date
     vessel_doc.eta_date = eta_date
     vessel_doc.dest_port_free_days = dest_port_free_days
-    vessel_doc.save(ignore_permissions=True)
+    vessel_doc.save()
     logger.debug("Vessels Time Table 已更新")
 
     # 2. 更新相關 PO Item 的 confirmed_shipdate
@@ -182,7 +185,7 @@ def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=Non
     if to_name and eta_date:
         logger.debug(f"開始更新 Transport Order [{to_name}] 相關 PO 的 confirmed_shipdate")
 
-        to_doc = frappe.get_doc('Transport Order', to_name)
+        to_doc = frappe.get_doc("Transport Order", to_name)
         logger.debug(f"🔍 TO [{to_name}] 共有 {len(to_doc.items)} 個 items")
 
         eta_date_obj = frappe.utils.getdate(eta_date)
@@ -196,8 +199,7 @@ def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=Non
             if not line.po_line:
                 continue
 
-            # 取出 PO name（parent）
-            po_name = frappe.db.get_value('Purchase Order Item', line.po_line, 'parent')
+            po_name = frappe.db.get_value("Purchase Order Item", line.po_line, "parent")
             if not po_name:
                 logger.warning(f"TO Line {line.name} 的 po_line {line.po_line} 無對應 PO")
                 continue
@@ -205,45 +207,34 @@ def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=Non
             logger.debug(f"處理 TO Line [{line.name}] po_line={line.po_line} → PO={po_name}")
 
             if po_name not in po_docs_to_save:
-                po_docs_to_save[po_name] = frappe.get_doc('Purchase Order', po_name)
+                if not frappe.has_permission("Purchase Order", "write", po_name):
+                    logger.warning(f"Skipping PO [{po_name}] — no write permission")
+                    continue
+                po_docs_to_save[po_name] = frappe.get_doc("Purchase Order", po_name)
 
             po_doc = po_docs_to_save[po_name]
-
-            # ✅ 注意：這裡要用 po_items，不是 items
             logger.debug(f"PO [{po_name}] 共有 {len(po_doc.po_items)} 個 po_items")
             found_match = False
 
             for idx, item in enumerate(po_doc.po_items):
-                logger.debug(
-                    f"  PO Item {idx}: name={item.name}, article={getattr(item, 'article_number', 'N/A')}"
-                )
-                logger.debug(
-                    f"    比對用 → item.name={item.name} ({type(item.name)}), "
-                    f"po_line={line.po_line} ({type(line.po_line)})"
-                )
-
-                # ✅ 統一用字串比對，避免 '683' vs 683 型別不一致
                 if str(item.name) == str(line.po_line):
                     old_value = item.confirmed_shipdate
                     logger.debug(
                         f"##PO [{po_name}] 的 Item [{item.name}] "
                         f"confirmed_shipdate 更新: {old_value} → {new_confirmed_shipdate}"
                     )
-
                     item.confirmed_shipdate = new_confirmed_shipdate
                     updated_items += 1
                     found_match = True
-                    logger.debug(f"✓ 已更新 PO [{po_name}] Item [{item.name}]")
                     break
 
             if not found_match:
                 logger.warning(f"❌ PO [{po_name}] 中找不到 po_line = {line.po_line}")
 
-        # 儲存所有有被修改過的 PO
         update_count = 0
         for po_name, po_doc in po_docs_to_save.items():
             try:
-                po_doc.save(ignore_permissions=True)
+                po_doc.save()
                 logger.debug(f"Purchase Order [{po_name}] 已儲存")
                 update_count += 1
             except Exception as e:
@@ -251,7 +242,7 @@ def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=Non
 
         logger.debug(f"總共更新 {updated_items} 個 Item，儲存 {update_count} 筆 PO")
 
-    # 3. 更新 Transport Order 本身欄位（如果需要）
+    # 3. 更新 Transport Order 本身欄位
     if to_name:
         updates = {}
         if cfs_close:
@@ -266,29 +257,8 @@ def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=Non
             frappe.db.set_value("Transport Order", to_name, updates)
             logger.debug(f"Transport Order [{to_name}] 已更新（CFS/ETD/ETA/Free Days）")
 
-    frappe.db.commit()
     logger.debug("=== update_vessel_dates 執行完畢 ===")
     return {"status": "success", "updated_items": updated_items}
-
-
-
-# 2. 更新 Transport Order → 改用 set_value 強制寫入（完全無視 workflow 凍結）
-    if to_name:
-        updates = {}
-        if cfs_close:          
-            updates["cfs_close"] = cfs_close
-        if etd_date:           
-            updates["etd_date"] = etd_date
-            #updates["booked_etd"] = etd_date
-        if eta_date:           
-            updates["eta_date"] = eta_date
-            updates["dest_port_free_days"] = int(dest_port_free_days)
-
-        frappe.db.set_value("Transport Order", to_name, updates)
-
-    frappe.db.commit()
-    return {"status": "success"}
-    
 
 
 @frappe.whitelist()
@@ -300,6 +270,7 @@ def fix_po_item_order_status_for_shipped_to(dry_run=False, reset_status_to=""):
     :param dry_run: True = 只列出會被更新的資料，不真的寫入 DB
     :param reset_status_to: 要改回的值，例如 "" 或 "Pending"
     """
+    frappe.only_for("System Manager")
     logger = frappe.logger("to_po_fix")
 
     # 1. 找出所有 workflow_state = 'Shipped' 的 Transport Order
@@ -340,14 +311,13 @@ def fix_po_item_order_status_for_shipped_to(dry_run=False, reset_status_to=""):
 
     logger.info(f"其中有 {len(to_reset)} 筆 PO Item 的 Shipped 狀態是多餘的，將被重設為 '{reset_status_to}'")
 
-    # if dry_run:
-    #     # 只印出名單，不動資料
-    #     for r in to_reset[:200]:
-    #         logger.info(f"[DRY RUN] 會被重設的 PO Item: {r.name} (PO: {r.parent})")
-    #     return {
-    #         "dry_run": True,
-    #         "to_reset_count": len(to_reset)
-    #     }
+    if dry_run:
+        for r in to_reset[:200]:
+            logger.info(f"[DRY RUN] 會被重設的 PO Item: {r.name} (PO: {r.parent})")
+        return {
+            "dry_run": True,
+            "to_reset_count": len(to_reset),
+        }
 
     # 5. 實際更新這些錯誤的 PO Item
     for r in to_reset:
@@ -364,11 +334,9 @@ def fix_po_item_order_status_for_shipped_to(dry_run=False, reset_status_to=""):
     return {
         "dry_run": False,
         "reset_to": reset_status_to,
-        "affected_rows": len(to_reset)
+        "affected_rows": len(to_reset),
     }
 
-
-import frappe
 
 @frappe.whitelist()
 def fix_po_item_order_status_and_trigger_before_save(dry_run=True, reset_status_to=""):
@@ -378,6 +346,7 @@ def fix_po_item_order_status_and_trigger_before_save(dry_run=True, reset_status_
     3) 其他多餘的改回 reset_status_to
     4) 對受影響的 Purchase Order 呼叫 save()，觸發 before_save
     """
+    frappe.only_for("System Manager")
     logger = frappe.logger("to_po_fix")
 
     # -------------------------------

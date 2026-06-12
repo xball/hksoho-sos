@@ -16,6 +16,7 @@ def import_xpin_po_from_xlsx():
     """
     從三個 XLSX 檔匯入 / 更新 xpin_po + child tables
     """
+    frappe.only_for("System Manager")
     # 1. 讀 Excel
     print("Reading Excel files...")
     header_df = pd.read_excel(HEADER_FILE)

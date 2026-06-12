@@ -19,7 +19,9 @@ def get_sales_orders(supplier):
 
 @frappe.whitelist()
 def get_order_items(order):
-    return frappe.get_doc('Purchase Order', order).order_items
+    if not frappe.has_permission("Purchase Order", "read", order):
+        frappe.throw(_("You do not have permission to read this Purchase Order."), frappe.PermissionError)
+    return frappe.get_doc("Purchase Order", order).order_items
 
 @frappe.whitelist()
 def get_inspection_items(template_name):
@@ -31,7 +33,10 @@ def get_po_items(po_name):
     """回傳指定 Purchase Order 的所有明細"""
     if not po_name:
         frappe.throw("請提供有效的採購訂單編號")
-    
+
+    if not frappe.has_permission("Purchase Order", "read", po_name):
+        frappe.throw(_("You do not have permission to read this Purchase Order."), frappe.PermissionError)
+
     items = frappe.get_all(
         "Purchase Order Item",
         filters={"parent": po_name},
@@ -72,17 +77,10 @@ def get_po_items_qcstatus(po_name):
         "Purchase Order Item",
         filters={
             "parent": po_name,
-            "qc_update_status": ["!=", "Passed"]
+            "qc_update_status": ["not in", ["Pass", "Passed"]],
         },
         fields=["name", "line", "confirmed_qty", "article_number", "article_name"],
         order_by="line asc",
-        ignore_permissions=True  # 僅限測試，生產環境應移除
-    )
-
-    # 記錄查詢結果
-    frappe.log_error(
-        message=f"Queried PO Items for {po_name}: {len(items)} items found",
-        title="get_po_items_qcstatus"
     )
 
     return items
@@ -131,15 +129,11 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
         frappe.throw(_("無有效的項目被選擇。"))
 
     # 獲取當前 po_items 表中的 po_number 和 po_item.line 組合，用於檢查重複
-    existing_items = set()
-    for row in inspection_event.po_items:
-        if row.po_number and row.po_item:
-            po_item = frappe.get_doc("Purchase Order Item", {
-                "parent": row.po_number,
-                "line": row.po_item
-            })
-            if po_item.line is not None:
-                existing_items.add((row.po_number, po_item.line))
+    existing_items = {
+        (row.po_number, cint(row.po_item))
+        for row in inspection_event.po_items
+        if row.po_number and row.po_item is not None
+    }
     added_count = 0
     skipped_items = []
     # 假設第一個項目的 supplier 適用於所有項目（因為它們來自同一個 PO）
@@ -175,7 +169,6 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
 
     # 保存 Inspection Event
     inspection_event.save()
-    frappe.db.commit()
 
     message = _("已成功添加 {0} 個項目。").format(added_count)
     if skipped_items:
@@ -187,6 +180,9 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
 
 @frappe.whitelist()
 def send_inspection_invitation(inspection_event_name):
+    if not frappe.has_permission("Inspection Event", "write", inspection_event_name):
+        frappe.throw(_("You do not have permission to send invitations for this event."), frappe.PermissionError)
+
     doc = frappe.get_doc("Inspection Event", inspection_event_name)
     
     if not doc.inspector:
@@ -246,14 +242,16 @@ def send_inspection_invitation(inspection_event_name):
 
 @frappe.whitelist()
 def update_qc_accepted_qty(purchase_order, line_number, aql_qty):
+    if not frappe.has_permission("Purchase Order", "write", purchase_order):
+        frappe.throw(_("You do not have permission to update this Purchase Order."), frappe.PermissionError)
+
     try:
         po_item = frappe.get_doc("Purchase Order Item", {
             "parent": purchase_order,
-            "line": line_number
+            "line": cint(line_number),
         })
         po_item.qc_accepted_qty = cint(po_item.qc_accepted_qty) + cint(aql_qty)
-        po_item.save(ignore_permissions=True)
-        frappe.db.commit()
+        po_item.save()
         return {"success": True, "qc_accepted_qty": po_item.qc_accepted_qty}
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "update_qc_accepted_qty")

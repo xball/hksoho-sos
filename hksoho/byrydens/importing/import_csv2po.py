@@ -3,6 +3,7 @@ import os
 import glob
 import shutil
 import frappe
+from frappe import _
 from datetime import datetime
 from frappe.desk.form.utils import add_comment
 import logging
@@ -65,7 +66,7 @@ def check_po_exists(po_number):
 # 查詢 PO 項目
 def get_poitem(po_number):
     try:
-        poitems = frappe.get_all(PO_ITEM_DOCTYPE, filters={"purchase_order": po_number}, fields=["*"])
+        poitems = frappe.get_all(PO_ITEM_DOCTYPE, filters={"parent": po_number}, fields=["*"])
         return poitems
     except Exception as e:
         msg = f"查詢採購訂單項目 {po_number} 失敗: {e}"
@@ -481,6 +482,9 @@ def reload_single_po_from_txt(po_number):
     從 INPUT_DIR 找出含有此 po_number 的 po*.txt，重新載入該 PO。
     po_number 由前端 (PO 表單) 傳入。
     """
+    if not frappe.has_permission("Purchase Order", "write"):
+        frappe.throw(_("You do not have permission to reload Purchase Orders."), frappe.PermissionError)
+
     po_number = (po_number or "").strip()
     if not po_number:
         frappe.throw("PO Number is empty.")
