@@ -1,0 +1,327 @@
+{
+ "actions": [],
+ "creation": "2026-01-22 08:04:43.705649",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "aritcale_master_section",
+  "articale_master",
+  "description",
+  "qty20",
+  "column_break_iegr",
+  "price",
+  "currency",
+  "section_break_uodh",
+  "container_price_usd",
+  "container_value_usd",
+  "freight_cost_percentage_per_unit",
+  "column_break_rwsb",
+  "freight_cost",
+  "custom_fee",
+  "outcome_of_customs_fee",
+  "column_break_tnqc",
+  "price_usd",
+  "currency_rate_in_sek",
+  "cprice_sek",
+  "section_break_ahro",
+  "column_break_kbmh",
+  "bulb",
+  "royalty",
+  "mould_cost",
+  "repa",
+  "hangtag",
+  "purchase_price",
+  "column_break_thse",
+  "additional_cost_percent",
+  "addition_cost",
+  "selling_price",
+  "selling_price_after_adjustment",
+  "gross_price",
+  "selling_unit",
+  "margin",
+  "column_break_yodh",
+  "offer_price_usd",
+  "offer_price_sek",
+  "section_break_wxzt",
+  "remark"
+ ],
+ "fields": [
+  {
+   "fieldname": "articale_master",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Articale Master",
+   "options": "Article Master"
+  },
+  {
+   "fieldname": "section_break_ahro",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "container_price_usd",
+   "fieldtype": "Float",
+   "label": "Container price (USD)"
+  },
+  {
+   "default": "0",
+   "description": "Auto",
+   "fieldname": "container_value_usd",
+   "fieldtype": "Float",
+   "label": "Container value (USD)",
+   "read_only": 1
+  },
+  {
+   "description": "Auto",
+   "fieldname": "freight_cost_percentage_per_unit",
+   "fieldtype": "Percent",
+   "label": "Freight cost percentage per unit",
+   "read_only": 1
+  },
+  {
+   "description": "Auto",
+   "fieldname": "freight_cost",
+   "fieldtype": "Float",
+   "label": "Freight cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_fee",
+   "fieldtype": "Percent",
+   "label": "Custom fee (%)"
+  },
+  {
+   "description": "Auto",
+   "fieldname": "outcome_of_customs_fee",
+   "fieldtype": "Float",
+   "label": "Outcome of customs fee",
+   "read_only": 1
+  },
+  {
+   "description": "Auto",
+   "fieldname": "price_usd",
+   "fieldtype": "Float",
+   "label": "Price (USD)",
+   "read_only": 1
+  },
+  {
+   "description": "Input the latest rate",
+   "fieldname": "currency_rate_in_sek",
+   "fieldtype": "Float",
+   "label": "Currency Rate in SEK"
+  },
+  {
+   "description": "Auto",
+   "fieldname": "cprice_sek",
+   "fieldtype": "Float",
+   "label": "Price (SEK)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bulb",
+   "fieldtype": "Float",
+   "label": "Bulb  (SEK)"
+  },
+  {
+   "fieldname": "royalty",
+   "fieldtype": "Float",
+   "label": "Royalty  (SEK)"
+  },
+  {
+   "fieldname": "mould_cost",
+   "fieldtype": "Float",
+   "label": "Mould Cost  (SEK)"
+  },
+  {
+   "default": "0.75",
+   "fieldname": "repa",
+   "fieldtype": "Float",
+   "label": "Repa/ Elkretsen  (SEK)"
+  },
+  {
+   "fieldname": "hangtag",
+   "fieldtype": "Float",
+   "label": "Hangtag  (SEK)"
+  },
+  {
+   "fieldname": "purchase_price",
+   "fieldtype": "Float",
+   "label": "Purchase price  (SEK)"
+  },
+  {
+   "default": "0",
+   "fieldname": "addition_cost",
+   "fieldtype": "Float",
+   "label": "Addition cost  (SEK)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "selling_price",
+   "fieldtype": "Float",
+   "label": "Selling price  (SEK)"
+  },
+  {
+   "fieldname": "selling_price_after_adjustment",
+   "fieldtype": "Float",
+   "label": "Selling price after adjustment  (SEK)"
+  },
+  {
+   "fieldname": "gross_price",
+   "fieldtype": "Float",
+   "label": "Gross price  (SEK)"
+  },
+  {
+   "fieldname": "selling_unit",
+   "fieldtype": "Float",
+   "label": "Selling unit"
+  },
+  {
+   "fieldname": "margin",
+   "fieldtype": "Float",
+   "label": "Margin"
+  },
+  {
+   "description": "Auto",
+   "fieldname": "offer_price_sek",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Offer Price (SEK)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "offer_price_usd",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Offer Price (USD) "
+  },
+  {
+   "fetch_from": "articale_master.price_usd",
+   "fieldname": "price",
+   "fieldtype": "Float",
+   "label": "Price",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "articale_master.currency",
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "Currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "aritcale_master_section",
+   "fieldtype": "Section Break",
+   "label": "Aritcale Master"
+  },
+  {
+   "fieldname": "column_break_iegr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_uodh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_rwsb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_tnqc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_kbmh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_thse",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yodh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "articale_master.description",
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_cost_percent",
+   "fieldtype": "Percent",
+   "label": "Additional cost (%)"
+  },
+  {
+   "fetch_from": "articale_master.qty20",
+   "fieldname": "qty20",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "QTY/20'",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "section_break_wxzt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-25 12:10:26.964993",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Internal Evaluation",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1
+}

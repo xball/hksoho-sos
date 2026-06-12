@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"YpGCeLfign\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"b7abeqw4NZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product\",\"col\":3}},{\"id\":\"3b-gDnqA23\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachment\",\"col\":3}},{\"id\":\"xeMWY9cAxy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachement Detail\",\"col\":3}}]",
+ "content": "[{\"id\":\"YpGCeLfign\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"b7abeqw4NZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product\",\"col\":3}},{\"id\":\"3b-gDnqA23\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachment\",\"col\":3}},{\"id\":\"xeMWY9cAxy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Attachement Detail\",\"col\":3}},{\"id\":\"qIHYyl5bgo\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Oe8HXKcR7P\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Article Master\",\"col\":3}},{\"id\":\"gpa_mfmvVa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Internal Evaluation\",\"col\":3}},{\"id\":\"dgiWqmyqeW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Quotation\",\"col\":3}}]",
  "creation": "2025-07-09 05:49:30.377847",
  "custom_blocks": [],
  "docstatus": 0,
@@ -92,7 +92,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-12-26 16:47:38.294846",
+ "modified": "2026-04-18 15:43:55.812057",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Products",
@@ -119,6 +119,14 @@
  "sequence_id": 2.0,
  "shortcuts": [
   {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Article Master",
+   "link_to": "Article Master",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
    "doc_view": "Report Builder",
    "label": "Product",
    "link_to": "Product",
@@ -140,6 +148,22 @@
    "link_to": "Product Attachement Detail",
    "report_ref_doctype": "Product Attachment",
    "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Customer Quotation",
+   "link_to": "Customer Quotation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Internal Evaluation",
+   "link_to": "Internal Evaluation",
+   "stats_filter": "[]",
+   "type": "DocType"
   }
  ],
  "title": "Products"

@@ -416,6 +416,7 @@ def get_due_po_details(year, month_name):
             po.supplier AS partner_id,
             COALESCE(p.partner_name, po.supplier, 'Unknown') AS partner_name,
             po.po_shipdate,
+            po.purpose,
             po.po_status,
             po.order_purchase_currency AS currency,
             SUM((item.confirmed_qty - COALESCE(item.booked_qty, 0)) * item.unit_price) AS undelivered_value
@@ -435,9 +436,10 @@ def get_due_po_details(year, month_name):
         {"label": "Partner ID", "fieldname": "partner_id", "fieldtype": "Data", "width": 120},
         {"label": "Partner Name", "fieldname": "partner_name", "fieldtype": "Data", "width": 280},
         {"label": "Ship Date", "fieldname": "po_shipdate", "fieldtype": "Date", "width": 110},
+        {"label": "Purpose", "fieldname": "purpose", "fieldtype": "Data", "width": 110},
         {"label": "Status", "fieldname": "po_status", "fieldtype": "Data", "width": 100},
-        {"label": "Currency", "fieldname": "currency", "fieldtype": "Data", "width": 80},
-        {"label": "Undelivered Value", "fieldname": "undelivered_value", "fieldtype": "Currency", "width": 160},
+        {"label": "Currency", "fieldname": "currency", "fieldtype": "Data", "width": 50},
+        {"label": "Undelivered Value", "fieldname": "undelivered_value", "fieldtype": "Currency", "width": 180},
     ]
 
     return {

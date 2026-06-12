@@ -160,81 +160,7 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-@frappe.whitelist()
-def update_vessel_dates1(vessel_name, cfs_close=None, etd_date=None, eta_date=None, dest_port_free_days=0, to_name=None):
-    # 寫入自訂 log file
-    logger.debug("=== update_vessel_dates 開始執行 ===")
-    logger.debug(f"Vessel: {vessel_name} | TO: {to_name} | ETA Date: {eta_date}")
-
-    # 1. 更新 Vessels Time Table
-    vessel_doc = frappe.get_doc('Vessels Time Table', vessel_name)
-    vessel_doc.cfs_close = cfs_close
-    vessel_doc.etd_date = etd_date
-    vessel_doc.eta_date = eta_date
-    vessel_doc.dest_port_free_days = dest_port_free_days
-    vessel_doc.save(ignore_permissions=True)
-    logger.debug("Vessels Time Table 已更新")
-
-    # 2. 更新相關 PO Item 的 confirmed_shipdate（觸發 before_save）
-    if to_name and eta_date:
-        logger.debug(f"開始更新 Transport Order [{to_name}] 相關 PO 的 confirmed_shipdate")
-        
-        to_doc = frappe.get_doc('Transport Order', to_name)
-        logger.debug(f"🔍 TO [{to_name}] 共有 {len(to_doc.items)} 個 items")  # ← 新增這行
-        
-        eta_date_obj = frappe.utils.getdate(eta_date)
-        new_confirmed_shipdate = eta_date_obj - timedelta(days=60)
-        logger.debug(f"新的 Confirmed Ship Date: {new_confirmed_shipdate}")
-
-        po_docs_to_save = {}
-        updated_items = 0
-
-        for line in to_doc.items:
-            logger.debug(f"🔍 TO Line: {line.name}, po_line: {getattr(line, 'po_line', 'None')}")
-            if line.po_line:
-                po_name = frappe.db.get_value('Purchase Order Item', line.po_line, 'parent')
-                if not po_name:
-                    logger.warning(f"TO Line {line.name} 的 po_line {line.po_line} 無對應 PO")
-                    continue
-
-                logger.debug(f"處理 TO Line [{line.name}] po_line={line.po_line} → PO={po_name}")
-
-                if po_name not in po_docs_to_save:
-                    po_docs_to_save[po_name] = frappe.get_doc('Purchase Order', po_name)
-
-                po_doc = po_docs_to_save[po_name]
-
-                # **加強偵錯：列出所有 PO Items**
-                logger.debug(f"PO [{po_name}] 共有 {len(po_doc.po_items)} 個 items")
-                found_match = False
-                
-                for idx, item in enumerate(po_doc.po_items):
-                    logger.debug(f"  PO Item {idx}: name={item.name}, article={getattr(item, 'article_number', 'N/A')}")
-                    if item.name == line.po_line:
-                        old_value = item.confirmed_shipdate
-                        logger.debug(f"##PO [{po_name}] 的 Item [{item.name}] confirmed_shipdate 更新: {old_value} → {new_confirmed_shipdate}")
-                        
-                        item.confirmed_shipdate = new_confirmed_shipdate
-                        updated_items += 1
-                        found_match = True
-                        logger.debug(f"✓ 已更新 PO [{po_name}] Item [{item.name}]")
-                        break
-                
-                if not found_match:
-                    logger.warning(f"❌ PO [{po_name}] 中找不到 po_line = {line.po_line}")
-
-        # 儲存 PO...
-        update_count = 0
-        for po_name, po_doc in po_docs_to_save.items():
-            try:
-                po_doc.save(ignore_permissions=True)
-                logger.debug(f"Purchase Order [{po_name}] 已儲存")
-                update_count += 1
-            except Exception as e:
-                logger.error(f"儲存 PO [{po_name}] 失敗: {str(e)}")
-
-        logger.debug(f"總共更新 {updated_items} 個 Item，儲存 {update_count} 筆 PO")
-    
+ 
 
 @frappe.whitelist()
 def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=None,
@@ -557,3 +483,105 @@ def fix_po_item_order_status_and_trigger_before_save(dry_run=True, reset_status_
         "reset_item_count": len(to_reset),
         "triggered_po_count": len(affected_po_names),
     }
+
+
+
+
+
+
+def check_po_qty(dry_run=True):
+    valid_states = ['Confirmed', 'Shipped', 'ETA Passed', 'Arrived', 'Undelivered', 'Delivered']
+    po_items = frappe.get_all("Purchase Order Item", 
+                              fields=["name", "confirmed_qty", "booked_qty", "delivery_qty", "remaining_qty"])
+    
+    problems = []
+    
+    for item in po_items:
+        # 計算所有有效 TO 的總出貨量
+        calc_delivery = frappe.db.sql("""
+            SELECT SUM(tol.qty) 
+            FROM `tabTransport Order Line` tol
+            INNER JOIN `tabTransport Order` tor ON tol.parent = tor.name
+            WHERE tol.po_line = %s 
+            AND tor.workflow_state IN %s
+        """, (item.name, tuple(valid_states)))[0][0] or 0
+        
+        # 新公式：remaining 以 confirmed_qty 為基準
+        calc_remaining = max(0, (item.confirmed_qty or 0) - calc_delivery)
+        
+        has_issue = (
+            item.delivery_qty != calc_delivery or
+            item.remaining_qty != calc_remaining or
+            calc_delivery > (item.confirmed_qty or 0)  # 檢查超額出貨
+        )
+        
+        if has_issue:
+            problems.append({
+                'name': item.name,
+                'confirmed_qty': item.confirmed_qty or 0,
+                'booked_qty': item.booked_qty or 0,
+                'current_delivery': item.delivery_qty,
+                'should_delivery': calc_delivery,
+                'current_remaining': item.remaining_qty,
+                'should_remaining': calc_remaining,
+                'over_delivery': calc_delivery > (item.confirmed_qty or 0)
+            })
+    
+    if not problems:
+        print("所有 PO Item 數值正確，無需修正")
+        return
+    
+    print(f"\n找到 {len(problems)} 筆有問題的 PO Item：\n")
+    for p in problems:
+        print(f"PO Item: {p['name']}")
+        print(f"  confirmed_qty : {p['confirmed_qty']}")
+        print(f"  booked_qty    : {p['booked_qty']}")
+        print(f"  delivery → 目前: {p['current_delivery']} | 應為: {p['should_delivery']}")
+        if p['over_delivery']:
+            print("  ※ 注意：delivery_qty 已超過 confirmed_qty（超額出貨）")
+        print(f"  remaining → 目前: {p['current_remaining']} | 應為: {p['should_remaining']}")
+        print("-" * 80 + "\n")
+    
+    if dry_run:
+        print("※ 目前為檢查模式，未更新資料庫。請確認後再執行更新。")
+    # 若要更新，可在此加入 frappe.db.set_value 邏輯
+
+# 執行方式（在 bench console）
+# check_po_qty(dry_run=True)
+
+
+def check_specific_po_items():
+    # 只檢查這 5 筆有嚴重問題的 PO Item
+    target_names = ['508', '509', '510', '511', '512']
+    
+    valid_states = ['Confirmed', 'Shipped', 'ETA Passed', 'Arrived', 'Undelivered', 'Delivered']
+    
+    po_items = frappe.get_all("Purchase Order Item",
+                              filters=[["name", "in", target_names]],
+                              fields=["name", "confirmed_qty", "booked_qty", "delivery_qty", "remaining_qty"])
+    
+    print(f"正在檢查 {len(po_items)} 筆指定 PO Item：{target_names}\n")
+    
+    for item in po_items:
+        calc_delivery = frappe.db.sql("""
+            SELECT SUM(tol.qty) 
+            FROM `tabTransport Order Line` tol
+            INNER JOIN `tabTransport Order` tor ON tol.parent = tor.name
+            WHERE tol.po_line = %s 
+            AND tor.workflow_state IN %s
+        """, (item.name, tuple(valid_states)))[0][0] or 0
+        
+        # remaining_qty 以 confirmed_qty 為基準（依您最新說明）
+        calc_remaining = max(0, (item.confirmed_qty or 0) - calc_delivery)
+        
+        print(f"PO Item: {item.name}")
+        print(f"  confirmed_qty : {item.confirmed_qty or 0}")
+        print(f"  booked_qty    : {item.booked_qty or 0}")
+        print(f"  目前 delivery_qty : {item.delivery_qty or 0}")
+        print(f"  應有 delivery_qty : {calc_delivery}")
+        print(f"  目前 remaining_qty: {item.remaining_qty or 0}")
+        print(f"  應有 remaining_qty: {calc_remaining}")
+        if calc_delivery > (item.confirmed_qty or 0):
+            print("  ※ 警告：delivery_qty 已超過 confirmed_qty（超額出貨）")
+        print("-" * 80 + "\n")
+

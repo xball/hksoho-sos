@@ -6,6 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "item_section",
   "po_number",
   "line",
   "article_number",
@@ -17,6 +18,7 @@
   "confirmed_qty",
   "booked_qty",
   "amount",
+  "changed_qty",
   "column_break_otjq",
   "requested_finish_date",
   "requested_shipdate",
@@ -93,6 +95,7 @@
    "description": "Not used",
    "fieldname": "requested_qty",
    "fieldtype": "Int",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Requested Qty ",
    "non_negative": 1,
@@ -103,7 +106,8 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Ordered Qty",
-   "non_negative": 1
+   "non_negative": 1,
+   "read_only_depends_on": "eval:(doc.confirmed_qty || 0) == (doc.delivery_qty || 0) && (doc.confirmed_qty || 0) > 0"
   },
   {
    "fieldname": "requested_finish_date",
@@ -180,6 +184,7 @@
    "default": "Repeat Item",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "Repeat Item\nNew Item"
   },
@@ -258,15 +263,18 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Unit Price",
+   "mandatory_depends_on": "eval:(doc.confirmed_qty || 0) == (doc.delivery_qty || 0) && (doc.confirmed_qty || 0) > 0",
    "non_negative": 1,
-   "precision": "2"
+   "precision": "2",
+   "read_only_depends_on": "eval:(doc.confirmed_qty || 0) == (doc.delivery_qty || 0) && (doc.confirmed_qty || 0) > 0"
   },
   {
    "fieldname": "booked_qty",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Booked Qty",
-   "non_negative": 1
+   "non_negative": 1,
+   "read_only_depends_on": "eval:(doc.confirmed_qty || 0) == (doc.delivery_qty || 0) && (doc.confirmed_qty || 0) > 0"
   },
   {
    "fieldname": "amount",
@@ -279,7 +287,9 @@
   {
    "fieldname": "delivery_qty",
    "fieldtype": "Int",
-   "label": "Delivery Qty"
+   "in_list_view": 1,
+   "label": "Delivery Qty",
+   "read_only_depends_on": "eval:(doc.confirmed_qty || 0) == (doc.delivery_qty || 0) && (doc.confirmed_qty || 0) > 0"
   },
   {
    "fieldname": "remaining_qty",
@@ -314,6 +324,18 @@
   {
    "fieldname": "column_break_qrsa",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_section",
+   "fieldtype": "Section Break",
+   "label": "Item"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:frappe.user.has_role(\"System Manager\") == 1",
+   "fieldname": "changed_qty",
+   "fieldtype": "Int",
+   "label": "Changed QTY"
   }
  ],
  "grid_page_length": 50,
@@ -321,7 +343,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-11 03:27:09.658055",
+ "modified": "2026-01-14 04:18:06.330017",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order Item",

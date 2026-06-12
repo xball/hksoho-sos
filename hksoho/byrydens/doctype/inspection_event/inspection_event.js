@@ -85,14 +85,14 @@ function open_po_items_dialog(frm) {
         method: 'frappe.client.get_list',
         args: {
             doctype: 'Purchase Order',
-            filters: { workflow_state: 'Ready to QC' },
+            filters: { workflow_state: ['in', ['Ready to QC', 'QC Checked','Ready to Ship','Partial Shipout']]},
             fields: ['name'],
             limit_page_length: 200,
             ignore_permissions: true   
         },
         callback: function(r) {
             if (!r.message || r.message.length === 0) {
-                frappe.msgprint(__('No Purchase Orders found with status "Ready to QC".'));
+                frappe.msgprint(__('No Purchase Orders found with status "Ready to QC, QC Checked, Ready to Ship, Partial Shipout".'));
                 return;
             }
 

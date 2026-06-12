@@ -27,6 +27,12 @@
   "tariff_description",
   "price",
   "currency",
+  "column_break_eicm",
+  "supplier",
+  "supplier_price",
+  "section_break_kweq",
+  "inspection_table_viewer",
+  "po_table_viewer",
   "dimensions_tab",
   "unit_section",
   "net_width_mm",
@@ -341,7 +347,8 @@
   {
    "fieldname": "price",
    "fieldtype": "Float",
-   "label": "Price"
+   "label": "Sell Price",
+   "non_negative": 1
   },
   {
    "fieldname": "currency",
@@ -357,13 +364,44 @@
    "fieldname": "list_of_attachment",
    "fieldtype": "HTML",
    "label": "List of Attachment"
+  },
+  {
+   "fieldname": "section_break_kweq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "inspection_table_viewer",
+   "fieldtype": "HTML",
+   "label": "Inspection Table"
+  },
+  {
+   "fieldname": "supplier_price",
+   "fieldtype": "Float",
+   "label": "Supplier Price",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "column_break_eicm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "po_table_viewer",
+   "fieldtype": "HTML",
+   "label": "PO Table"
   }
  ],
  "grid_page_length": 50,
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-17 03:15:46.611296",
+ "modified": "2026-01-02 04:40:41.843608",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",

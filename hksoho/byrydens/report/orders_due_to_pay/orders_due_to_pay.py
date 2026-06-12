@@ -47,9 +47,9 @@ def execute(filters=None):
 
     columns = [
         {"label": "Year",       "fieldname": "year",       "fieldtype": "Int",      "width": 80},
-        {"label": "Month",      "fieldname": "month",      "fieldtype": "Data",     "width": 160},
+        {"label": "Month",      "fieldname": "month",      "fieldtype": "Data",     "width": 300},
         {"label": "Amount Due", "fieldname": "due_amount", "fieldtype": "Currency", "width": 180},
-        {"label": "Details",    "fieldname": "details",    "fieldtype": "Button",   "width": 130}
+        {"label": "Details",    "fieldname": "details",    "fieldtype": "Button",   "width": 150}
     ]
 
     return columns, rows

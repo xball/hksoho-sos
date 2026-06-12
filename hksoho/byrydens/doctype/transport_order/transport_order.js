@@ -71,8 +71,408 @@ frappe.ui.form.on('Transport Order', {
 
 
         // Add custom button "Add Item"
+        if (false){
+            frm.add_custom_button('Add Item_old', function() {
+                // Get all valid Purchase Orders with workflow_state = 'Ready to Ship'
+                frappe.call({
+                    method: 'frappe.client.get_list',
+                    args: {
+                        doctype: 'Purchase Order',
+                        filters: {
+                            workflow_state: ['in', ['Ready to Ship', 'Partial Shipout']]
+                        },
+                        fields: ['name'],
+                        limit_page_length: 200
+                    },
+                    callback: function(r) {
+                        if (r.message && r.message.length > 0) {
+                            let po_options = r.message.map(po => po.name);
+
+                            // Create dialog with increased width
+                            let d = new frappe.ui.Dialog({
+                                title: 'Select Purchase Order Items',
+                                size: 'extra-large',
+                                fields: [
+                                    {
+                                        label: 'Select Purchase Order',
+                                        fieldname: 'po_select',
+                                        fieldtype: 'Select',
+                                        options: po_options,
+                                        reqd: 1,
+                                        change: function() {
+                                            refreshTable(d);
+                                        }
+                                    },
+                                    {
+                                        label: 'Items List',
+                                        fieldname: 'items_table',
+                                        fieldtype: 'HTML'
+                                    }
+                                ],
+                                primary_action_label: 'Add Selected Items',
+                                primary_action: function() {
+                                    let selected_items = [];
+                                    let po_name = d.get_value('po_select');
+                                    $(d.$wrapper).find('input[name="item_select"]:checked').each(function() {
+                                        selected_items.push({
+                                            name: $(this).val(),
+                                            line: $(this).data('line'),
+                                            article_number: $(this).data('article-number'),
+                                            article_name: $(this).data('article-name'),
+                                            qty: parseFloat($(this).data('qty') || 0),
+                                            ctns: parseInt($(this).data('ctns') || 0),
+                                            cbm: parseFloat($(this).data('cbm') || 0),
+                                            gross_kg: parseFloat($(this).data('gross-kg') || 0),
+                                            unit_price: parseFloat($(this).data('unit-price') || 0)
+                                        });
+                                    });
+
+                                    if (selected_items.length === 0) {
+                                        frappe.msgprint({
+                                            title: 'Error',
+                                            message: 'Please select at least one item!',
+                                            indicator: 'red'
+                                        });
+                                        return;
+                                    }
+
+                                    // Check for duplicate po_line
+                                    let existing_po_lines = frm.doc.items ? frm.doc.items.map(item => item.po_line) : [];
+                                    let duplicates = selected_items.filter(item => existing_po_lines.includes(item.name));
+                                    if (duplicates.length > 0) {
+                                        frappe.msgprint({
+                                            title: 'Error',
+                                            message: 'The following items already exist in Transport Order Line: ' + duplicates.map(d => d.line).join(', '),
+                                            indicator: 'red'
+                                        });
+                                        return;
+                                    }
+
+                                    // Add selected items to Transport Order Line child table
+                                    selected_items.forEach(item => {
+                                        let row = frm.add_child('items');
+                                        row.po_number = po_name;
+                                        row.po_line = item.name;
+                                        row.article_number = item.article_number;
+                                        row.article_name = item.article_name;
+                                        row.qty = item.qty;
+                                        row.ctns = item.ctns;
+                                        row.cbm = item.cbm;
+                                        row.gross_kg = item.gross_kg;
+                                        row.unit_price = item.unit_price;
+                                        row.value = item.qty * item.unit_price;
+                                    });
+
+                                    // Refresh child table and update total
+                                    frm.refresh_field('items');
+                                    calculate_total(frm);
+                                    d.hide();
+                                    setTimeout(function() {
+                                        frappe.msgprint({
+                                            title: 'Success',
+                                            message: 'Selected items added successfully to Transport Order!',
+                                            indicator: 'green'
+                                        });
+                                    }, 1500);
+                                }
+                            });
+
+                            // Disable "Add Selected Items" button by default
+                            d.get_primary_btn().prop('disabled', true);
+
+                            // Define function to refresh table
+
+                            function refreshTable(dialog) {
+                                let po_name = dialog.get_value('po_select');
+                                if (!po_name) {
+                                    dialog.fields_dict.items_table.$wrapper.empty();
+                                    dialog.get_primary_btn().prop('disabled', true);
+                                    return;
+                                }
+
+                                frappe.call({
+                                    method: 'hksoho.byrydens.transport_order_api.get_po_items',
+                                    args: {
+                                        po_name: po_name
+                                    },
+                                    callback: function(r) {
+                                        let $container = dialog.fields_dict.items_table.$wrapper;
+                                        $container.empty();
+
+                                        if (r.message && Array.isArray(r.message) && r.message.length > 0) {
+                                            let table = $(`
+                                                <table class="table table-bordered" style="width: 100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 5%;">
+                                                                <input type="checkbox" id="select_all_items">
+                                                                Select
+                                                            </th>
+                                                            <th style="width: 5%;">Line</th>
+                                                            <th style="width: 15%;">Article #</th>
+                                                            <th style="width: 25%;">Article Name</th>
+                                                            <th style="width: 10%;">Qty</th>
+                                                            <th style="width: 10%;">Ctns</th>
+                                                            <th style="width: 10%;">CBM</th>
+                                                            <th style="width: 10%;">Gross Kg</th>
+                                                            <th style="width: 10%;">Unit Price</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            `);
+
+                                            table.find('#select_all_items').on('change', function() {
+                                                table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
+                                                let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                                dialog.get_primary_btn().prop('disabled', !any_checked);
+                                            });
+
+                                            let tbody = table.find('tbody');
+
+                                            // 批次處理所有項目的 Product 資料
+                                            let items = r.message;
+                                            let processed = 0;
+
+                                            items.forEach((item, index) => {
+                                                let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
+                                                let article_number = item.article_number || '';
+
+                                                // 預設值先用 PO 的（若有）
+                                                let display_ctns = item.ctns_on_pallet || 0;
+                                                let display_cbm = item.carton_cbm || 0;
+                                                let display_gross_kg = item.carton_gross_kg || 0;
+
+                                                // 如果有 article_number，就去抓 Product 的標準外箱資料
+                                                if (article_number) {
+                                                    frappe.db.get_doc('Product', article_number).then(product => {
+                                                        if (product) {
+                                                            display_ctns = product.number_of_cartons_colli_per_unit || 1;
+                                                            display_cbm = product.carton_cbm_outer_carton || 0;
+                                                            display_gross_kg = product.carton_weight_kg_outer_carton || 0;
+                                                        }
+
+                                                        // 動態新增表格列
+                                                        tbody.append(`
+                                                            <tr>
+                                                                <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                                    data-line="${item.line || ''}" 
+                                                                    data-article-number="${article_number}" 
+                                                                    data-article-name="${item.article_name || ''}" 
+                                                                    data-qty="${qty}" 
+                                                                    data-ctns="${display_ctns}" 
+                                                                    data-cbm="${display_cbm}" 
+                                                                    data-gross-kg="${display_gross_kg}" 
+                                                                    data-unit-price="${item.unit_price || 0}"></td>
+                                                                <td>${item.line || ''}</td>
+                                                                <td>${article_number}</td>
+                                                                <td>${item.article_name || ''}</td>
+                                                                <td>${qty}</td>
+                                                                <td>${display_ctns}</td>
+                                                                <td>${display_cbm}</td>
+                                                                <td>${display_gross_kg}</td>
+                                                                <td>${item.unit_price || 0}</td>
+                                                            </tr>
+                                                        `);
+
+                                                        processed++;
+                                                        if (processed === items.length) {
+                                                            setupCheckboxEvents();
+                                                        }
+                                                    }).catch(() => {
+                                                        // 若抓不到 Product，維持 PO 原值
+                                                        tbody.append(`
+                                                            <tr>
+                                                                <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                                    data-line="${item.line || ''}" 
+                                                                    data-article-number="${article_number}" 
+                                                                    data-article-name="${item.article_name || ''}" 
+                                                                    data-qty="${qty}" 
+                                                                    data-ctns="${display_ctns}" 
+                                                                    data-cbm="${display_cbm}" 
+                                                                    data-gross-kg="${display_gross_kg}" 
+                                                                    data-unit-price="${item.unit_price || 0}"></td>
+                                                                <td>${item.line || ''}</td>
+                                                                <td>${article_number}</td>
+                                                                <td>${item.article_name || ''}</td>
+                                                                <td>${qty}</td>
+                                                                <td>${display_ctns}</td>
+                                                                <td>${display_cbm}</td>
+                                                                <td>${display_gross_kg}</td>
+                                                                <td>${item.unit_price || 0}</td>
+                                                            </tr>
+                                                        `);
+
+                                                        processed++;
+                                                        if (processed === items.length) {
+                                                            setupCheckboxEvents();
+                                                        }
+                                                    });
+                                                } else {
+                                                    // 沒有 article_number，直接用 PO 值
+                                                    tbody.append(`
+                                                        <tr>
+                                                            <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                                data-line="${item.line || ''}" 
+                                                                data-article-number="" 
+                                                                data-article-name="${item.article_name || ''}" 
+                                                                data-qty="${qty}" 
+                                                                data-ctns="${display_ctns}" 
+                                                                data-cbm="${display_cbm}" 
+                                                                data-gross-kg="${display_gross_kg}" 
+                                                                data-unit-price="${item.unit_price || 0}"></td>
+                                                            <td>${item.line || ''}</td>
+                                                            <td></td>
+                                                            <td>${item.article_name || ''}</td>
+                                                            <td>${qty}</td>
+                                                            <td>${display_ctns}</td>
+                                                            <td>${display_cbm}</td>
+                                                            <td>${display_gross_kg}</td>
+                                                            <td>${item.unit_price || 0}</td>
+                                                        </tr>
+                                                    `);
+
+                                                    processed++;
+                                                    if (processed === items.length) {
+                                                        setupCheckboxEvents();
+                                                    }
+                                                }
+                                            });
+
+                                            // 獨立出 checkbox 事件綁定，避免重複綁定
+                                            function setupCheckboxEvents() {
+                                                table.find('tbody input[name="item_select"]').on('change', function() {
+                                                    let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                                    dialog.get_primary_btn().prop('disabled', !any_checked);
+                                                    let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
+                                                    table.find('#select_all_items').prop('checked', all_checked);
+                                                });
+
+                                                $container.append(table);
+                                                dialog.get_primary_btn().prop('disabled', true);
+                                            }
+
+                                            if (items.length === 0) {
+                                                $container.html('<p>No items to display</p>');
+                                                dialog.get_primary_btn().prop('disabled', true);
+                                            }
+                                        } else {
+                                            $container.html('<p>No items to display</p>');
+                                            dialog.get_primary_btn().prop('disabled', true);
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            function refreshTable1(dialog) {
+                                let po_name = dialog.get_value('po_select');
+                                if (!po_name) {
+                                    dialog.fields_dict.items_table.$wrapper.empty();
+                                    dialog.get_primary_btn().prop('disabled', true);
+                                    return;
+                                }
+
+                                frappe.call({
+                                    method: 'hksoho.byrydens.transport_order_api.get_po_items',
+                                    args: {
+                                        po_name: po_name
+                                    },
+                                    callback: function(r) {
+                                        let $container = dialog.fields_dict.items_table.$wrapper;
+                                        $container.empty();
+
+                                        if (r.message && Array.isArray(r.message) && r.message.length > 0) {
+                                            let table = $(`
+                                                <table class="table table-bordered" style="width: 100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 5%;">
+                                                                <input type="checkbox" id="select_all_items">
+                                                                Select
+                                                            </th>
+                                                            <th style="width: 5%;">Line</th>
+                                                            <th style="width: 15%;">Article #</th>
+                                                            <th style="width: 25%;">Article Name</th>
+                                                            <th style="width: 10%;">Qty</th>
+                                                            <th style="width: 10%;">Ctns</th>
+                                                            <th style="width: 10%;">CBM</th>
+                                                            <th style="width: 10%;">Gross Kg</th>
+                                                            <th style="width: 10%;">Unit Price</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            `);
+
+                                            table.find('#select_all_items').on('change', function() {
+                                                table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
+                                                let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                                dialog.get_primary_btn().prop('disabled', !any_checked);
+                                            });
+
+                                            let tbody = table.find('tbody');
+                                            r.message.forEach(item => {
+                                                let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
+                                                tbody.append(`
+                                                    <tr>
+                                                        <td><input type="checkbox" name="item_select" value="${item.name}" 
+                                                            data-line="${item.line || ''}" 
+                                                            data-article-number="${item.article_number || ''}" 
+                                                            data-article-name="${item.article_name || ''}" 
+                                                            data-qty="${qty}" 
+                                                            data-ctns="${item.ctns_on_pallet || 0}" 
+                                                            data-cbm="${item.carton_cbm || 0}" 
+                                                            data-gross-kg="${item.carton_gross_kg || 0}" 
+                                                            data-unit-price="${item.unit_price || 0}"></td>
+                                                        <td>${item.line || ''}</td>
+                                                        <td>${item.article_number || ''}</td>
+                                                        <td>${item.article_name || ''}</td>
+                                                        <td>${qty}</td>
+                                                        <td>${item.ctns_on_pallet || 0}</td>
+                                                        <td>${item.carton_cbm || 0}</td>
+                                                        <td>${item.carton_gross_kg || 0}</td>
+                                                        <td>${item.unit_price || 0}</td>
+                                                    </tr>
+                                                `);
+                                            });
+
+                                            table.find('tbody input[name="item_select"]').on('change', function() {
+                                                let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                                dialog.get_primary_btn().prop('disabled', !any_checked);
+                                                let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
+                                                table.find('#select_all_items').prop('checked', all_checked);
+                                            });
+
+                                            if (tbody.find('tr').length === 0) {
+                                                $container.html('<p>No items to display</p>');
+                                                dialog.get_primary_btn().prop('disabled', true);
+                                            } else {
+                                                $container.append(table);
+                                                dialog.get_primary_btn().prop('disabled', true);
+                                            }
+                                        } else {
+                                            $container.html('<p>No items to display</p>');
+                                            dialog.get_primary_btn().prop('disabled', true);
+                                        }
+                                    }
+                                });
+                            }
+
+                            d.show();
+                            d.fields_dict.items_table.$wrapper.empty();
+                        } else {
+                            frappe.msgprint({
+                                title: 'No Data',
+                                message: 'No Purchase Orders with workflow_state "Ready to Ship" found.',
+                                indicator: 'orange'
+                            });
+                        }
+                    }
+                });
+            });
+         }
+// 在 Transport Order 的 Client Script 中新增
         frm.add_custom_button('Add Item', function() {
-            // Get all valid Purchase Orders with workflow_state = 'Ready to Ship'
             frappe.call({
                 method: 'frappe.client.get_list',
                 args: {
@@ -81,395 +481,210 @@ frappe.ui.form.on('Transport Order', {
                         workflow_state: ['in', ['Ready to Ship', 'Partial Shipout']]
                     },
                     fields: ['name'],
-                    limit_page_length: 100
+                    limit_page_length: 50
                 },
                 callback: function(r) {
-                    if (r.message && r.message.length > 0) {
-                        let po_options = r.message.map(po => po.name);
-
-                        // Create dialog with increased width
-                        let d = new frappe.ui.Dialog({
-                            title: 'Select Purchase Order Items',
-                            size: 'extra-large',
-                            fields: [
-                                {
-                                    label: 'Select Purchase Order',
-                                    fieldname: 'po_select',
-                                    fieldtype: 'Select',
-                                    options: po_options,
-                                    reqd: 1,
-                                    change: function() {
-                                        refreshTable(d);
-                                    }
-                                },
-                                {
-                                    label: 'Items List',
-                                    fieldname: 'items_table',
-                                    fieldtype: 'HTML'
-                                }
-                            ],
-                            primary_action_label: 'Add Selected Items',
-                            primary_action: function() {
-                                let selected_items = [];
-                                let po_name = d.get_value('po_select');
-                                $(d.$wrapper).find('input[name="item_select"]:checked').each(function() {
-                                    selected_items.push({
-                                        name: $(this).val(),
-                                        line: $(this).data('line'),
-                                        article_number: $(this).data('article-number'),
-                                        article_name: $(this).data('article-name'),
-                                        qty: parseFloat($(this).data('qty') || 0),
-                                        ctns: parseInt($(this).data('ctns') || 0),
-                                        cbm: parseFloat($(this).data('cbm') || 0),
-                                        gross_kg: parseFloat($(this).data('gross-kg') || 0),
-                                        unit_price: parseFloat($(this).data('unit-price') || 0)
-                                    });
-                                });
-
-                                if (selected_items.length === 0) {
-                                    frappe.msgprint({
-                                        title: 'Error',
-                                        message: 'Please select at least one item!',
-                                        indicator: 'red'
-                                    });
-                                    return;
-                                }
-
-                                // Check for duplicate po_line
-                                let existing_po_lines = frm.doc.items ? frm.doc.items.map(item => item.po_line) : [];
-                                let duplicates = selected_items.filter(item => existing_po_lines.includes(item.name));
-                                if (duplicates.length > 0) {
-                                    frappe.msgprint({
-                                        title: 'Error',
-                                        message: 'The following items already exist in Transport Order Line: ' + duplicates.map(d => d.line).join(', '),
-                                        indicator: 'red'
-                                    });
-                                    return;
-                                }
-
-                                // Add selected items to Transport Order Line child table
-                                selected_items.forEach(item => {
-                                    let row = frm.add_child('items');
-                                    row.po_number = po_name;
-                                    row.po_line = item.name;
-                                    row.article_number = item.article_number;
-                                    row.article_name = item.article_name;
-                                    row.qty = item.qty;
-                                    row.ctns = item.ctns;
-                                    row.cbm = item.cbm;
-                                    row.gross_kg = item.gross_kg;
-                                    row.unit_price = item.unit_price;
-                                    row.value = item.qty * item.unit_price;
-                                });
-
-                                // Refresh child table and update total
-                                frm.refresh_field('items');
-                                calculate_total(frm);
-                                d.hide();
-                                setTimeout(function() {
-                                    frappe.msgprint({
-                                        title: 'Success',
-                                        message: 'Selected items added successfully to Transport Order!',
-                                        indicator: 'green'
-                                    });
-                                }, 1500);
-                            }
-                        });
-
-                        // Disable "Add Selected Items" button by default
-                        d.get_primary_btn().prop('disabled', true);
-
-                        // Define function to refresh table
-
-                        function refreshTable(dialog) {
-                            let po_name = dialog.get_value('po_select');
-                            if (!po_name) {
-                                dialog.fields_dict.items_table.$wrapper.empty();
-                                dialog.get_primary_btn().prop('disabled', true);
-                                return;
-                            }
-
-                            frappe.call({
-                                method: 'hksoho.byrydens.transport_order_api.get_po_items',
-                                args: {
-                                    po_name: po_name
-                                },
-                                callback: function(r) {
-                                    let $container = dialog.fields_dict.items_table.$wrapper;
-                                    $container.empty();
-
-                                    if (r.message && Array.isArray(r.message) && r.message.length > 0) {
-                                        let table = $(`
-                                            <table class="table table-bordered" style="width: 100%;">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 5%;">
-                                                            <input type="checkbox" id="select_all_items">
-                                                            Select
-                                                        </th>
-                                                        <th style="width: 5%;">Line</th>
-                                                        <th style="width: 15%;">Article #</th>
-                                                        <th style="width: 25%;">Article Name</th>
-                                                        <th style="width: 10%;">Qty</th>
-                                                        <th style="width: 10%;">Ctns</th>
-                                                        <th style="width: 10%;">CBM</th>
-                                                        <th style="width: 10%;">Gross Kg</th>
-                                                        <th style="width: 10%;">Unit Price</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-                                        `);
-
-                                        table.find('#select_all_items').on('change', function() {
-                                            table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
-                                            let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
-                                            dialog.get_primary_btn().prop('disabled', !any_checked);
-                                        });
-
-                                        let tbody = table.find('tbody');
-
-                                        // 批次處理所有項目的 Product 資料
-                                        let items = r.message;
-                                        let processed = 0;
-
-                                        items.forEach((item, index) => {
-                                            let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
-                                            let article_number = item.article_number || '';
-
-                                            // 預設值先用 PO 的（若有）
-                                            let display_ctns = item.ctns_on_pallet || 0;
-                                            let display_cbm = item.carton_cbm || 0;
-                                            let display_gross_kg = item.carton_gross_kg || 0;
-
-                                            // 如果有 article_number，就去抓 Product 的標準外箱資料
-                                            if (article_number) {
-                                                frappe.db.get_doc('Product', article_number).then(product => {
-                                                    if (product) {
-                                                        display_ctns = product.number_of_cartons_colli_per_unit || 1;
-                                                        display_cbm = product.carton_cbm_outer_carton || 0;
-                                                        display_gross_kg = product.carton_weight_kg_outer_carton || 0;
-                                                    }
-
-                                                    // 動態新增表格列
-                                                    tbody.append(`
-                                                        <tr>
-                                                            <td><input type="checkbox" name="item_select" value="${item.name}" 
-                                                                data-line="${item.line || ''}" 
-                                                                data-article-number="${article_number}" 
-                                                                data-article-name="${item.article_name || ''}" 
-                                                                data-qty="${qty}" 
-                                                                data-ctns="${display_ctns}" 
-                                                                data-cbm="${display_cbm}" 
-                                                                data-gross-kg="${display_gross_kg}" 
-                                                                data-unit-price="${item.unit_price || 0}"></td>
-                                                            <td>${item.line || ''}</td>
-                                                            <td>${article_number}</td>
-                                                            <td>${item.article_name || ''}</td>
-                                                            <td>${qty}</td>
-                                                            <td>${display_ctns}</td>
-                                                            <td>${display_cbm}</td>
-                                                            <td>${display_gross_kg}</td>
-                                                            <td>${item.unit_price || 0}</td>
-                                                        </tr>
-                                                    `);
-
-                                                    processed++;
-                                                    if (processed === items.length) {
-                                                        setupCheckboxEvents();
-                                                    }
-                                                }).catch(() => {
-                                                    // 若抓不到 Product，維持 PO 原值
-                                                    tbody.append(`
-                                                        <tr>
-                                                            <td><input type="checkbox" name="item_select" value="${item.name}" 
-                                                                data-line="${item.line || ''}" 
-                                                                data-article-number="${article_number}" 
-                                                                data-article-name="${item.article_name || ''}" 
-                                                                data-qty="${qty}" 
-                                                                data-ctns="${display_ctns}" 
-                                                                data-cbm="${display_cbm}" 
-                                                                data-gross-kg="${display_gross_kg}" 
-                                                                data-unit-price="${item.unit_price || 0}"></td>
-                                                            <td>${item.line || ''}</td>
-                                                            <td>${article_number}</td>
-                                                            <td>${item.article_name || ''}</td>
-                                                            <td>${qty}</td>
-                                                            <td>${display_ctns}</td>
-                                                            <td>${display_cbm}</td>
-                                                            <td>${display_gross_kg}</td>
-                                                            <td>${item.unit_price || 0}</td>
-                                                        </tr>
-                                                    `);
-
-                                                    processed++;
-                                                    if (processed === items.length) {
-                                                        setupCheckboxEvents();
-                                                    }
-                                                });
-                                            } else {
-                                                // 沒有 article_number，直接用 PO 值
-                                                tbody.append(`
-                                                    <tr>
-                                                        <td><input type="checkbox" name="item_select" value="${item.name}" 
-                                                            data-line="${item.line || ''}" 
-                                                            data-article-number="" 
-                                                            data-article-name="${item.article_name || ''}" 
-                                                            data-qty="${qty}" 
-                                                            data-ctns="${display_ctns}" 
-                                                            data-cbm="${display_cbm}" 
-                                                            data-gross-kg="${display_gross_kg}" 
-                                                            data-unit-price="${item.unit_price || 0}"></td>
-                                                        <td>${item.line || ''}</td>
-                                                        <td></td>
-                                                        <td>${item.article_name || ''}</td>
-                                                        <td>${qty}</td>
-                                                        <td>${display_ctns}</td>
-                                                        <td>${display_cbm}</td>
-                                                        <td>${display_gross_kg}</td>
-                                                        <td>${item.unit_price || 0}</td>
-                                                    </tr>
-                                                `);
-
-                                                processed++;
-                                                if (processed === items.length) {
-                                                    setupCheckboxEvents();
-                                                }
-                                            }
-                                        });
-
-                                        // 獨立出 checkbox 事件綁定，避免重複綁定
-                                        function setupCheckboxEvents() {
-                                            table.find('tbody input[name="item_select"]').on('change', function() {
-                                                let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
-                                                dialog.get_primary_btn().prop('disabled', !any_checked);
-                                                let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
-                                                table.find('#select_all_items').prop('checked', all_checked);
-                                            });
-
-                                            $container.append(table);
-                                            dialog.get_primary_btn().prop('disabled', true);
-                                        }
-
-                                        if (items.length === 0) {
-                                            $container.html('<p>No items to display</p>');
-                                            dialog.get_primary_btn().prop('disabled', true);
-                                        }
-                                    } else {
-                                        $container.html('<p>No items to display</p>');
-                                        dialog.get_primary_btn().prop('disabled', true);
-                                    }
-                                }
-                            });
-                        }
-                        
-                        function refreshTable1(dialog) {
-                            let po_name = dialog.get_value('po_select');
-                            if (!po_name) {
-                                dialog.fields_dict.items_table.$wrapper.empty();
-                                dialog.get_primary_btn().prop('disabled', true);
-                                return;
-                            }
-
-                            frappe.call({
-                                method: 'hksoho.byrydens.transport_order_api.get_po_items',
-                                args: {
-                                    po_name: po_name
-                                },
-                                callback: function(r) {
-                                    let $container = dialog.fields_dict.items_table.$wrapper;
-                                    $container.empty();
-
-                                    if (r.message && Array.isArray(r.message) && r.message.length > 0) {
-                                        let table = $(`
-                                            <table class="table table-bordered" style="width: 100%;">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 5%;">
-                                                            <input type="checkbox" id="select_all_items">
-                                                            Select
-                                                        </th>
-                                                        <th style="width: 5%;">Line</th>
-                                                        <th style="width: 15%;">Article #</th>
-                                                        <th style="width: 25%;">Article Name</th>
-                                                        <th style="width: 10%;">Qty</th>
-                                                        <th style="width: 10%;">Ctns</th>
-                                                        <th style="width: 10%;">CBM</th>
-                                                        <th style="width: 10%;">Gross Kg</th>
-                                                        <th style="width: 10%;">Unit Price</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-                                        `);
-
-                                        table.find('#select_all_items').on('change', function() {
-                                            table.find('tbody input[name="item_select"]').prop('checked', $(this).prop('checked'));
-                                            let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
-                                            dialog.get_primary_btn().prop('disabled', !any_checked);
-                                        });
-
-                                        let tbody = table.find('tbody');
-                                        r.message.forEach(item => {
-                                            let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
-                                            tbody.append(`
-                                                <tr>
-                                                    <td><input type="checkbox" name="item_select" value="${item.name}" 
-                                                        data-line="${item.line || ''}" 
-                                                        data-article-number="${item.article_number || ''}" 
-                                                        data-article-name="${item.article_name || ''}" 
-                                                        data-qty="${qty}" 
-                                                        data-ctns="${item.ctns_on_pallet || 0}" 
-                                                        data-cbm="${item.carton_cbm || 0}" 
-                                                        data-gross-kg="${item.carton_gross_kg || 0}" 
-                                                        data-unit-price="${item.unit_price || 0}"></td>
-                                                    <td>${item.line || ''}</td>
-                                                    <td>${item.article_number || ''}</td>
-                                                    <td>${item.article_name || ''}</td>
-                                                    <td>${qty}</td>
-                                                    <td>${item.ctns_on_pallet || 0}</td>
-                                                    <td>${item.carton_cbm || 0}</td>
-                                                    <td>${item.carton_gross_kg || 0}</td>
-                                                    <td>${item.unit_price || 0}</td>
-                                                </tr>
-                                            `);
-                                        });
-
-                                        table.find('tbody input[name="item_select"]').on('change', function() {
-                                            let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
-                                            dialog.get_primary_btn().prop('disabled', !any_checked);
-                                            let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
-                                            table.find('#select_all_items').prop('checked', all_checked);
-                                        });
-
-                                        if (tbody.find('tr').length === 0) {
-                                            $container.html('<p>No items to display</p>');
-                                            dialog.get_primary_btn().prop('disabled', true);
-                                        } else {
-                                            $container.append(table);
-                                            dialog.get_primary_btn().prop('disabled', true);
-                                        }
-                                    } else {
-                                        $container.html('<p>No items to display</p>');
-                                        dialog.get_primary_btn().prop('disabled', true);
-                                    }
-                                }
-                            });
-                        }
-
-                        d.show();
-                        d.fields_dict.items_table.$wrapper.empty();
-                    } else {
+                    if (!r.message || r.message.length === 0) {
                         frappe.msgprint({
                             title: 'No Data',
-                            message: 'No Purchase Orders with workflow_state "Ready to Ship" found.',
+                            message: 'No eligible Purchase Orders found.',
                             indicator: 'orange'
                         });
+                        return;
                     }
+
+                    // 建立 dialog，並在 field 中直接定義 get_query
+                    let d = new frappe.ui.Dialog({
+                        title: 'Select Purchase Order Items',
+                        size: 'extra-large',
+                        fields: [
+                            {
+                                label: 'Purchase Order',
+                                fieldname: 'po_select',
+                                fieldtype: 'Link',
+                                options: 'Purchase Order',
+                                reqd: 1,
+                                placeholder: 'Enter PO number or prefix to search...',
+                                get_query: function() {
+                                    return {
+                                        filters: [
+                                            ['Purchase Order', 'workflow_state', 'in', ['Ready to Ship', 'Partial Shipout']]
+                                        ],
+                                        order_by: 'name asc'
+                                    };
+                                },
+                                change: function() {
+                                    refreshTable(d);
+                                }
+                            },
+                            {
+                                label: 'Items List',
+                                fieldname: 'items_table',
+                                fieldtype: 'HTML'
+                            }
+                        ],
+                        primary_action_label: 'Add Selected Items',
+                        primary_action: function(values) {
+                            let selected_items = [];
+                            let po_name = d.get_value('po_select');
+
+                            $(d.$wrapper).find('input[name="item_select"]:checked').each(function() {
+                                selected_items.push({
+                                    name: $(this).val(),
+                                    line: $(this).data('line'),
+                                    article_number: $(this).data('article-number'),
+                                    article_name: $(this).data('article-name'),
+                                    qty: parseFloat($(this).data('qty') || 0),
+                                    ctns: parseInt($(this).data('ctns') || 0),
+                                    cbm: parseFloat($(this).data('cbm') || 0),
+                                    gross_kg: parseFloat($(this).data('gross-kg') || 0),
+                                    unit_price: parseFloat($(this).data('unit-price') || 0)
+                                });
+                            });
+
+                            if (selected_items.length === 0) {
+                                frappe.msgprint({ title: 'Error', message: 'Please select at least one item!', indicator: 'red' });
+                                return;
+                            }
+
+                            let existing_po_lines = frm.doc.items ? frm.doc.items.map(item => item.po_line) : [];
+                            let duplicates = selected_items.filter(item => existing_po_lines.includes(item.name));
+                            if (duplicates.length > 0) {
+                                frappe.msgprint({
+                                    title: 'Error',
+                                    message: 'The following items already exist: ' + duplicates.map(d => d.line).join(', '),
+                                    indicator: 'red'
+                                });
+                                return;
+                            }
+
+                            selected_items.forEach(item => {
+                                let row = frm.add_child('items');
+                                row.po_number = po_name;
+                                row.po_line = item.name;
+                                row.article_number = item.article_number;
+                                row.article_name = item.article_name;
+                                row.qty = item.qty;
+                                row.ctns = item.ctns;
+                                row.cbm = item.cbm;
+                                row.gross_kg = item.gross_kg;
+                                row.unit_price = item.unit_price;
+                                row.value = item.qty * item.unit_price;
+                            });
+
+                            frm.refresh_field('items');
+                            if (typeof calculate_total === 'function') calculate_total(frm);
+                            d.hide();
+
+                            setTimeout(() => {
+                                frappe.msgprint({
+                                    title: 'Success',
+                                    message: 'Selected items added successfully!',
+                                    indicator: 'green'
+                                });
+                            }, 1500);
+                        }
+                    });
+
+                    // 禁用按鈕初始狀態
+                    d.get_primary_btn().prop('disabled', true);
+
+                    // 表格刷新函式（簡化版，先讓基本功能跑起來）
+                    function refreshTable(dialog) {
+                        let po_name = dialog.get_value('po_select');
+                        if (!po_name) {
+                            dialog.fields_dict.items_table.$wrapper.html('<p>Please select a Purchase Order.</p>');
+                            dialog.get_primary_btn().prop('disabled', true);
+                            return;
+                        }
+
+                        frappe.call({
+                            method: 'hksoho.byrydens.transport_order_api.get_po_items',
+                            args: { po_name: po_name },
+                            callback: function(res) {
+                                let $wrapper = dialog.fields_dict.items_table.$wrapper;
+                                $wrapper.empty();
+
+                                if (res.exc) {
+                                    frappe.msgprint({ title: 'API Error', message: res.exc, indicator: 'red' });
+                                    console.error(res.exc);
+                                    return;
+                                }
+
+                                if (!res.message || res.message.length === 0) {
+                                    $wrapper.html('<p>No items available for this Purchase Order.</p>');
+                                    dialog.get_primary_btn().prop('disabled', true);
+                                    return;
+                                }
+
+                                let table = $('<table class="table table-bordered"><thead><tr>' +
+                                    '<th><input type="checkbox" id="select_all_items"> Select</th>' +
+                                    '<th>Line</th><th>Article #</th><th>Article Name</th><th>Qty</th><th>Ctns</th><th>CBM</th><th>Gross Kg</th><th>Unit Price</th></tr></thead><tbody></tbody></table>');
+
+                                table.find('#select_all_items').on('change', function() {
+                                    table.find('tbody input[name="item_select"]').prop('checked', this.checked);
+                                    let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                    dialog.get_primary_btn().prop('disabled', !any_checked);
+                                });
+
+                                let tbody = table.find('tbody');
+                                res.message.forEach(item => {
+                                    let qty = (item.booked_qty || 0) - (item.delivery_qty || 0);
+                                    let ctns = item.ctns_on_pallet || 0;
+                                    let cbm = item.carton_cbm || 0;
+                                    let gross_kg = item.carton_gross_kg || 0;
+                                    tbody.append(`
+                                        <tr>
+                                            <td><input type="checkbox" name="item_select" value="${item.name}"
+                                                data-line="${item.line || ''}"
+                                                data-article-number="${item.article_number || ''}"
+                                                data-article-name="${item.article_name || ''}"
+                                                data-qty="${qty}"
+                                                data-ctns="${ctns}"
+                                                data-cbm="${cbm}"
+                                                data-gross-kg="${gross_kg}"
+                                                data-unit-price="${item.unit_price || 0}"></td>
+                                            <td>${item.line || ''}</td>
+                                            <td>${item.article_number || ''}</td>
+                                            <td>${item.article_name || ''}</td>
+                                            <td>${qty}</td>
+                                            <td>${ctns}</td>
+                                            <td>${cbm}</td>
+                                            <td>${gross_kg}</td>
+                                            <td>${item.unit_price || 0}</td>
+                                        </tr>
+                                    `);
+                                });
+
+                                table.find('tbody input[name="item_select"]').on('change', function() {
+                                    let any_checked = table.find('tbody input[name="item_select"]:checked').length > 0;
+                                    dialog.get_primary_btn().prop('disabled', !any_checked);
+                                    let all_checked = table.find('tbody input[name="item_select"]').length === table.find('tbody input[name="item_select"]:checked').length;
+                                    table.find('#select_all_items').prop('checked', all_checked);
+                                });
+
+                                $wrapper.append(table);
+                                dialog.get_primary_btn().prop('disabled', true); // 初始禁用，等勾選才啟用
+                            },
+                            error: function(err) {
+                                frappe.msgprint({ title: 'Error', message: 'Failed to load items. Check console.', indicator: 'red' });
+                                console.error(err);
+                            }
+                        });
+                    }
+
+                    d.show();
+                    // 自動聚焦 PO 欄位
+                    setTimeout(() => {
+                        d.fields_dict.po_select.input.focus();
+                    }, 300);
+                },
+                error: function(err) {
+                    frappe.msgprint({ title: 'Error', message: 'Failed to load Purchase Orders.', indicator: 'red' });
+                    console.error(err);
                 }
             });
         });
-
         // Add custom button "Vendor Invoice" (visible in all workflow states)
         frm.add_custom_button('Vendor Invoice', function() {
             // Get unique PO numbers from Transport Order Line

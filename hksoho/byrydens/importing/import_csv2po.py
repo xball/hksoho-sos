@@ -107,12 +107,14 @@ def import_po_data(file_path):
                     purchase_orders[row[1]] = current_po
                 # 處理 PO 項目 (02)
                 elif row_type == "02" and current_po:
+                    logger.info(f"all row data: {row} ")
+
                     item_data = {
                         "line": row[2],
                         "article_number": row[3],
                         "confirmed_qty": int(row[4]) if row[4] else 0,
                         "article_name": row[6],
-                        "supplier_art_number": row[7],
+                        "supplier_art_number": row[7] if row[7] else None,
                         "unit_price": float(row[8]) if row[8] else 0,
                         "price_currency": row[9],
                         "requested_finish_date": row[12] if row[12] else None,
@@ -204,6 +206,10 @@ def create_purchase_order(po_data):
                 msg = f"計算項目日期失敗 (line {item.get('line')}): {e}"
                 logger.warning(msg)
                 print(msg)
+        else:
+            logger.info(f"line {item.get('line')} 無 requested_finish_date，跳過日期計算")
+            item["requested_shipdate"] = None
+            # item["requested_eta"] = None
 
     # === po_shipdate 仍然用「第一個有 requested_eta 的項目 - 60 天」 ===
     po_shipdate = None
@@ -317,8 +323,10 @@ def create_purchase_order(po_data):
             "requested_eta": format_date(item["requested_eta"]),
             "line": item["line"],
             "supplier_art_number": item["supplier_art_number"],
-            "po_number": po_data["po_number"]
+            "po_number": po_data["po_number"],
+            "remaining_qty":item["confirmed_qty"]
         }
+        logger.info(f"build item_data   for line {item['line']} ")
 
         if po_exists and item["line"] in existing_items:
             existing_item = existing_items[item["line"]]

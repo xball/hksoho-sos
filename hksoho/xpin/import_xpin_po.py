@@ -42,7 +42,8 @@ def import_xpin_po_from_xlsx():
     print("Data grouped by PO number.")
     created = 0
     updated = 0
-
+    founddesc = 0
+    
     # 2. 逐行處理 Header
     for _, row in header_df.iterrows():
         po_number = str(row.get("po_number") or "").strip()
@@ -133,7 +134,13 @@ def import_xpin_po_from_xlsx():
             child.unit_price = _safe_float(item_row.get("unit_price"))
             child.amount = _safe_float(item_row.get("amount"))
             child.html_filename = _nan_to_none(item_row.get("html_filename"))
+            child.description = _nan_to_none(item_row.get("description"))
 
+        if (child.description is not None):
+            founddesc += 1
+            if (founddesc % 50 == 0):
+                print(child.description)
+            
         # 5. 塞 attached_docs child table
         for doc_row in docs_by_po.get(po_number, []):
             child = doc.append("attached_docs", {})

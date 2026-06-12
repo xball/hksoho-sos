@@ -91,7 +91,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-27 08:40:31.783982",
+ "modified": "2025-12-27 14:40:00.921255",
  "modified_by": "Administrator",
  "module": "xpin",
  "name": "xpin_po_files",
@@ -109,6 +109,24 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1
   }
  ],
  "route": "General",

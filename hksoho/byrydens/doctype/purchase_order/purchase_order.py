@@ -3,7 +3,7 @@ from frappe.model.document import Document
 import os
 from datetime import datetime, date
 from datetime import date, datetime, timedelta
-
+from frappe.utils import add_days, getdate   # ← 務必加上這行
 
 # Constants
 DEBUG_FILE = "/home/frappe/frappe-bench/temp/debug_log.txt"
@@ -45,11 +45,18 @@ class PurchaseOrder(Document):
             tbook_qty = 0
             tbook_amt = 0.0
             actualfinishdate = self.actual_finish_date
-            write_debug_log(f"set item {actualfinishdate}")
+            write_debug_log(f"@@@@@set item {actualfinishdate}")
             if actualfinishdate:
                 for item in self.po_items:
                     write_debug_log(f"set item {item.idx} actual_finishdate")
+                    write_debug_log(f"set item {actualfinishdate}")
                     item.actual_finishdate = actualfinishdate
+                    # 正確加 10 天
+                    if not item.confirmed_shipdate:  # or item.confirmed_shipdate < add_days(actualfinishdate, 10):
+                        item.confirmed_shipdate = add_days(actualfinishdate, 10)
+                    write_debug_log(f"*******confirmed_shipdate =  {item.confirmed_shipdate}")
+                    
+                    
             write_debug_log(f" ###2 validate triggered for PO: {self.name}")
             for item in self.po_items:
                 uprice = item.unit_price
@@ -175,15 +182,15 @@ class PurchaseOrder(Document):
                     qc_status_output = "APPROVED"
                 else: 
                     qc_status_output = "REQUESTED"
-                if order_status == "Shipped":
-                # 已出貨 → 數量差異強制為 0
-                    qty_diff = 0
-                else:
-                # 未出貨 → 原本邏輯：confirmed_qty - requested_qty
-                    qty_diff = (item.remaining_qty or 0) 
-
+                # if order_status == "Shipped":
+                # # 已出貨 → 數量差異強制為 0
+                #     qty_diff = 0
+                # else:
+                # # 未出貨 → 原本邏輯：confirmed_qty - requested_qty
+                #     qty_diff = (item.remaining_qty or 0) 
+                qty_diff = item.changed_qty 
                 content.append(f"#12441;{qty_diff}")
-                
+                item.changed_qty  = 0
                 ship_date = item.confirmed_shipdate 
                 if ship_date:
                     try:

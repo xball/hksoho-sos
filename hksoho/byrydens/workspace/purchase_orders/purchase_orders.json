@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"tOHy-CzUkd\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Purchase Orders</span>\",\"col\":12}},{\"id\":\"5p4ji7vi3Q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Orders\",\"col\":3}},{\"id\":\"gqkYwFYcl1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"PO Detail\",\"col\":3}},{\"id\":\"L1u4d28vCc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection</b></span>\",\"col\":12}},{\"id\":\"_bHKnS7txc\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item inspection wizard\",\"col\":3}},{\"id\":\"lkJ6PDb22B\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection List\",\"col\":3}},{\"id\":\"l78EDrkWR_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Detail\",\"col\":3}},{\"id\":\"nsfzxClEQg\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection Event</b></span>\",\"col\":12}},{\"id\":\"Cuqjfhs47U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event\",\"col\":3}},{\"id\":\"crCPUHG3ee\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event Detail\",\"col\":3}},{\"id\":\"JtrMhrPR-B\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Report</b></span>\",\"col\":12}},{\"id\":\"bKDb7WbZc-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Undelivered Items\",\"col\":3}}]",
+ "content": "[{\"id\":\"tOHy-CzUkd\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Purchase Orders</span>\",\"col\":12}},{\"id\":\"5p4ji7vi3Q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Orders\",\"col\":3}},{\"id\":\"gqkYwFYcl1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"PO Detail\",\"col\":3}},{\"id\":\"L1u4d28vCc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection</b></span>\",\"col\":12}},{\"id\":\"_bHKnS7txc\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item inspection wizard\",\"col\":3}},{\"id\":\"lkJ6PDb22B\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection List\",\"col\":3}},{\"id\":\"l78EDrkWR_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Detail\",\"col\":3}},{\"id\":\"nsfzxClEQg\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection Event</b></span>\",\"col\":12}},{\"id\":\"Cuqjfhs47U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event\",\"col\":3}},{\"id\":\"crCPUHG3ee\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event Detail\",\"col\":3}},{\"id\":\"pd9X7dorTY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Event Calendar\",\"col\":3}},{\"id\":\"JtrMhrPR-B\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Report</b></span>\",\"col\":12}},{\"id\":\"bKDb7WbZc-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Undelivered Items\",\"col\":3}}]",
  "creation": "2025-08-29 04:28:56.421180",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Purchase Orders",
  "links": [],
- "modified": "2025-12-26 16:47:38.345156",
+ "modified": "2026-04-18 15:43:55.863305",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Orders",
@@ -89,6 +89,13 @@
    "link_to": "Inspection Detail",
    "report_ref_doctype": "Inspection",
    "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Inspection Event Calendar",
+   "type": "URL",
+   "url": "/app/inspection-event/view/calendar/Inspection%20Event%20Calendar%20View"
   },
   {
    "color": "Grey",

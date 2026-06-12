@@ -121,4 +121,109 @@ def link_attachments_to_products(file_docs, products):
         frappe.log_error('Product Attachment Upload Error', frappe.get_traceback())
         frappe.throw(_('上傳過程出錯：{}').format(str(e)))
         
-        
+
+@frappe.whitelist()
+def get_po_items_for_product(article_number):
+    """
+    取得指定 article_number 的所有 Purchase Order Items
+    以及對應的 PO header 資料
+    """
+    if not article_number:
+        return []
+
+    # Query Purchase Order Items
+    items = frappe.db.sql("""
+        SELECT 
+            poi.name,
+            poi.po_number,
+            poi.line,
+            poi.article_name,
+            poi.confirmed_qty,
+            poi.booked_qty,
+            poi.unit_price,
+            poi.amount,
+            poi.requested_shipdate,
+            poi.confirmed_shipdate,
+            po.order_type,
+            po.supplier,
+            po.po_placed,
+            po.po_status,
+            po.qc_status
+        FROM `tabPurchase Order Item` poi
+        LEFT JOIN `tabPurchase Order` po ON poi.po_number = po.po_number
+        WHERE poi.article_number = %(article_number)s
+        ORDER BY poi.po_number DESC, poi.line ASC
+    """, {"article_number": article_number}, as_dict=True)
+
+    return items
+
+
+
+@frappe.whitelist()
+def get_purchase_order_items_for_product(article_number):
+    """
+    取得 Purchase Order Items（現有系統）
+    """
+    if not article_number:
+        return []
+
+    items = frappe.db.sql("""
+        SELECT 
+            poi.name,
+            poi.po_number,
+            poi.line,
+            poi.confirmed_qty,
+            poi.booked_qty,
+            poi.unit_price,
+            poi.amount,
+            poi.requested_shipdate,
+            poi.confirmed_shipdate,
+            po.order_type,
+            po.supplier,
+            po.po_placed,
+            po.po_status,
+            po.qc_status
+        FROM `tabPurchase Order Item` poi
+        LEFT JOIN `tabPurchase Order` po ON poi.po_number = po.po_number
+        WHERE poi.article_number = %(article_number)s
+        ORDER BY poi.po_number DESC, poi.line ASC
+    """, {"article_number": article_number}, as_dict=True)
+
+    return items
+
+
+@frappe.whitelist()
+def get_xpin_po_items_for_product(article_number):
+    """
+    取得 xpin_po_items（舊系統匯入）
+    """
+    if not article_number:
+        return []
+
+    items = frappe.db.sql("""
+        SELECT 
+            poi.name,
+            poi.po_number,
+            poi.line,
+            poi.article_name,
+            poi.requested_ship_week,
+            poi.requested_qty,
+            poi.confirmed_ship_week,
+            poi.confirmed_qty,
+            poi.booked_qty,
+            poi.delivery_qty,
+            poi.unit_price,
+            poi.amount,
+            po.supplier,
+            po.buyer,
+            po.order_placed,
+            po.finish_date,
+            po.po_status,
+            po.qc_status
+        FROM `tabxpin_po_items` poi
+        LEFT JOIN `tabxpin_po` po ON poi.po_number = po.po_number
+        WHERE poi.art_nr = %(article_number)s
+        ORDER BY poi.po_number DESC, poi.line ASC
+    """, {"article_number": article_number}, as_dict=True)
+
+    return items

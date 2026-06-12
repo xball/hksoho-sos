@@ -1,0 +1,36 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [],
+ "creation": "2026-03-31 18:17:14.576749",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Company Logo header",
+ "letterhead": null,
+ "modified": "2026-03-31 18:34:02.106105",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Shipment On Water Report with status",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\r\n    tol.po_number AS `PO Number:Data:130`,\r\n    sp.partner_name AS `Supplier:Data:200`,\r\n    p.group AS `Group:Data:100`,\r\n    tor.dest_code AS `Dest Port:Data:100`,\r\n    v.vessel AS `Vessel:Data:150`,\r\n    tor.container_number AS `Container:Data:120`,\r\n    tor.equipment AS `Size:Data:80`,\r\n    tor.etd_date AS `Ship Date:Date:110`,\r\n    tor.eta_date AS `ETA Date:Date:110`,\r\n    \r\n    tol.value AS `Value On Water:Currency:130`,\r\n    tol.exchange_rate_to_sek AS `Exchange Rate to SEK:Float:130`,\r\n    (tol.value * IFNULL(tol.exchange_rate_to_sek, 1)) AS `Value in SEK:Currency:140`,\r\n    \r\n    po.order_purchase_currency AS `Currency:Data:90`,\r\n    po.delivery_status AS `Dvy Status:Data:100`,\r\n    cp.partner_name AS `Customer:Data:180`,\r\n    po.dc_warehousestore AS `DC:Data:80`,\r\n    tol.invoice_no AS `Invoice#:Data:120`,\r\n    tor.workflow_state AS `Status:Select:100`\r\nFROM\r\n    `tabTransport Order Line` tol\r\nINNER JOIN `tabTransport Order` tor ON tor.name = tol.parent\r\nINNER JOIN `tabPurchase Order` po ON po.name = tol.po_number\r\nLEFT JOIN `tabProduct` p ON p.article_number = tol.article_number\r\nLEFT JOIN `tabPartner` sp ON sp.name = po.supplier\r\nLEFT JOIN `tabPartner` cp ON cp.name = po.customer\r\nLEFT JOIN `tabVessels Time Table` v ON v.name = tor.vessel\r\n\r\nSELECT\r\n    tol.po_number AS `PO Number:Data:130`,\r\n    sp.partner_name AS `Supplier:Data:200`,\r\n    p.group AS `Group:Data:100`,\r\n    tor.dest_code AS `Dest Port:Data:100`,\r\n    v.vessel AS `Vessel:Data:150`,\r\n    tor.container_number AS `Container:Data:120`,\r\n    tor.equipment AS `Size:Data:80`,\r\n    tor.etd_date AS `Ship Date:Date:110`,\r\n    tor.eta_date AS `ETA Date:Date:110`,\r\n    \r\n    tol.value AS `Value On Water:Currency:130`,\r\n    tol.exchange_rate_to_sek AS `Exchange Rate to SEK:Float:130`,\r\n    (tol.value * IFNULL(tol.exchange_rate_to_sek, 1)) AS `Value in SEK:Currency:140`,\r\n    \r\n    po.order_purchase_currency AS `Currency:Data:90`,\r\n    po.delivery_status AS `Dvy Status:Data:100`,\r\n    cp.partner_name AS `Customer:Data:180`,\r\n    po.dc_warehousestore AS `DC:Data:80`,\r\n    tol.invoice_no AS `Invoice#:Data:120`,\r\n    tor.workflow_state AS `Status:Select:100`\r\nFROM\r\n    `tabTransport Order Line` tol\r\nINNER JOIN `tabTransport Order` tor ON tor.name = tol.parent\r\nINNER JOIN `tabPurchase Order` po ON po.name = tol.po_number\r\nLEFT JOIN `tabProduct` p ON p.article_number = tol.article_number\r\nLEFT JOIN `tabPartner` sp ON sp.name = po.supplier\r\nLEFT JOIN `tabPartner` cp ON cp.name = po.customer\r\nLEFT JOIN `tabVessels Time Table` v ON v.name = tor.vessel\r\n\r\nWHERE\r\n    tor.mode = 'Sea'\r\n    AND tor.etd_date >= %(etd_date_from)s\r\n    AND (tor.workflow_state = %(workflow_state)s OR %(workflow_state)s IS NULL OR %(workflow_state)s = '')\r\nORDER BY\r\n    tol.po_number, tor.etd_date, tor.name;\r\n\r\n",
+ "ref_doctype": "Transport Order",
+ "report_name": "Shipment On Water Report with status",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Co-operator"
+  },
+  {
+   "role": "Purchase Manager"
+  }
+ ],
+ "timeout": 0
+}

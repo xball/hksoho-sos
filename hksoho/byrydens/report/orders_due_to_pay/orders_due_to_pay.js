@@ -56,6 +56,7 @@ function showDuePODetails(year, month) {
                                     <th>Partner ID</th>
                                     <th>Partner Name</th>
                                     <th>Ship Date</th>
+                                    <th>Purpose</th>
                                     <th>Status</th>
                                     <th>Currency</th>
                                     <th style="text-align: right;">Undelivered Value</th>
@@ -72,7 +73,8 @@ function showDuePODetails(year, month) {
                             <td>${row.partner_id || ''}</td>
                             <td>${row.partner_name || ''}</td>
                             <td>${frappe.datetime.str_to_user(row.po_shipdate) || ''}</td>
-                            <td><span class="badge badge-primary">${row.po_status || ''}</span></td>
+                            <td>${row.purpose || ''}</td>
+                            <td><span class="badge badge-primary">${row.po_status || ''}</td>
                             <td>${row.currency || ''}</td>
                             <td style="text-align: right;">${format_currency(row.undelivered_value, row.currency)}</td>
                         </tr>

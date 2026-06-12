@@ -1,0 +1,531 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:product_number",
+ "creation": "2026-01-17 14:40:01.279860",
+ "default_email_template": "Notification_Email",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_jmun",
+  "product_type",
+  "category",
+  "led",
+  "hide",
+  "section_break_bogj",
+  "product_number",
+  "description",
+  "supplier",
+  "supplier_item_number",
+  "price_usd",
+  "currency",
+  "size",
+  "finish_and_material",
+  "shade_size",
+  "shade_material_and_color",
+  "column_break_pcav",
+  "number_of_lampholder",
+  "lampholder_color",
+  "bulb_type",
+  "bulb_included",
+  "max_wattage",
+  "cable_type",
+  "cable_color",
+  "maximum_visible_cable_length",
+  "switch_type",
+  "switch_position",
+  "column_break_hmao",
+  "suspension_information",
+  "transformerdimmer",
+  "kelvin",
+  "life_time_for_led",
+  "lumen",
+  "cri",
+  "fitting_type",
+  "section_break_obkt",
+  "inner_box_information_column",
+  "lenght_inner_box_cm",
+  "width_inner_box_cm",
+  "height_inner_box_cm",
+  "volumn_inner_box_m3",
+  "column_break_dgek",
+  "lenght_middle_box_cm",
+  "width_middle_box_cm",
+  "height_middle_box_cm",
+  "volumn_middle_box_m3",
+  "column_break_tsal",
+  "lenght_outer_box_cm",
+  "width_outer_box_cm",
+  "height_outer_box_cm",
+  "volumn_outer_box_m3",
+  "section_break_iwhh",
+  "pcsctn",
+  "qty20",
+  "column_break_axuq",
+  "packing_method",
+  "section_break_gqwl",
+  "remark",
+  "attachments_tab",
+  "product_image",
+  "files",
+  "column_break_jqse",
+  "product_image_view"
+ ],
+ "fields": [
+  {
+   "fieldname": "product_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "depends_on": "eval:doc.hide !== 1",
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
+   "options": "Partner",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.hide !== 1",
+   "fieldname": "supplier_item_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier item number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "finish_and_material",
+   "fieldtype": "Data",
+   "label": "Finish and Material"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "suspension_information",
+   "fieldtype": "Select",
+   "label": "Suspension information",
+   "options": "N/A\n1.2m L cable\n1.2m L metal chain\n1.2m L wire suspension\n1.5m L cable\n2m L cable\n3m L cable\n5m L cable\ntelescope\nothers"
+  },
+  {
+   "fieldname": "column_break_pcav",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "number_of_lampholder",
+   "fieldtype": "Select",
+   "label": "Number of lampholder",
+   "options": "N/A\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "bulb_type",
+   "fieldtype": "Select",
+   "label": "Bulb type",
+   "options": "N/A\nAR111\nE10\nE14\nE27\nE5\nG4\nG6.35\nG9\nGU10\nLED\nMR11\nMR16\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "lampholder_color",
+   "fieldtype": "Select",
+   "label": "Lampholder color",
+   "options": "N/A\nwhite\nblack\nclear\nmetal cup color\nwhite ceramic cup\nothers"
+  },
+  {
+   "default": "No",
+   "fieldname": "bulb_included",
+   "fieldtype": "Select",
+   "label": "Bulb included",
+   "options": "No\nYes"
+  },
+  {
+   "fieldname": "shade_size",
+   "fieldtype": "Data",
+   "label": "Shade size"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "maximum_visible_cable_length",
+   "fieldtype": "Select",
+   "label": "Maximum visible cable length",
+   "options": "N/A\n1m L\n1.2m L\n1.4m L\n1.5m L\n1.8m L\n2m L\n2.5m L\n3m L\n3.5m L\n4m L\n4.5m L\n5m L\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "max_wattage",
+   "fieldtype": "Select",
+   "label": "Maximum wattage",
+   "options": "N/A\n0.8W\n1W\n1.2W\n1.8W\n3W\n5W\n8W\n10W\n20W\n40W\nothers"
+  },
+  {
+   "fieldname": "column_break_hmao",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cable_color",
+   "fieldtype": "Select",
+   "label": "Cable color",
+   "options": "N/A\nclear\nwhite\nblack\nsame as metal color\ngold\nbrown\nred\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "switch_type",
+   "fieldtype": "Select",
+   "label": "Switch type",
+   "options": "N/A\non-off switch\nfoot dimmer\nrotary dimmer\nmemory dimmer\npush dimmer\n3-step dimmer"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "transformerdimmer",
+   "fieldtype": "Select",
+   "label": "Transformer/dimmer",
+   "options": "N/A\nHUIBOLONG\nKAOYI\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cable_type",
+   "fieldtype": "Select",
+   "label": "Cable type",
+   "options": "N/A\nVDE, 2-wire, flat\nVDE, 2-wire, round\nVDE, 3-wire, round\ntextile, 2-wire, flat\ntextile, 2-wire, round\ntextile, 2-wire, twist\ntextile, 3-wire, round\ntwist textile, 2-wire\ntwist textile, 3-wire\nrubber, 2-wire, round\nrubber, 3-wire, round"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "switch_position",
+   "fieldtype": "Select",
+   "label": "Switch position",
+   "options": "N/A\non cable\non base\non pole\non lampholder\non shade"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cri",
+   "fieldtype": "Select",
+   "label": "CRI",
+   "options": "N/A\n>80\n>90"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "kelvin",
+   "fieldtype": "Select",
+   "label": "Kelvin",
+   "options": "N/A\n2500K\n2700K\n3000K\n3300K\n3800K\n4000K\n5000K\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "lumen",
+   "fieldtype": "Data",
+   "label": "Lumen"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "life_time_for_led",
+   "fieldtype": "Select",
+   "label": "Life time for LED",
+   "options": "N/A\n10000 hours\n20000 hours\n30000 hours"
+  },
+  {
+   "fieldname": "section_break_obkt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "fitting_type",
+   "fieldtype": "Select",
+   "label": "Fitting type",
+   "options": "N/A\nw/o canopy, hook system, w/EUR plug\nw/plastic canopy, hook system\nw/metal canopy, hook system\nw/metal canopy, mounting bar\nothers"
+  },
+  {
+   "fieldname": "packing_method",
+   "fieldtype": "Select",
+   "label": "Packing method",
+   "options": "RY BLACK BOX\ncolor box\nmail box\nMONO packing\nshiny white box\nshiny white box w/color label\nnormal white box\nnormal white box w/color label\nnormal brown box\nnormal brown box w/color label\npolybag\npolybag w/header\nshrinkage pack\nshrinkage pack w/color label\nOPP\nOPP w/color label\nblister card\nPET box\nothers"
+  },
+  {
+   "fieldname": "lenght_inner_box_cm",
+   "fieldtype": "Float",
+   "label": "Length (Inner box, cm)"
+  },
+  {
+   "fieldname": "width_inner_box_cm",
+   "fieldtype": "Float",
+   "label": "Width (Inner box, cm)"
+  },
+  {
+   "fieldname": "height_inner_box_cm",
+   "fieldtype": "Float",
+   "label": "Height (Inner box, cm)"
+  },
+  {
+   "fieldname": "column_break_dgek",
+   "fieldtype": "Column Break",
+   "label": "Middle box information"
+  },
+  {
+   "fieldname": "column_break_tsal",
+   "fieldtype": "Column Break",
+   "label": "Outer carton information"
+  },
+  {
+   "fieldname": "lenght_middle_box_cm",
+   "fieldtype": "Float",
+   "label": "Length (Middle box, cm) "
+  },
+  {
+   "fieldname": "width_middle_box_cm",
+   "fieldtype": "Float",
+   "label": "Width (Middle box, cm) "
+  },
+  {
+   "fieldname": "height_middle_box_cm",
+   "fieldtype": "Float",
+   "label": "Height (Middle box, cm)"
+  },
+  {
+   "default": "0",
+   "description": "L x W x H / 1000000",
+   "fieldname": "volumn_inner_box_m3",
+   "fieldtype": "Float",
+   "label": "Volume (Inner box, m\u00b3) ",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "L x W x H / 1000000",
+   "fieldname": "volumn_middle_box_m3",
+   "fieldtype": "Float",
+   "label": "Volume (Middle box, m\u00b3) ",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inner_box_information_column",
+   "fieldtype": "Column Break",
+   "label": "Inner box information"
+  },
+  {
+   "fieldname": "lenght_outer_box_cm",
+   "fieldtype": "Float",
+   "label": "Length (Outer box, cm) "
+  },
+  {
+   "fieldname": "width_outer_box_cm",
+   "fieldtype": "Float",
+   "label": "Width (Outer box, cm) "
+  },
+  {
+   "fieldname": "height_outer_box_cm",
+   "fieldtype": "Float",
+   "label": "Height (Outer box, cm) "
+  },
+  {
+   "default": "0",
+   "description": "L x W x H / 1000000",
+   "fieldname": "volumn_outer_box_m3",
+   "fieldtype": "Float",
+   "label": "Volume (Outer box, m\u00b3) ",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_gqwl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "attachments_tab",
+   "fieldtype": "Tab Break",
+   "label": "Attachments"
+  },
+  {
+   "depends_on": "eval:doc.hide !== 1",
+   "fieldname": "price_usd",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Price"
+  },
+  {
+   "fieldname": "product_image",
+   "fieldtype": "Attach Image",
+   "label": "Product image"
+  },
+  {
+   "fieldname": "files",
+   "fieldtype": "Table",
+   "label": "Files",
+   "options": "Product Attachment Item"
+  },
+  {
+   "fieldname": "pcsctn",
+   "fieldtype": "Int",
+   "label": "Pcs/ctn"
+  },
+  {
+   "default": "0",
+   "fieldname": "qty20",
+   "fieldtype": "Int",
+   "label": "Qty/20'",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_jmun",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "product_type",
+   "fieldtype": "Select",
+   "label": "Product Type",
+   "options": "Bulb\nFloor / table / wall lamp\nHanging lamp\nShade\nOthers",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_bogj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "led",
+   "fieldtype": "Check",
+   "label": "LED"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Floor lamp\nFloorbase\nTable lamp\nLampbase\nWall lamp\nWallbase\nHanging lamp\nPlafond\nSpot light\nWindow pendant\nClip lamp\nShade w/clip\nShade w/rack\nElectrical fitting\nLight-chain w/plug\nLight-chain use battery\nComponent\nSpare part\nBulb",
+   "reqd": 1,
+   "sort_options": 1
+  },
+  {
+   "fieldname": "shade_material_and_color",
+   "fieldtype": "Data",
+   "label": "Shade material and color"
+  },
+  {
+   "fieldname": "section_break_iwhh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_axuq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.hide !== 1",
+   "description": "Currency from supplier\n",
+   "fetch_from": "supplier.currency",
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Currency"
+  },
+  {
+   "fieldname": "product_image_view",
+   "fieldtype": "Image",
+   "label": "Product Image View",
+   "options": "product_image"
+  },
+  {
+   "fieldname": "column_break_jqse",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide",
+   "fieldtype": "Check",
+   "label": "Hide",
+   "print_hide": 1,
+   "report_hide": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "image_field": "product_image",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-28 04:28:20.201928",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Article Master",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "product_number, description",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "product_number",
+ "track_changes": 1,
+ "track_seen": 1
+}

@@ -67,7 +67,6 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "PO Number",
-   "reqd": 1,
    "unique": 1
   },
   {
@@ -112,6 +111,8 @@
   {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Customer",
    "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
    "options": "Partner"
@@ -319,6 +320,7 @@
    "default": "0",
    "fieldname": "total_confirmed_amount",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Total Ordered Amount",
    "read_only": 1
   },
@@ -386,7 +388,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-20 08:06:47.399048",
+ "modified": "2026-03-31 19:14:56.004182",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Order",

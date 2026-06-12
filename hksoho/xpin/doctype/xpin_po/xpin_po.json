@@ -7,6 +7,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "viewer_tab",
+  "html_viewer",
   "details_tab",
   "section_break_k4ni",
   "po_number",
@@ -49,8 +51,7 @@
   "buyer_address",
   "delivery_address",
   "html_filename",
-  "viewer_tab",
-  "html_viewer",
+  "pdf_report",
   "items_tab",
   "items",
   "attached_docs"
@@ -267,9 +268,9 @@
    "label": "html_filename"
   },
   {
+   "depends_on": "eval:frappe.user.has_role(\"System Manager\") == 1",
    "fieldname": "items_tab",
    "fieldtype": "Tab Break",
-   "hidden": 1,
    "label": "More"
   },
   {
@@ -295,20 +296,25 @@
    "label": "Html Viewer"
   },
   {
+   "depends_on": "eval:frappe.user.has_role(\"System Manager\") == 1",
    "fieldname": "details_tab",
    "fieldtype": "Tab Break",
-   "hidden": 1,
    "label": "Details"
   },
   {
    "fieldname": "delivered",
    "fieldtype": "Date",
    "label": "Delivered"
+  },
+  {
+   "fieldname": "pdf_report",
+   "fieldtype": "Attach",
+   "label": "pdf_report"
   }
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-12-27 08:17:27.439540",
+ "modified": "2025-12-30 15:39:50.075323",
  "modified_by": "Administrator",
  "module": "xpin",
  "name": "xpin_po",
@@ -347,7 +353,7 @@
   }
  ],
  "row_format": "Dynamic",
- "sort_field": "modified",
+ "sort_field": "order_placed",
  "sort_order": "DESC",
  "states": []
 }

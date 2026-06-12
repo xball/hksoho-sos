@@ -42,3 +42,45 @@
       font-size: 10px;
   }
 }
+/* Article Master Image View - 讓縮圖完整顯示、不裁切、自動適應比例 */
+.image-view-item .image-field,
+.image-view-item .image-field img {
+    object-fit: contain !important;     /* 完整顯示圖片，不裁切邊緣 */
+    width: 100% !important;
+    height: auto !important;            /* 高度自動跟隨原始比例 */
+    max-height: 320px !important;       /* 限制最大高度，避免列表過長，可調 280~380px */
+    min-height: 180px;                  /* 最小高度，防止矮圖太小 */
+    background: #f8f9fa;                /* 淺背景，留白美觀 */
+    border-radius: 6px;
+    padding: 12px;                      /* 內距，讓圖有空間不貼邊 */
+    box-sizing: border-box;
+}
+
+/* 讓整個 image-view-body 高度自動，不固定死 */
+.image-view-item .image-view-body {
+    height: auto !important;
+    min-height: 220px;
+}
+
+/* 整個項目卡片調整（避免塌陷或過擠） */
+.image-view-item {
+    height: auto !important;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;         /* 可選：加邊框讓卡片更明顯 */
+    border-radius: 8px;
+    background: white;
+}
+
+/* hover 時輕微放大，提升互動感（可選） */
+.image-view-item:hover .image-field img {
+    transform: scale(1.04);
+    transition: transform 0.25s ease;
+}
+
+/* 手機版縮小高度 */
+@media (max-width: 768px) {
+    .image-view-item .image-field img {
+        max-height: 260px;
+    }
+}

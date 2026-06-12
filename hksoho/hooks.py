@@ -21,7 +21,7 @@ app_license = "mit"
 # 	}
 # ]
 # 確保 CSS 檔案被包含在應用程式的資源中
-app_include_css = ["/assets/hksoho/css/custom2.css?v=1.1"]  # 將 your_app_name 替換為您的應用程式名稱
+app_include_css = ["/assets/hksoho/css/custom2.css?v=1.5"]  # 將 your_app_name 替換為您的應用程式名稱
 #web_include_css = ["/assets/hksoho/css/custom.css"]
 scheduler_events = {
     "hourly": [

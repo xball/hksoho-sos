@@ -18,6 +18,7 @@
   "ends_on",
   "type",
   "send_reminder",
+  "summary",
   "section_break_deek",
   "po_items",
   "section_break_8",
@@ -118,27 +119,24 @@
   {
    "fieldname": "section_break_deek",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Summary"
   }
  ],
  "grid_page_length": 50,
+ "is_calendar_and_gantt": 1,
  "links": [],
- "modified": "2025-12-03 07:11:06.973616",
+ "modified": "2026-01-26 03:10:56.729297",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Inspection Event",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "email": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Desk User",
-   "share": 1,
-   "write": 1
-  },
   {
    "create": 1,
    "delete": 1,
@@ -153,13 +151,28 @@
    "write": 1
   },
   {
+   "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
-   "share": 1
+   "role": "Co-operator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "write": 1
   }
  ],
  "read_only": 1,

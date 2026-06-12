@@ -3,7 +3,7 @@ from frappe import _
 from frappe.model.document import Document
 import json
 
-from frappe.utils import format_date, format_time
+from frappe.utils import cint, format_date, format_time
 from icalendar import Calendar, Event
 from datetime import datetime
 import io
@@ -251,7 +251,7 @@ def update_qc_accepted_qty(purchase_order, line_number, aql_qty):
             "parent": purchase_order,
             "line": line_number
         })
-        po_item.qc_accepted_qty = (po_item.qc_accepted_qty or 0) + aql_qty
+        po_item.qc_accepted_qty = cint(po_item.qc_accepted_qty) + cint(aql_qty)
         po_item.save(ignore_permissions=True)
         frappe.db.commit()
         return {"success": True, "qc_accepted_qty": po_item.qc_accepted_qty}
