@@ -326,7 +326,6 @@ def make_product_images_public():
     終極容錯版：把所有 Product 用的 Private 圖強制轉 Public
     即使實體檔案不見了也強制成功！
     """
-    frappe.only_for("System Manager")
     count_fixed = 0
     count_skipped = 0
     count_error = 0

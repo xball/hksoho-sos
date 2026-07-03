@@ -302,9 +302,13 @@ class PurchaseOrder(Document):
     
     
     def after_save(self):
-        """Log after_save for debugging; avoid explicit commits inside hooks."""
+        """
+        測試 after_save 事件是否被觸發。
+        """
         logger = frappe.logger(LOGGER_NAME)
         try:
+            frappe.msgprint(f"After_save triggered for PO: {self.name}")
+            frappe.db.commit()
             write_debug_log(f"after_save triggered for PO: {self.name}")
             logger.info(f"after_save triggered for Purchase Order: {self.name}")
         except Exception as e:

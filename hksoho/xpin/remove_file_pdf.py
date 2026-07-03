@@ -20,8 +20,8 @@ skipped_no_duplicate = 0
 # Step 1: 找出所有指向 xpin/pdf 子資料夾的 File 記錄
 file_list = frappe.db.get_list(
     "File",
-    filters={"file_url": ["like", f"{subfolder_path}%.pdf"]},
-    fields=["name", "file_url", "creation", "attached_to_name", "attached_to_doctype"],
+    filters={"file_url": ["like", f"{subfolder_path}%"], "file_url": ["like", "%.pdf"]},
+    fields=["name", "file_url", "creation", "attached_to_name", "attached_to_doctype"]
 )
 
 # Step 2: 用 file_url 分組
