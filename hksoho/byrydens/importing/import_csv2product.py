@@ -493,3 +493,81 @@ def execute():
             logger.info(f"匯入完成，檔案移至: {dest}")
 
         logger.info("=== 匯入結束 ===")
+
+
+# ============================ 手動驗證 Product 與 CSV 差異 ============================
+def verify_product_csv_vs_db():
+    """
+    僅供手動檢查：比對 CSV 與資料庫的 article_number 差異
+    """
+    logger.info("=== 開始手動驗證 Product 與 CSV article_number 差異 ===")
+
+    file_path = os.path.join(PROCEED_DIR, PRODUCT_FILE)
+    if not os.path.isfile(file_path):
+        logger.error(f"驗證失敗：找不到檔案 {file_path}")
+        frappe.msgprint("找不到 xpin_products.txt 檔案！", alert=True)
+        return
+
+    csv_articles = set()
+    try:
+        with open(file_path, 'r', encoding='cp1252', errors='ignore') as f:
+            reader = csv.DictReader(f, delimiter='\t')
+            for row in reader:
+                artno = (row.get("ARTNO", "") or "").strip()
+                if artno:
+                    csv_articles.add(artno)
+    except Exception as e:
+        logger.error(f"讀取 CSV 失敗: {e}")
+        frappe.msgprint(f"讀取 CSV 時發生錯誤: {e}", alert=True)
+        return
+
+    # 取得資料庫所有 article_number
+    db_articles = set()
+    try:
+        db_products = frappe.get_all(
+            PRODUCT_DOCTYPE,
+            fields=["article_number"],
+            filters={"article_number": ["!=", ""]}
+        )
+        for p in db_products:
+            if p.article_number:
+                db_articles.add(str(p.article_number).strip())
+    except Exception as e:
+        logger.error(f"查詢資料庫失敗: {e}")
+        frappe.msgprint(f"查詢資料庫失敗: {e}", alert=True)
+        return
+
+    # 計算差異
+    only_in_csv = sorted(csv_articles - db_articles)
+    only_in_db = sorted(db_articles - csv_articles)
+
+    total_csv = len(csv_articles)
+    total_db = len(db_articles)
+
+    result_msg = f"""
+    <b>驗證完成！</b><br>
+    CSV 檔案總筆數：{total_csv} 筆<br>
+    資料庫 Product 總筆數：{total_db} 筆<br><br>
+    """
+
+    if only_in_csv:
+        result_msg += f"<b style='color:red'>CSV 有，但資料庫沒有的（建議新增）：</b> {len(only_in_csv)} 筆<br>"
+        result_msg += "<br>".join([f"• {art}" for art in only_in_csv[:100]])
+        if len(only_in_csv) > 100:
+            result_msg += f"<br>... 還有 {len(only_in_csv)-100} 筆"
+        result_msg += "<br><br>"
+
+    if only_in_db:
+        result_msg += f"<b style='color:orange'>資料庫有，但 CSV 沒有的（可能已停售）：</b> {len(only_in_db)} 筆<br>"
+        result_msg += "<br>".join([f"• {art}" for art in only_in_db[:100]])
+        if len(only_in_db) > 100:
+            result_msg += f"<br>... 還有 {len(only_in_db)-100} 筆"
+        result_msg += "<br><br>"
+
+    if not only_in_csv and not only_in_db:
+        result_msg += "<b style='color:green'>✅ CSV 與資料庫的 article_number 完全一致！</b>"
+
+    logger.info(result_msg.replace("<br>", " | ").replace("<b>", "").replace("</b>", ""))
+    
+    # 在前端顯示結果
+    frappe.msgprint(result_msg, title="Product CSV 與資料庫比對結果", indicator="blue" if not only_in_csv and not only_in_db else "orange")

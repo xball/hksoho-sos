@@ -1,0 +1,38 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [],
+ "creation": "2026-06-18 16:53:06.156708",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Company Logo header",
+ "letterhead": null,
+ "modified": "2026-06-18 16:53:15.730044",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Supplier Products",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Product",
+ "report_name": "Supplier Products",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Purchase Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Co-operator"
+  },
+  {
+   "role": "Supplier Only"
+  }
+ ],
+ "timeout": 0
+}

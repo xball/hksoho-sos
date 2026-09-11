@@ -4,7 +4,7 @@ app_publisher = "HKSoHo"
 app_description = "ERP app by HKSoHo"
 app_email = "paul@hksoho.net"
 app_license = "mit"
-
+default_app = "desk"
 # Apps
 # ------------------
 

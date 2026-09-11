@@ -1,0 +1,65 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"1Rt8PYqefo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Reports</span>\",\"col\":12}},{\"id\":\"js4VxzUL-c\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Undelivered Items\",\"col\":3}},{\"id\":\"m37VGsf31q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Shipment On Water Report\",\"col\":3}},{\"id\":\"mYFVnZTE8u\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Orders Due To Pay\",\"col\":3}}]",
+ "creation": "2025-09-21 11:57:27.033250",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "crm",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Reports",
+ "links": [],
+ "modified": "2026-06-18 13:46:56.355643",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Reports",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Purchase Manager"
+  },
+  {
+   "role": "Co-operator"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 5.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Orders Due To Pay",
+   "link_to": "Orders Due to Pay",
+   "report_ref_doctype": "Purchase Order",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Shipment On Water Report",
+   "link_to": "Shipment On Water Report",
+   "report_ref_doctype": "Transport Order",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "Report Builder",
+   "label": "Undelivered Items",
+   "link_to": "Undelivered Items",
+   "report_ref_doctype": "Purchase Order",
+   "stats_filter": "[]",
+   "type": "Report"
+  }
+ ],
+ "title": "Reports"
+}

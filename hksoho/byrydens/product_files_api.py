@@ -193,7 +193,7 @@ def get_purchase_order_items_for_product(article_number):
 
 
 @frappe.whitelist()
-def get_xpin_po_items_for_product(article_number):
+def get_xpin_po_items_for_product_old(article_number):
     """
     取得 xpin_po_items（舊系統匯入）
     """
@@ -227,3 +227,218 @@ def get_xpin_po_items_for_product(article_number):
     """, {"article_number": article_number}, as_dict=True)
 
     return items
+
+
+@frappe.whitelist()
+def get_xpin_po_items_for_product_old2(article_number):
+    """
+    取得 xpin_po_items，並依 User Permission 過濾 Supplier
+    """
+    if not article_number:
+        return []
+
+    user = frappe.session.user
+
+    # 取得該使用者的 Partner User Permission
+    permissions = frappe.get_all("User Permission",
+        filters={"user": user, "allow": "Partner"},
+        fields=["for_value"])
+    
+    allowed_suppliers = [p.for_value for p in permissions]
+
+    supplier_condition = ""
+    if allowed_suppliers:
+        supplier_list = ','.join([frappe.db.escape(s) for s in allowed_suppliers])
+        supplier_condition = f"AND po.supplier IN ({supplier_list})"
+
+    items = frappe.db.sql(f"""
+        SELECT 
+            poi.name,
+            poi.po_number,
+            poi.line,
+            poi.article_name,
+            poi.requested_ship_week,
+            poi.requested_qty,
+            poi.confirmed_ship_week,
+            poi.confirmed_qty,
+            poi.booked_qty,
+            poi.delivery_qty,
+            poi.unit_price,
+            poi.amount,
+            po.supplier,
+            po.buyer,
+            po.order_placed,
+            po.finish_date,
+            po.po_status,
+            po.qc_status
+        FROM `tabxpin_po_items` poi
+        LEFT JOIN `tabxpin_po` po ON poi.po_number = po.po_number
+        WHERE poi.art_nr = %(article_number)s
+          {supplier_condition}
+        ORDER BY poi.po_number DESC, poi.line ASC
+    """, {"article_number": article_number}, as_dict=True)
+
+    return items
+
+
+@frappe.whitelist()
+def get_xpin_po_items_for_product(article_number):
+    if not article_number:
+        return []
+
+    user = frappe.session.user
+
+    # 取得 User Permission (For Value = Partner ID)
+    permissions = frappe.get_all("User Permission",
+        filters={"user": user, "allow": "Partner"},
+        fields=["for_value"])
+    
+    partner_ids = [p.for_value for p in permissions]
+    
+    frappe.log(f"DEBUG User: {user}")
+    frappe.log(f"DEBUG Partner IDs: {partner_ids}")
+
+    # 從 Partner Doctype 取出真正的 Partner Name
+    if partner_ids:
+        partner_names = frappe.db.get_all("Partner",
+            filters={"name": ["in", partner_ids]},
+            fields=["partner_name"])
+        allowed_supplier_names = [p.partner_name.strip() for p in partner_names if p.partner_name]
+    else:
+        allowed_supplier_names = []
+    
+    frappe.log(f"DEBUG Allowed Partner Names: {allowed_supplier_names}")
+
+    supplier_condition = ""
+    if allowed_supplier_names:
+        conditions = [f"po.supplier = {frappe.db.escape(name)}" for name in allowed_supplier_names]
+        supplier_condition = "AND (" + " OR ".join(conditions) + ")"
+
+    items = frappe.db.sql(f"""
+        SELECT 
+            poi.name,
+            poi.po_number,
+            poi.line,
+            poi.article_name,
+            po.supplier,
+            po.buyer,
+            po.order_placed,
+            po.finish_date,
+            po.po_status,
+            po.qc_status
+        FROM `tabxpin_po_items` poi
+        LEFT JOIN `tabxpin_po` po ON poi.po_number = po.po_number
+        WHERE poi.art_nr = %(article_number)s
+          {supplier_condition}
+        ORDER BY poi.po_number DESC, poi.line ASC
+    """, {"article_number": article_number}, as_dict=True)
+
+    frappe.log(f"DEBUG Found {len(items)} records")
+    return items
+
+
+@frappe.whitelist()
+def get_supplier_allowed_articles():
+    """回傳該供應商可看到的 Article Number"""
+    user = frappe.session.user
+    
+    permissions = frappe.get_all("User Permission",
+        filters={"user": user, "allow": "Partner"},
+        fields=["for_value"])
+    
+    if not permissions:
+        return []
+    
+    allowed_suppliers = [p.for_value for p in permissions]
+    
+    articles = frappe.db.sql("""
+        SELECT DISTINCT poi.article_number
+        FROM `tabPurchase Order Item` poi
+        JOIN `tabPurchase Order` po ON poi.parent = po.name
+        WHERE po.supplier IN %(suppliers)s
+        ORDER BY poi.article_number
+    """, {"suppliers": allowed_suppliers}, as_list=True)
+    
+    return [a[0] for a in articles if a[0]]
+
+
+
+@frappe.whitelist()
+def get_supplier_product_query(doctype, txt, searchfield, start, page_len, filters):
+    """Supplier Only Role 的 Server Side 過濾"""
+    user = frappe.session.user
+    
+    # 取得 User Permission 中的 Partner
+    perm = frappe.get_all("User Permission",
+        filters={"user": user, "allow": "Partner"},
+        fields=["for_value"])
+    
+    if not perm:
+        return [[" "]]  # 故意返回空結果
+    
+    allowed_suppliers = [p.for_value for p in perm]
+    
+    supplier_list = ','.join([frappe.db.escape(s) for s in allowed_suppliers])
+    
+    return frappe.db.sql(f"""
+        SELECT p.name, p.article_name, p.category
+        FROM `tabProduct` p
+        WHERE p.article_number IN (
+            SELECT DISTINCT poi.article_number
+            FROM `tabPurchase Order Item` poi
+            JOIN `tabPurchase Order` po ON poi.parent = po.name
+            WHERE po.supplier IN ({supplier_list})
+        )
+        ORDER BY p.article_number
+        LIMIT {start}, {page_len}
+    """, as_list=True)
+@frappe.whitelist()
+def check_product_supplier_permission(article_number):
+    """檢查是否有權限查看此 Product"""
+    try:
+        user = frappe.session.user
+        print(f"DEBUG check_permission - User: {user}, Article: {article_number}")
+
+        if not article_number:
+            return True
+
+        # 取得 User Permission
+        permissions = frappe.get_all("User Permission",
+            filters={"user": user, "allow": "Partner"},
+            fields=["for_value"])
+        
+        allowed_suppliers = [p.for_value for p in permissions]
+        print(f"DEBUG Allowed Suppliers: {allowed_suppliers}")
+
+        # 沒有 User Permission → 無限制
+        if not allowed_suppliers:
+            print("DEBUG: No User Permission → Allow All")
+            return True
+
+        # 條件1: Product.supplier 欄位匹配
+        product_supplier = frappe.db.get_value("Product", article_number, "supplier")
+        print(f"DEBUG Product Supplier: {product_supplier}")
+
+        if product_supplier and product_supplier in allowed_suppliers:
+            print("DEBUG: Allowed by Product.supplier")
+            return True
+
+        # 條件2: 出現在 PO 中
+        po_list = frappe.db.get_all("Purchase Order", 
+            filters={"supplier": ["in", allowed_suppliers]}, 
+            pluck="name")
+        
+        if po_list:
+            exists = frappe.db.exists("Purchase Order Item", {
+                "article_number": article_number,
+                "parent": ["in", po_list]
+            })
+            print(f"DEBUG Exists in PO: {exists}")
+            return bool(exists)
+        else:
+            print("DEBUG: No PO for this supplier → Deny")
+            return False
+
+    except Exception as e:
+        print(f"ERROR in check_product_supplier_permission: {str(e)}")
+        return False   # 發生錯誤時預設拒絕

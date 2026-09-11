@@ -401,7 +401,7 @@
  "image_field": "primary_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-02 04:40:41.843608",
+ "modified": "2026-06-20 03:25:44.073640",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product",
@@ -436,15 +436,6 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "UAT_Viewer",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
    "role": "Co-operator",
    "share": 1,
    "write": 1
@@ -455,7 +446,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "Supplier Only",
    "share": 1
   }
  ],

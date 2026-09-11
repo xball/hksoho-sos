@@ -92,7 +92,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-04-18 15:43:55.812057",
+ "modified": "2026-06-18 13:49:56.533751",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Products",
@@ -108,9 +108,6 @@
   },
   {
    "role": "Partner Viewer"
-  },
-  {
-   "role": "UAT_Viewer"
   },
   {
    "role": "Co-operator"

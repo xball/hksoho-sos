@@ -257,7 +257,8 @@
    "fieldname": "packing_method",
    "fieldtype": "Select",
    "label": "Packing method",
-   "options": "RY BLACK BOX\ncolor box\nmail box\nMONO packing\nshiny white box\nshiny white box w/color label\nnormal white box\nnormal white box w/color label\nnormal brown box\nnormal brown box w/color label\npolybag\npolybag w/header\nshrinkage pack\nshrinkage pack w/color label\nOPP\nOPP w/color label\nblister card\nPET box\nothers"
+   "options": "RY BLACK BOX\ncolor box\nmail box\nMONO packing\nshiny white box\nshiny white box w/color label\nnormal white box\nnormal white box w/color label\nnormal brown box\nnormal brown box w/color label\npolybag\npolybag w/header\nshrinkage pack\nshrinkage pack w/color label\nOPP\nOPP w/color label\nblister card\nPET box\nothers\nLight Box\nStandard Box\nGrand Box",
+   "sort_options": 1
   },
   {
    "fieldname": "lenght_inner_box_cm",
@@ -465,7 +466,7 @@
  "image_field": "product_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-28 04:28:20.201928",
+ "modified": "2026-06-25 03:02:50.595480",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Article Master",

@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Purchase Orders",
  "links": [],
- "modified": "2026-04-18 15:43:55.863305",
+ "modified": "2026-06-18 13:49:15.093312",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Purchase Orders",
@@ -24,13 +24,13 @@
  "quick_lists": [],
  "roles": [
   {
-   "role": "UAT_Viewer"
-  },
-  {
    "role": "Purchase Manager"
   },
   {
    "role": "Co-operator"
+  },
+  {
+   "role": "System Manager"
   }
  ],
  "sequence_id": 3.0,

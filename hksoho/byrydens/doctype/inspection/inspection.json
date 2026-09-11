@@ -239,7 +239,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-11 15:25:59.080428",
+ "modified": "2026-06-18 15:06:13.064582",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Inspection",
@@ -276,6 +276,15 @@
    "role": "Co-operator",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Supplier Only",
+   "share": 1
   }
  ],
  "row_format": "Dynamic",

@@ -1,0 +1,63 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"cdEGW_WAo1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Utilities</span>\",\"col\":12}},{\"id\":\"gfx3ybi-u7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Note\",\"col\":3}},{\"id\":\"5GlJgi47PA\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Todo\",\"col\":3}},{\"id\":\"mMlEw4DH2U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Drive\",\"col\":3}}]",
+ "creation": "2026-04-18 15:50:55.692280",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "getting-started",
+ "idx": 0,
+ "indicator_color": "grey",
+ "is_hidden": 0,
+ "label": "Utilities",
+ "links": [],
+ "modified": "2026-06-18 13:47:18.698118",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Utilities",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Co-operator"
+  },
+  {
+   "role": "Purchase Manager"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 23.0,
+ "shortcuts": [
+  {
+   "color": "Pink",
+   "doc_view": "List",
+   "label": "Todo",
+   "link_to": "ToDo",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Drive",
+   "type": "URL",
+   "url": "/drive"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Note",
+   "link_to": "Note",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Utilities"
+}

@@ -14,6 +14,7 @@
   "po_number",
   "buyer",
   "supplier",
+  "supplier_link",
   "dc",
   "origin_country",
   "origin_port",
@@ -310,11 +311,18 @@
    "fieldname": "pdf_report",
    "fieldtype": "Attach",
    "label": "pdf_report"
+  },
+  {
+   "fieldname": "supplier_link",
+   "fieldtype": "Link",
+   "label": "Supplier_link",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
+   "options": "Partner"
   }
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-12-30 15:39:50.075323",
+ "modified": "2026-06-19 13:58:12.829830",
  "modified_by": "Administrator",
  "module": "xpin",
  "name": "xpin_po",
@@ -349,6 +357,15 @@
    "read": 1,
    "report": 1,
    "role": "Purchase Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Supplier Only",
    "share": 1
   }
  ],
