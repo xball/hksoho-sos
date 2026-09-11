@@ -76,6 +76,7 @@ flowchart LR
 | `hksoho/byrydens/doctype/` | Operational DocTypes |
 | `hksoho/byrydens/importing/` | Hourly CSV/TXT importers |
 | `hksoho/byrydens/*_api.py` | Whitelisted desk/web APIs |
+| `hksoho/byrydens/customer_quotation_pdf.py` | Quo-Report PDF download override (append print attachments) |
 | `hksoho/byrydens/report/` | Script/query reports |
 | `hksoho/byrydens/workspace/` | Desk workspaces |
 | `hksoho/byrydens/web_form/` | Web forms |
@@ -144,8 +145,9 @@ flowchart TD
 | Product Attachment | Doc | Multi-file attachment set |
 | Product Attachment Item | Child | Files in a set |
 | Product Attachment Link | Child | Link set ↔ products |
-| Article Master | Doc | Lighting / article technical specs |
-| Customer Quotation | Doc | Customer-facing cost / price worksheet |
+| Article Master | Doc | Lighting / article technical specs; Attachments tab includes `product_image` and `files` (`Product Attachment Item`) |
+| Customer Quotation | Doc | Customer-facing cost / price worksheet; links Article Master via `articale_master`; **Print Attachments** tab (`print_files`) |
+| Customer Quotation File | Child | Selectable print rows: `print`, `description`, `attach_file`, `file_type` |
 | Internal Evaluation | Doc | Internal cost build-up |
 | Partner | Doc | Supplier / Buyer / Customer / Agent / Transporter |
 | Payment Term | Doc | Payment terms |
@@ -244,6 +246,16 @@ From `hksoho/hooks.py`:
 - `app_include_css`: `/assets/hksoho/css/custom2.css`
 - Jinja global: `get_image_datauri` → `hksoho.byrydens.utils.get_image_datauri`
 
+### Override whitelisted methods
+
+| Original | Replacement |
+|----------|-------------|
+| `frappe.utils.print_format.download_pdf` | `hksoho.byrydens.customer_quotation_pdf.download_pdf` |
+
+When `doctype == Customer Quotation` and `format == Quo-Report`, the override merges selected `print_files` (Print checked) after the Quo-Report PDF: PDF pages via pypdf; images via PIL → single-page PDF. Other doctypes/formats call through unchanged.
+
+**Print format note:** `Quo-Report` is a **Print Designer** format stored in the site DB (not exported as app fixtures). HTML print preview is unchanged; attachment append applies to PDF download only.
+
 ### Patches / fixtures
 
 - `hksoho/patches.txt` — no active pre/post model sync patches at scan time
@@ -274,6 +286,16 @@ From `hksoho/hooks.py`:
 - `get_po_items_for_product`, `get_purchase_order_items_for_product`
 - `get_xpin_po_items_for_product` (+ older variants)
 - `get_supplier_allowed_articles`, `get_supplier_product_query`, `check_product_supplier_permission`
+
+### Customer Quotation — print attachments
+
+| Callable | Role |
+|----------|------|
+| `byrydens.doctype.customer_quotation.customer_quotation.get_article_master_files` | Returns Article Master `product_image` + `files` rows for the CQ fetch button |
+| `byrydens.customer_quotation_pdf.download_pdf` | Whitelist override; appends selected CQ files to Quo-Report PDF |
+| Desk button | **Fetch Files from Article Master** on Customer Quotation form |
+
+Flow: link `articale_master` → fetch/select files on **Print Attachments** → Print → Quo-Report → PDF.
 
 ### Utils — `byrydens/utils.py`
 
@@ -413,10 +435,11 @@ Unconfirmed → Empty TO Head → Confirmed → Shipped → ETA Passed → Arriv
 
 | Field | Value |
 |-------|--------|
-| Spec version | 1.1 |
+| Spec version | 1.2 |
 | Source of truth | Code under `apps/hksoho` + live site DocTypes/Workflows |
 | Last full scan | 2026-09-08 |
 | Docs aligned to audit | 2026-09-11 |
+| Quo-Report print attachments | 2026-09-11 |
 | Maintainer | HKSoHo (`paul@hksoho.net`) |
 
 When DocTypes, hooks, or integrations change, update this SPEC and the README feature tables in the same change set.

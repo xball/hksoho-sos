@@ -73,8 +73,9 @@ Declared in `hksoho/modules.txt`.
 
 - **Product** catalog with dimensions, packaging, tariff codes, supplier, and primary image
 - **Product Attachment** — multi-file attachments linkable to multiple products
-- **Article Master** — detailed lighting specifications (lampholder, bulb, cable, shade, certifications)
+- **Article Master** — detailed lighting specifications (lampholder, bulb, cable, shade, certifications); files live in child table `files` (`Product Attachment Item`)
 - **Customer Quotation** and **Internal Evaluation** — cost build-up worksheets (freight, customs, royalty, selling price)
+- **Quo-Report print attachments** — on Customer Quotation, **Print Attachments** tab (`print_files` / `Customer Quotation File`) lets users fetch Article Master files (PDF/image), tick **Print**, then append those pages after the **Quo-Report** PDF (Print Designer format)
 - Sync product images, CBM, weight, and HS code from Product to PO lines
 - Hourly product CSV import from FTP (uses `partner_import_*` site_config keys — naming is historical)
 - Supplier-scoped product visibility APIs (`get_supplier_allowed_articles`, etc.)
@@ -176,6 +177,8 @@ Whitelisted server methods used by web forms and desk UI:
 | `inspection_api.py` | `get_suppliers`, `get_po_items`, `get_po_items_qcstatus`, `add_po_items_to_inspection_event`, `send_inspection_invitation`, `update_qc_accepted_qty` |
 | `transport_order_api.py` | `get_po_items`, `update_to_line_invoice`, `update_vessel_dates`, maintenance helpers `fix_po_item_order_status_*` (treat as destructive; prefer dry-run) |
 | `product_files_api.py` | `get_product_attachments`, `link_attachments_to_products`, `get_po_items_for_product`, `get_xpin_po_items_for_product`, supplier visibility helpers |
+| `customer_quotation.py` | `get_article_master_files` — load Article Master `files` + `product_image` into CQ Print Attachments |
+| `customer_quotation_pdf.py` | Overrides `frappe.utils.print_format.download_pdf` — appends selected CQ print files after **Quo-Report** |
 | `utils.py` | `load_product_images_to_po_items`, `make_product_images_public`, `get_due_po_details`, `get_image_datauri` (Jinja) |
 | `import_csv2po.py` | `reload_single_po_from_txt` |
 | `xpin/import_xpin_po.py` | `import_xpin_po_from_xlsx` |

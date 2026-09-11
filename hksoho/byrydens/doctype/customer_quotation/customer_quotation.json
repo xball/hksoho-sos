@@ -46,7 +46,9 @@
   "offer_price_usd",
   "offer_price_sek",
   "section_break_mvrc",
-  "remark"
+  "remark",
+  "print_attachments_tab",
+  "print_files"
  ],
  "fields": [
   {
@@ -277,6 +279,18 @@
    "fieldname": "remark",
    "fieldtype": "Small Text",
    "label": "Remark"
+  },
+  {
+   "fieldname": "print_attachments_tab",
+   "fieldtype": "Tab Break",
+   "label": "Print Attachments"
+  },
+  {
+   "description": "Select Article Master files (PDF or image) to append after Quo-Report PDF",
+   "fieldname": "print_files",
+   "fieldtype": "Table",
+   "label": "Print Files",
+   "options": "Customer Quotation File"
   },
   {
    "fieldname": "column_break_fsih",
