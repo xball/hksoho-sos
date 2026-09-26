@@ -17,7 +17,7 @@ HKSoHo is a tailor-made Frappe app that replaces / complements legacy XPIN sourc
 1. Ingest and manage **Purchase Orders** and line quantities
 2. Plan and record **quality inspections**
 3. Book **transport / shipment** (vessels, containers, ETAs)
-4. Maintain **product / article / partner** master data
+4. Maintain **product / article / partner** master data and **Product Sheet** information records
 5. Preserve **legacy XPIN** history for lookup and migration
 6. Sync selected data back to **Pyramid ERP** and send **M365** email
 
@@ -77,6 +77,7 @@ flowchart LR
 | `hksoho/byrydens/importing/` | Hourly CSV/TXT importers |
 | `hksoho/byrydens/*_api.py` | Whitelisted desk/web APIs |
 | `hksoho/byrydens/customer_quotation_pdf.py` | Quo-Report PDF download override (append print attachments) |
+| `hksoho/byrydens/assignment.py` | Auto-share on ToDo assign (Product Sheet → Read+Write) |
 | `hksoho/byrydens/report/` | Script/query reports |
 | `hksoho/byrydens/workspace/` | Desk workspaces |
 | `hksoho/byrydens/web_form/` | Web forms |
@@ -115,7 +116,8 @@ flowchart TD
 2. **PO lifecycle** — import or create PO → workflow transitions → line qty progression (PO is **not** submittable)
 3. **Inspection** — Inspection Event schedules lines → Inspection records results → accepted qty written back to PO lines
 4. **Transport** — pick Ready-to-Ship / Partial Shipout PO lines onto Transport Order → vessel ETD/ETA → shipment reports
-5. **Legacy** — XPIN DocTypes remain queryable for product PO history
+5. **Product Sheet** — create/update information sheet → Assign To for verify → auto Share Read+Write → print **Product Information Sheet** PDF
+6. **Legacy** — XPIN DocTypes remain queryable for product PO history
 
 ---
 
@@ -146,6 +148,8 @@ flowchart TD
 | Product Attachment Item | Child | Files in a set |
 | Product Attachment Link | Child | Link set ↔ products |
 | Article Master | Doc | Lighting / article technical specs; Attachments tab includes `product_image` and `files` (`Product Attachment Item`) |
+| Product Sheet | Doc | Supplier product information sheet; autoname = `rydens_model_no`; sections: general, LED, RoHS (Link → Article Master), comments child, packing, labels (attach/preview), photos, support files |
+| Product Sheet Comment | Child | Comment rows on Product Sheet |
 | Customer Quotation | Doc | Customer-facing cost / price worksheet; links Article Master via `articale_master`; **Print Attachments** tab (`print_files`) |
 | Customer Quotation File | Child | Selectable print rows: `print`, `description`, `attach_file`, `file_type` |
 | Internal Evaluation | Doc | Internal cost build-up |
@@ -200,7 +204,7 @@ flowchart TD
 | Workspace | Notable shortcuts |
 |-----------|-------------------|
 | Partners | Partner, Role / Permission Manager |
-| Products | Product, Article Master, Product Attachment, Customer Quotation, Internal Evaluation |
+| Products | Product, Article Master, Product Attachment, Product Sheet, Customer Quotation, Internal Evaluation |
 | Purchase Orders | PO list, Inspection list/event/calendar, Item inspection wizard, Undelivered Items |
 | Transports | Transport Order, Vessels, Vessels Time Table |
 | Reports | Orders Due To Pay, Shipment On Water, Undelivered Items |
@@ -240,6 +244,9 @@ From `hksoho/hooks.py`:
 | DocType | Event | Handler |
 |---------|-------|---------|
 | Purchase Order | `after_save` | `hksoho.byrydens.doctype.purchase_order.purchase_order.after_save` |
+| ToDo | `after_insert` | `hksoho.byrydens.assignment.share_on_todo_assign` |
+
+**Assign → Share (Product Sheet):** when a ToDo is created with `reference_type = Product Sheet`, the assignee is automatically DocShared with **read=1, write=1** (`notify=0` so assignment notification is not duplicated). Controlled by `SHARE_ON_ASSIGN_DOCTYPES` in `assignment.py`. Frappe core still shares Read-only only when the user has no permission; this hook always ensures Read+Write for Product Sheet.
 
 ### Assets / Jinja
 
@@ -256,10 +263,17 @@ When `doctype == Customer Quotation` and `format == Quo-Report`, the override me
 
 **Print format note:** `Quo-Report` is a **Print Designer** format stored in the site DB (not exported as app fixtures). HTML print preview is unchanged; attachment append applies to PDF download only.
 
+### Print formats (Product Sheet)
+
+| Format | Path | Notes |
+|--------|------|-------|
+| Product Information Sheet | `byrydens/print_format/product_information_sheet/` | Default print for Product Sheet via Property Setter `product_sheet_default_print_format.json`; table-based layout for wkhtmltopdf |
+
 ### Patches / fixtures
 
-- `hksoho/patches.txt` — no active pre/post model sync patches at scan time
+- `hksoho/patches.txt` — post-model-sync: `hksoho.patches.v1_0.update_po_workflow_sample_qc_approve` (Sample PO QC Approve condition)
 - `hooks.py` has **no `fixtures`** — Workflows, Notification live event, and web-form publish flags are site DB state
+- Property Setter JSON under `byrydens/property_setter/` for Product Sheet default print format
 
 ---
 
@@ -375,6 +389,10 @@ PO importer only updates existing POs when `workflow_state` is `Draft` or `Submi
 ### PO-Workflow (live, site DB)
 
 Draft → Submitted → Supplier Confirmed → Ready to QC → QC Checked → Ready to Ship → Booked QTY → Partial Shipout → Shipout → Rejected / Cancelled
+
+**Sample QC Approve:** Order Type `Sample` still enters Ready to QC (inspection recorded as usual), but `QC Approve` does **not** require any line `qc_update_status == Pass`. Other order types still need at least one Pass. Condition (patch `update_po_workflow_sample_qc_approve`):
+
+`doc.order_type == "Sample" or [item for item in doc.po_items if item.qc_update_status == "Pass"]`
 
 ### TO-Workflow (live, site DB)
 

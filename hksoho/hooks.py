@@ -39,7 +39,10 @@ scheduler_events = {
 doc_events = {
     "Purchase Order": {
         "after_save": "hksoho.byrydens.doctype.purchase_order.purchase_order.after_save"
-    }
+    },
+    "ToDo": {
+        "after_insert": "hksoho.byrydens.assignment.share_on_todo_assign"
+    },
 }
 
 

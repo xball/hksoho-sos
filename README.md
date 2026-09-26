@@ -12,6 +12,8 @@ Custom [Frappe](https://frappe.io) ERP application for **By Rydéns** sourcing o
 
 Companion apps on this bench (not part of this repo): `print_designer`, `frappe_desk_theme`, `infintrix_theme`, `drive`.
 
+**Desk theme note (`infintrix_theme`, local customizations on this bench):** animated unseen notification bell; navbar **ToDo** icon with open-count badge (`9+` when > 9); login wrong-password message asks users to contact the website administrator (self-service forgot-password disabled on the themed login page). Those changes live in the theme app checkout, not this repository.
+
 ## Modules
 
 | Module | Path | Purpose |
@@ -74,6 +76,7 @@ Declared in `hksoho/modules.txt`.
 - **Product** catalog with dimensions, packaging, tariff codes, supplier, and primary image
 - **Product Attachment** — multi-file attachments linkable to multiple products
 - **Article Master** — detailed lighting specifications (lampholder, bulb, cable, shade, certifications); files live in child table `files` (`Product Attachment Item`)
+- **Product Sheet** — supplier/product information sheet (general → LED → RoHS → labels → packing → photos/support files); named by **Rydéns Model No**; default print format **Product Information Sheet** (PDF-friendly tables)
 - **Customer Quotation** and **Internal Evaluation** — cost build-up worksheets (freight, customs, royalty, selling price)
 - **Quo-Report print attachments** — on Customer Quotation, **Print Attachments** tab (`print_files` / `Customer Quotation File`) lets users fetch Article Master files (PDF/image), tick **Print**, then append those pages after the **Quo-Report** PDF (Print Designer format)
 - Sync product images, CBM, weight, and HS code from Product to PO lines
@@ -82,6 +85,14 @@ Declared in `hksoho/modules.txt`.
 - Embedded PO history on Product form (current system + legacy XPIN)
 - **Reports:** Supplier Products
 - **Workspace:** Products
+
+### Product Sheet collaboration
+
+- Desk URL: `/app/product-sheet/<Rydéns-Model-No>`
+- **Assign To** creates a ToDo (Complete By / Priority optional); email/in-app notification to assignee
+- On Product Sheet assignment, auto-**Share** with **Can Read** + **Can Write** (`hksoho.byrydens.assignment.share_on_todo_assign`)
+- Manual **Share** still available; unticking Read/Write removes share access
+- Roles with share on Product Sheet: System Manager, Co-operator, Purchase Manager, Accounts Manager
 
 ### Partners & Master Data
 
@@ -103,7 +114,7 @@ Declared in `hksoho/modules.txt`.
 | Workspace | Key shortcuts |
 |-----------|---------------|
 | Partners | Partner, roles, permissions |
-| Products | Product, Product Attachment, Article Master, Customer Quotation, Internal Evaluation |
+| Products | Product, Product Attachment, Article Master, Product Sheet, Customer Quotation, Internal Evaluation |
 | Purchase Orders | PO list, Inspection wizard, Inspection list, Inspection Event calendar, Undelivered Items |
 | Transports | Transport Order, Vessels, Vessels Time Table, TO Details |
 | Reports | Orders Due To Pay, Shipment On Water, Undelivered Items |

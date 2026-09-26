@@ -1,0 +1,998 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:rydens_model_no",
+ "creation": "2026-09-13 13:56:00",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "general_section",
+  "rydens_model_no",
+  "rydens_model_name",
+  "supplier_item_no",
+  "sample_item_no",
+  "column_break_header",
+  "customer",
+  "description_section",
+  "description",
+  "size",
+  "material_and_finish",
+  "shade_size",
+  "shade_material_and_finish",
+  "sewed_label_on_shade",
+  "details_section",
+  "shade_pantone",
+  "no_of_lampholder",
+  "lampholder_cup",
+  "lampholder_color",
+  "ceiling_hook_system",
+  "visible_cable_length",
+  "visible_suspension_length",
+  "cable_color",
+  "switch_dimmer_color",
+  "switch_dimmer_position",
+  "dimmer_driver_range",
+  "tilt_test",
+  "suspension_method",
+  "instruction_manual",
+  "column_break_details",
+  "shade_inside_color",
+  "socket_type",
+  "lampholder_type",
+  "lampholdercup_color",
+  "max_wattage",
+  "bulb_included",
+  "bulb_voltage",
+  "cable_type",
+  "switch_type",
+  "plug_type",
+  "dimmer_driver_brand",
+  "fuse",
+  "canopy_color",
+  "classification",
+  "led_section",
+  "model_use_led",
+  "number_of_led_module",
+  "number_of_led_in_each_module",
+  "color_temperature_kelvin",
+  "total_power_w",
+  "color_rendering_index_cri",
+  "life_time_of_led_hour",
+  "life_time_of_led_driver_hour",
+  "column_break_led",
+  "led_chip_current_ma",
+  "led_chip_voltage_v",
+  "luminous_flux_lm",
+  "power_factor",
+  "energy_class",
+  "beam_angle",
+  "sdcm",
+  "rohs_section",
+  "rohs_document_relevant_code",
+  "comments_section",
+  "comments",
+  "packing_section",
+  "packing_method",
+  "inner_box_length_cm",
+  "inner_box_width_cm",
+  "inner_box_height_cm",
+  "inner_box_volume_m3",
+  "column_break_packing_1",
+  "middle_box_length_cm",
+  "middle_box_width_cm",
+  "middle_box_height_cm",
+  "middle_box_volume_m3",
+  "column_break_packing_2",
+  "outer_carton_length_cm",
+  "outer_carton_width_cm",
+  "outer_carton_height_cm",
+  "outer_carton_volume_m3",
+  "packing_weights_section",
+  "net_weight_kg",
+  "inner_box_gross_weight_kg",
+  "middle_box_gross_weight_kg",
+  "outer_carton_gross_weight_kg",
+  "column_break_packing_3",
+  "ean",
+  "quantity_inner_box",
+  "quantity_middle_box",
+  "quantity_outer_carton",
+  "qty_20",
+  "show_by_rydens_on_shipping_mark",
+  "other_section",
+  "recommended_bulb",
+  "special_production_method",
+  "wire",
+  "insulation",
+  "column_break_other",
+  "recommended_lumen",
+  "designer",
+  "temperatures",
+  "strain_relief",
+  "column_break_other_2",
+  "cert_lampholder",
+  "cert_switch",
+  "cert_plug",
+  "cert_term_block",
+  "labels_tab",
+  "product_label_section",
+  "product_label_image",
+  "product_label_position",
+  "column_break_product_label",
+  "product_label_preview",
+  "wattage_label_section",
+  "wattage_label_image",
+  "wattage_label_position",
+  "column_break_wattage_label",
+  "wattage_label_preview",
+  "other_labels_section",
+  "designer_label_image",
+  "designer_label_position",
+  "column_break_other_labels",
+  "designer_label_preview",
+  "energy_label_section",
+  "energy_label_image",
+  "energy_label_position",
+  "column_break_energy_label",
+  "energy_label_preview",
+  "photos_tab",
+  "product_image",
+  "column_break_photo",
+  "product_image_view",
+  "support_files_section",
+  "support_files"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_section",
+   "fieldtype": "Section Break",
+   "label": "General Information"
+  },
+  {
+   "bold": 1,
+   "fieldname": "rydens_model_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "RYDENS Model No.",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "rydens_model_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "RYDENS Model Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "supplier_item_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier Item No.",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "sample_item_no",
+   "fieldtype": "Data",
+   "label": "Sample Item No.",
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_header",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Customer",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
+   "options": "Partner",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description_section",
+   "fieldtype": "Section Break",
+   "label": "Product Description"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description",
+   "unique": 1
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "material_and_finish",
+   "fieldtype": "Data",
+   "label": "Material and Finish"
+  },
+  {
+   "fieldname": "shade_size",
+   "fieldtype": "Data",
+   "label": "Shade Size"
+  },
+  {
+   "fieldname": "shade_material_and_finish",
+   "fieldtype": "Data",
+   "label": "Shade Material and Finish"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "sewed_label_on_shade",
+   "fieldtype": "Data",
+   "label": "Sewed Label on Shade"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Technical Details"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "shade_pantone",
+   "fieldtype": "Data",
+   "label": "Shade Pantone"
+  },
+  {
+   "fieldname": "no_of_lampholder",
+   "fieldtype": "Data",
+   "label": "No. of Lampholder"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "lampholder_cup",
+   "fieldtype": "Select",
+   "label": "Lampholder Cup",
+   "options": "N/A\nHalf\nFull"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "lampholder_color",
+   "fieldtype": "Select",
+   "label": "Lampholder Color",
+   "options": "N/A\nwhite\nblack\nclear\nothers"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "ceiling_hook_system",
+   "fieldtype": "Data",
+   "label": "Ceiling Hook System"
+  },
+  {
+   "fieldname": "visible_cable_length",
+   "fieldtype": "Data",
+   "label": "Visible Cable Length"
+  },
+  {
+   "fieldname": "visible_suspension_length",
+   "fieldtype": "Data",
+   "label": "Visible Suspension Length"
+  },
+  {
+   "fieldname": "cable_color",
+   "fieldtype": "Data",
+   "label": "Cable Color"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "switch_dimmer_color",
+   "fieldtype": "Data",
+   "label": "Switch/Dimmer Color"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "switch_dimmer_position",
+   "fieldtype": "Select",
+   "label": "Switch/Dimmer Position",
+   "options": "N/A\non cable\non cable 140cm from plug\non cable 150cm from plug\non cable 170cm from plug\non base\non pole\non lampholder"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "dimmer_driver_range",
+   "fieldtype": "Data",
+   "label": "Dimmer/Driver Range"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "tilt_test",
+   "fieldtype": "Data",
+   "label": "Tilt Test"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "suspension_method",
+   "fieldtype": "Select",
+   "label": "Suspension Method",
+   "options": "N/A\ncable\ncable w/plastic canopy\ncable w/metal canopy\nwire suspension\nchain\ntelescope\npole"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "instruction_manual",
+   "fieldtype": "Select",
+   "label": "Instruction Manual",
+   "options": "N/A\nInstallation manual\nSafety instruction\nInstallation manual + Safety instruction\nNO"
+  },
+  {
+   "fieldname": "column_break_details",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "shade_inside_color",
+   "fieldtype": "Data",
+   "label": "Shade Inside Color"
+  },
+  {
+   "fieldname": "socket_type",
+   "fieldtype": "Data",
+   "label": "Socket Type"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "lampholder_type",
+   "fieldtype": "Select",
+   "label": "Lampholder Type",
+   "options": "N/A\nNo threads\nThreaded with ring\nHalf thread with ring"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "lampholdercup_color",
+   "fieldtype": "Select",
+   "label": "Lampholdercup Color",
+   "options": "N/A\nmatt white\nshiny white\nmatt black\nshiny black\nChrome\nPB\nCopper\nsame as lamp"
+  },
+  {
+   "fieldname": "max_wattage",
+   "fieldtype": "Data",
+   "label": "Max. Wattage"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "bulb_included",
+   "fieldtype": "Select",
+   "label": "Bulb Included",
+   "options": "N/A\nYES\nNO"
+  },
+  {
+   "default": "230VAC",
+   "fieldname": "bulb_voltage",
+   "fieldtype": "Select",
+   "label": "Bulb Voltage",
+   "options": "230VAC\n12V\n24VDC\n24V\n110VAC"
+  },
+  {
+   "fieldname": "cable_type",
+   "fieldtype": "Data",
+   "label": "Cable Type"
+  },
+  {
+   "fieldname": "switch_type",
+   "fieldtype": "Data",
+   "label": "Switch Type"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "plug_type",
+   "fieldtype": "Select",
+   "label": "Plug Type",
+   "options": "N/A\nEUR plug\nUK plug\nUL plug\nIP44 EUR round plug\nTerminal block"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "dimmer_driver_brand",
+   "fieldtype": "Select",
+   "label": "Dimmer/Driver Brand",
+   "options": "N/A\nKAOYI\nHui Bo Long\nGallop\nLCZ\nACTec\nother"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "fuse",
+   "fieldtype": "Select",
+   "label": "Fuse",
+   "options": "N/A\nno fuse\nunchangeable fuse\nchangeable fuse"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "canopy_color",
+   "fieldtype": "Select",
+   "label": "Canopy Color",
+   "options": "N/A\nwhite\nblack\nchrome\ncopper\nPB\nsame as lamp"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "classification",
+   "fieldtype": "Select",
+   "label": "Classification",
+   "options": "N/A\nCLASS I\nCLASS II\nCLASS III"
+  },
+  {
+   "fieldname": "led_section",
+   "fieldtype": "Section Break",
+   "label": "LED Information"
+  },
+  {
+   "default": "No",
+   "description": "If yes, please fill in below information; if no, leave it blank",
+   "fieldname": "model_use_led",
+   "fieldtype": "Select",
+   "label": "Model use LED?",
+   "options": "Yes\nNo"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "number_of_led_module",
+   "fieldtype": "Data",
+   "label": "Number of LED Module"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "number_of_led_in_each_module",
+   "fieldtype": "Data",
+   "label": "Number of LED in Each Module"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "color_temperature_kelvin",
+   "fieldtype": "Data",
+   "label": "Color Temperature (Kelvin)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "total_power_w",
+   "fieldtype": "Data",
+   "label": "Total Power (W)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "color_rendering_index_cri",
+   "fieldtype": "Data",
+   "label": "Color Rendering Index (CRI)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "life_time_of_led_hour",
+   "fieldtype": "Data",
+   "label": "Life Time of LED (Hour)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "life_time_of_led_driver_hour",
+   "fieldtype": "Data",
+   "label": "Life Time of LED Driver (Hour)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "column_break_led",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "led_chip_current_ma",
+   "fieldtype": "Data",
+   "label": "LED Chip Current (mA)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "led_chip_voltage_v",
+   "fieldtype": "Data",
+   "label": "LED Chip Voltage (V)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "luminous_flux_lm",
+   "fieldtype": "Data",
+   "label": "Luminous Flux (lm)"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "power_factor",
+   "fieldtype": "Data",
+   "label": "Power Factor"
+  },
+  {
+   "default": "N/A",
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "energy_class",
+   "fieldtype": "Select",
+   "label": "Energy Class",
+   "options": "N/A\nA++\nA+\nA\nB\nC\nD\nE"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "beam_angle",
+   "fieldtype": "Data",
+   "label": "Beam Angle"
+  },
+  {
+   "depends_on": "eval:doc.model_use_led==\"Yes\"",
+   "fieldname": "sdcm",
+   "fieldtype": "Data",
+   "label": "SDCM"
+  },
+  {
+   "fieldname": "rohs_section",
+   "fieldtype": "Section Break",
+   "label": "RoHS"
+  },
+  {
+   "fieldname": "rohs_document_relevant_code",
+   "fieldtype": "Link",
+   "label": "RoHS Document Relevant Code",
+   "options": "Article Master"
+  },
+  {
+   "fieldname": "comments_section",
+   "fieldtype": "Section Break",
+   "label": "Comment for the Product"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Table",
+   "label": "Comments",
+   "options": "Product Sheet Comment"
+  },
+  {
+   "fieldname": "packing_section",
+   "fieldtype": "Section Break",
+   "label": "Packing Information"
+  },
+  {
+   "fieldname": "packing_method",
+   "fieldtype": "Select",
+   "label": "Packing Method",
+   "options": "None\nblack color box, By Rydens hangtag with item name and greetings text, Thank card included\nblack color box, By Rydens hangtag with item name and designer text, Thank card included\nblack color box, By Rydens hangtag with item name and handmade text, Thank card included\nnormal white box, By Rydens hangtag, Thank card included\nwhite box, By Rydens hangtag with item name and designer text, Thank card included\nwhite box, By Rydens hangtag with item name and handmade text, Thank card included\nwhite box packing with line drawing, handmade hangtag included, thank card included\nblack color box, By Rydens hangtag w/o item name and  w/o greetings text, Thank card included\nMail box, JOTEX hangtag included, thank card not included, droptest required\nbrown box, hangtag not included, thank card not included\nshrink pack, hangtag not included, thank card not included\npolybag, hangtag not included, thank card not included\npolybag w header, hangtag not included, thank card not included\nOP, no hangtag, thank card not included\nPET box, By Rydens hangtag with item name and greetings text, Thank card included\nPET box, By Rydens hangtag with item name and greetings text, Thank card not included\nPET box, hangtag not included, thank card not included\nother"
+  },
+  {
+   "fieldname": "inner_box_length_cm",
+   "fieldtype": "Float",
+   "label": "Inner Box Length (cm)"
+  },
+  {
+   "fieldname": "inner_box_width_cm",
+   "fieldtype": "Float",
+   "label": "Inner Box Width (cm)"
+  },
+  {
+   "fieldname": "inner_box_height_cm",
+   "fieldtype": "Float",
+   "label": "Inner Box Height (cm)"
+  },
+  {
+   "default": "0",
+   "description": "L x W x H / 1000000",
+   "fieldname": "inner_box_volume_m3",
+   "fieldtype": "Float",
+   "label": "Inner Box Volume (m\u00b3)",
+   "precision": "6",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_packing_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "middle_box_length_cm",
+   "fieldtype": "Float",
+   "label": "Middle Box Length (cm)"
+  },
+  {
+   "fieldname": "middle_box_width_cm",
+   "fieldtype": "Float",
+   "label": "Middle Box Width (cm)"
+  },
+  {
+   "fieldname": "middle_box_height_cm",
+   "fieldtype": "Float",
+   "label": "Middle Box Height (cm)"
+  },
+  {
+   "default": "0",
+   "description": "L x W x H / 1000000",
+   "fieldname": "middle_box_volume_m3",
+   "fieldtype": "Float",
+   "label": "Middle Box Volume (m\u00b3)",
+   "precision": "6",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_packing_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "outer_carton_length_cm",
+   "fieldtype": "Float",
+   "label": "Outer Carton Length (cm)"
+  },
+  {
+   "fieldname": "outer_carton_width_cm",
+   "fieldtype": "Float",
+   "label": "Outer Carton Width (cm)"
+  },
+  {
+   "fieldname": "outer_carton_height_cm",
+   "fieldtype": "Float",
+   "label": "Outer Carton Height (cm)"
+  },
+  {
+   "default": "0",
+   "description": "L x W x H / 1000000",
+   "fieldname": "outer_carton_volume_m3",
+   "fieldtype": "Float",
+   "label": "Outer Carton Volume (m\u00b3)",
+   "precision": "6",
+   "read_only": 1
+  },
+  {
+   "fieldname": "packing_weights_section",
+   "fieldtype": "Section Break",
+   "label": "Weights and Quantities"
+  },
+  {
+   "fieldname": "net_weight_kg",
+   "fieldtype": "Float",
+   "label": "Net Weight (KG)"
+  },
+  {
+   "fieldname": "inner_box_gross_weight_kg",
+   "fieldtype": "Float",
+   "label": "Inner Box Gross Weight (KG)"
+  },
+  {
+   "fieldname": "middle_box_gross_weight_kg",
+   "fieldtype": "Float",
+   "label": "Middle Box Gross Weight (KG)"
+  },
+  {
+   "fieldname": "outer_carton_gross_weight_kg",
+   "fieldtype": "Float",
+   "label": "Outer Carton Gross Weight (KG)"
+  },
+  {
+   "fieldname": "column_break_packing_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "ean",
+   "fieldtype": "Data",
+   "label": "EAN"
+  },
+  {
+   "fieldname": "quantity_inner_box",
+   "fieldtype": "Int",
+   "label": "Quantity / Inner Box (PCS)"
+  },
+  {
+   "fieldname": "quantity_middle_box",
+   "fieldtype": "Int",
+   "label": "Quantity / Middle Box (PCS)"
+  },
+  {
+   "fieldname": "quantity_outer_carton",
+   "fieldtype": "Int",
+   "label": "Quantity / Outer Carton (PCS)"
+  },
+  {
+   "fieldname": "qty_20",
+   "fieldtype": "Int",
+   "label": "Q'ty / 20' (PCS)"
+  },
+  {
+   "fieldname": "show_by_rydens_on_shipping_mark",
+   "fieldtype": "Data",
+   "label": "Show BY RYDENS on Shipping Mark"
+  },
+  {
+   "fieldname": "other_section",
+   "fieldtype": "Section Break",
+   "label": "Other Information"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "recommended_bulb",
+   "fieldtype": "Select",
+   "label": "Recommended Bulb",
+   "options": "N/A\nHalogen ball\nHalogen classic\nHalogen globe\nHalogen candle\nHalogen\nLED classic\nGU10 LED L60mm\nLED Filament\nLED Filament Globe\nLED Filament ball\nLED Filament candle\nFixed LED"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "special_production_method",
+   "fieldtype": "Select",
+   "label": "Special Production Method",
+   "options": "N/A\nLaser Cut\nHandicraft\nGlass blown by mouth\nMetal spinning\nStamp pressing\nHand Made"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "wire",
+   "fieldtype": "Select",
+   "label": "Wire",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "insulation",
+   "fieldtype": "Select",
+   "label": "Insulation",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "fieldname": "column_break_other",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "recommended_lumen",
+   "fieldtype": "Select",
+   "label": "Recommended Lumen",
+   "options": "\n100-200\n200-300\n300-500\n400-600\n500-700\n600-800\n700-900\n800-1000\nN/A"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "designer",
+   "fieldtype": "Data",
+   "label": "Designer"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "temperatures",
+   "fieldtype": "Select",
+   "label": "Temperatures",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "strain_relief",
+   "fieldtype": "Select",
+   "label": "Strain Relief",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "fieldname": "column_break_other_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cert_lampholder",
+   "fieldtype": "Select",
+   "label": "Cert. Lampholder",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cert_switch",
+   "fieldtype": "Select",
+   "label": "Cert. Switch",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cert_plug",
+   "fieldtype": "Select",
+   "label": "Cert. Plug",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "cert_term_block",
+   "fieldtype": "Select",
+   "label": "Cert. Term. Block",
+   "options": "N/A\nPass\nFail"
+  },
+  {
+   "fieldname": "labels_tab",
+   "fieldtype": "Tab Break",
+   "label": "Label Information"
+  },
+  {
+   "fieldname": "product_label_section",
+   "fieldtype": "Section Break",
+   "label": "Product Label"
+  },
+  {
+   "fieldname": "product_label_image",
+   "fieldtype": "Attach Image",
+   "label": "Product Label"
+  },
+  {
+   "fieldname": "product_label_position",
+   "fieldtype": "Small Text",
+   "label": "Position"
+  },
+  {
+   "fieldname": "column_break_product_label",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_label_preview",
+   "fieldtype": "Image",
+   "label": "Product Label Preview",
+   "options": "product_label_image"
+  },
+  {
+   "fieldname": "wattage_label_section",
+   "fieldtype": "Section Break",
+   "label": "Wattage Label"
+  },
+  {
+   "fieldname": "wattage_label_image",
+   "fieldtype": "Attach Image",
+   "label": "Wattage Label"
+  },
+  {
+   "fieldname": "wattage_label_position",
+   "fieldtype": "Small Text",
+   "label": "Position"
+  },
+  {
+   "fieldname": "column_break_wattage_label",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "wattage_label_preview",
+   "fieldtype": "Image",
+   "label": "Wattage Label Preview",
+   "options": "wattage_label_image"
+  },
+  {
+   "fieldname": "other_labels_section",
+   "fieldtype": "Section Break",
+   "label": "Designer Label"
+  },
+  {
+   "fieldname": "designer_label_image",
+   "fieldtype": "Attach Image",
+   "label": "Designer Label File"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "designer_label_position",
+   "fieldtype": "Small Text",
+   "label": "Position"
+  },
+  {
+   "fieldname": "column_break_other_labels",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "designer_label_preview",
+   "fieldtype": "Image",
+   "label": "Designer Label Preview",
+   "options": "designer_label_image"
+  },
+  {
+   "fieldname": "energy_label_section",
+   "fieldtype": "Section Break",
+   "label": "Enerygy Label"
+  },
+  {
+   "fieldname": "energy_label_image",
+   "fieldtype": "Attach Image",
+   "label": "Energy Label File"
+  },
+  {
+   "default": "N/A",
+   "fieldname": "energy_label_position",
+   "fieldtype": "Small Text",
+   "label": "Position"
+  },
+  {
+   "fieldname": "column_break_energy_label",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "energy_label_preview",
+   "fieldtype": "Image",
+   "label": "Energy Label Preview",
+   "options": "energy_label_image"
+  },
+  {
+   "fieldname": "photos_tab",
+   "fieldtype": "Tab Break",
+   "label": "Photos"
+  },
+  {
+   "fieldname": "product_image",
+   "fieldtype": "Attach Image",
+   "label": "Product Photo"
+  },
+  {
+   "fieldname": "column_break_photo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_image_view",
+   "fieldtype": "Image",
+   "label": "Product Photo Preview",
+   "options": "product_image"
+  },
+  {
+   "fieldname": "support_files_section",
+   "fieldtype": "Section Break",
+   "label": "Additional Support Files"
+  },
+  {
+   "fieldname": "support_files",
+   "fieldtype": "Table",
+   "label": "Support Files",
+   "options": "Product Attachment Item"
+  }
+ ],
+ "image_field": "product_image",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-09-26 02:57:10.136666",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Product Sheet",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Co-operator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "rydens_model_no,rydens_model_name,supplier_item_no,customer",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "rydens_model_no",
+ "track_changes": 1,
+ "track_seen": 1
+}

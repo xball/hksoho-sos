@@ -1,0 +1,10 @@
+{
+ "doctype": "Property Setter",
+ "name": "Product Sheet-main-default_print_format",
+ "doc_type": "Product Sheet",
+ "doctype_or_field": "DocType",
+ "property": "default_print_format",
+ "property_type": "Data",
+ "value": "Product Information Sheet",
+ "is_system_generated": 0
+}

@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-09-13 14:24:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "comment_no",
+  "comment_date",
+  "column_break_comment",
+  "supplier_reply_date",
+  "section_break_comment",
+  "comment",
+  "supplier_reply",
+  "attachment"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "comment_no",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "No.",
+   "non_negative": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "comment_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Comment Date"
+  },
+  {
+   "fieldname": "column_break_comment",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 2,
+   "fieldname": "supplier_reply_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Supplier Reply Date"
+  },
+  {
+   "fieldname": "section_break_comment",
+   "fieldtype": "Section Break"
+  },
+  {
+   "columns": 3,
+   "fieldname": "comment",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Comment"
+  },
+  {
+   "columns": 3,
+   "fieldname": "supplier_reply",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Supplier Reply"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach Image",
+   "label": "Attachment"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-13 14:24:00.000000",
+ "modified_by": "Administrator",
+ "module": "byrydens",
+ "name": "Product Sheet Comment",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

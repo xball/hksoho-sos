@@ -1,0 +1,245 @@
+{# Product Information Sheet — wkhtmltopdf-safe table layout #}
+{% macro v(val) %}{{ val if val not in (None, '') else '' }}{% endmacro %}
+{% macro row2(l1, v1, l2, v2) -%}
+<tr>
+	<td class="lbl">{{ l1 }}</td>
+	<td class="val">{{ v(v1) }}</td>
+	<td class="lbl">{{ l2 }}</td>
+	<td class="val">{{ v(v2) }}</td>
+</tr>
+{%- endmacro %}
+{% macro row1(l1, v1) -%}
+<tr>
+	<td class="lbl">{{ l1 }}</td>
+	<td class="val" colspan="3">{{ v(v1) }}</td>
+</tr>
+{%- endmacro %}
+{% macro abs_img(path) -%}
+{%- if path -%}
+{%- if path.startswith('http') -%}{{ path }}
+{%- else -%}{{ frappe.utils.get_url(path) }}
+{%- endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+<div class="pis">
+	{% set company_logo = frappe.db.get_value("Letter Head", {"is_default": 1}, "image") or "/files/512x512.jpg" %}
+	<table class="pis-header-table">
+		<tr>
+			<td class="pis-logo-cell">
+				<img class="pis-logo" src="{{ abs_img(company_logo) }}" alt="Company Logo">
+			</td>
+			<td class="pis-brand">
+				<div class="pis-company">AB Rydéns</div>
+				<div>Södergatan, box 138</div>
+				<div>S-335 23 Gnosjö, Sweden</div>
+				<div>Fax +46 370 33 30 50, Tel +46 370 33 30 40</div>
+			</td>
+			<td class="pis-docmeta">
+				<div class="pis-doccode">BYHCDOC-00003</div>
+				<div>Version: 1.0</div>
+			</td>
+		</tr>
+	</table>
+
+	<div class="pis-title">PRODUCT INFORMATION SHEET</div>
+
+	<table class="pis-table">
+		<tr>
+			<td class="lbl">Supplier item no:</td>
+			<td class="val">{{ v(doc.supplier_item_no) }}</td>
+			<td class="lbl">Customer:</td>
+			<td class="val">{{ v(doc.customer) }}</td>
+		</tr>
+	</table>
+
+	<div class="pis-section-title">General information</div>
+	<table class="pis-outer">
+		<tr>
+			<td class="pis-fields-cell">
+				<table class="pis-table">
+					{{ row2("RYDENS model no.", doc.rydens_model_no, "Customer:", doc.customer) }}
+					{{ row1("RYDENS model name:", doc.rydens_model_name) }}
+					{{ row1("Supplier item no:", doc.supplier_item_no) }}
+					{{ row1("Sample Item no:", doc.sample_item_no) }}
+					{{ row1("Description:", doc.description) }}
+					{{ row1("Size:", doc.size) }}
+					{{ row1("Material and finish:", doc.material_and_finish) }}
+					{{ row1("Shade size:", doc.shade_size) }}
+					{{ row1("Shade material and finish:", doc.shade_material_and_finish) }}
+					{{ row1("Sewed label on shade:", doc.sewed_label_on_shade) }}
+					{{ row2("Shade Pantone:", doc.shade_pantone, "Shade inside color:", doc.shade_inside_color) }}
+					{{ row2("No. of lampholder:", doc.no_of_lampholder, "Socket type:", doc.socket_type) }}
+					{{ row2("Lampholder cup:", doc.lampholder_cup, "Lampholder type:", doc.lampholder_type) }}
+					{{ row2("Lampholder color:", doc.lampholder_color, "Lampholdercup color:", doc.lampholdercup_color) }}
+					{{ row2("Ceiling hook system:", doc.ceiling_hook_system, "Max. wattage:", doc.max_wattage) }}
+					{{ row2("Visible cable length:", doc.visible_cable_length, "Bulb included:", doc.bulb_included) }}
+					{{ row2("Visible suspension length:", doc.visible_suspension_length, "Bulb voltage:", doc.bulb_voltage) }}
+					{{ row2("Cable color:", doc.cable_color, "Cable type:", doc.cable_type) }}
+					{{ row2("Switch/dimmer color:", doc.switch_dimmer_color, "Switch type:", doc.switch_type) }}
+					{{ row2("Switch/dimmer position:", doc.switch_dimmer_position, "Plug type:", doc.plug_type) }}
+					{{ row2("Dimmer/driver range:", doc.dimmer_driver_range, "Dimmer/Driver brand:", doc.dimmer_driver_brand) }}
+					{{ row2("Tilt test:", doc.tilt_test, "Fuse:", doc.fuse) }}
+					{{ row2("Suspension method:", doc.suspension_method, "Canopy color:", doc.canopy_color) }}
+					{{ row2("Instruction manual:", doc.instruction_manual, "Classification:", doc.classification) }}
+				</table>
+			</td>
+			<td class="pis-photo-cell">
+				{% if doc.product_image %}
+				<img class="pis-photo" src="{{ abs_img(doc.product_image) }}" alt="Product">
+				{% else %}
+				<div class="pis-photo-placeholder">Product photo</div>
+				{% endif %}
+			</td>
+		</tr>
+	</table>
+
+	<div class="pis-section-title">
+		Model use LED?
+		<span class="pis-led-flag">{{ v(doc.model_use_led) or 'No' }}</span>
+	</div>
+	{% if doc.model_use_led == 'Yes' %}
+	<table class="pis-table">
+		{{ row2("Number of LED module:", doc.number_of_led_module, "LED chip current (mA):", doc.led_chip_current_ma) }}
+		{{ row2("Number of LED in each module:", doc.number_of_led_in_each_module, "LED chip voltage (V):", doc.led_chip_voltage_v) }}
+		{{ row2("Color temperature (Kelvin):", doc.color_temperature_kelvin, "Luminous Flux (lm):", doc.luminous_flux_lm) }}
+		{{ row2("Total Power (W):", doc.total_power_w, "Power Factor:", doc.power_factor) }}
+		{{ row2("Color Rendering Index (CRI):", doc.color_rendering_index_cri, "Energy Class:", doc.energy_class) }}
+		{{ row2("Life time of LED (hour):", doc.life_time_of_led_hour, "Beam angle:", doc.beam_angle) }}
+		{{ row2("Life time of LED driver (hour):", doc.life_time_of_led_driver_hour, "SDCM:", doc.sdcm) }}
+	</table>
+	{% endif %}
+
+	<div class="pis-section-title">RoHS document relevant code</div>
+	<div class="pis-block">{{ v(doc.rohs_document_relevant_code) }}</div>
+
+	<div class="pis-section-title">Label information</div>
+	<table class="pis-table">
+		<tr>
+			<td class="lbl">Product label:</td>
+			<td class="val">
+				{% if doc.product_label_image %}
+				<img class="pis-label-img" src="{{ abs_img(doc.product_label_image) }}" alt="Product label">
+				{% endif %}
+			</td>
+			<td class="lbl">Designer label:</td>
+			<td class="val">
+				{{ v(doc.designer_label) }}
+				{% if doc.designer_label_image %}
+				<br><img class="pis-label-img" src="{{ abs_img(doc.designer_label_image) }}" alt="Designer label">
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td class="lbl">Position:</td>
+			<td class="val" colspan="3">{{ v(doc.product_label_position) }}</td>
+		</tr>
+		<tr>
+			<td class="lbl">Wattage label:</td>
+			<td class="val">
+				{% if doc.wattage_label_image %}
+				<img class="pis-label-img" src="{{ abs_img(doc.wattage_label_image) }}" alt="Wattage label">
+				{% endif %}
+			</td>
+			<td class="lbl">Energy label:</td>
+			<td class="val">
+				{{ v(doc.energy_label) }}
+				{% if doc.energy_label_image %}
+				<br><img class="pis-label-img" src="{{ abs_img(doc.energy_label_image) }}" alt="Energy label">
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td class="lbl">Position:</td>
+			<td class="val" colspan="3">{{ v(doc.wattage_label_position) }}</td>
+		</tr>
+		<tr>
+			<td class="lbl">Designer label position:</td>
+			<td class="val">{{ v(doc.designer_label_position) }}</td>
+			<td class="lbl">Energy label position:</td>
+			<td class="val">{{ v(doc.energy_label_position) }}</td>
+		</tr>
+	</table>
+
+	<div class="pis-section-title">Comment for the product</div>
+	{% if doc.comments %}
+	<table class="pis-comments-table">
+		<tr>
+		{% for c in doc.comments %}
+			<td class="pis-comment-card">
+				<div class="pis-comment-no">{{ c.comment_no or loop.index }}</div>
+				{% if c.attachment %}
+				<img class="pis-comment-img" src="{{ abs_img(c.attachment) }}" alt="Comment photo">
+				{% endif %}
+				<div><b>Comment:</b> {{ v(c.comment) }}
+					{% if c.comment_date %}<span class="pis-date">({{ frappe.format(c.comment_date, {'fieldtype':'Date'}) }})</span>{% endif %}
+				</div>
+				<div><b>Supplier reply:</b> {{ v(c.supplier_reply) }}
+					{% if c.supplier_reply_date %}<span class="pis-date">({{ frappe.format(c.supplier_reply_date, {'fieldtype':'Date'}) }})</span>{% endif %}
+				</div>
+			</td>
+			{% if loop.index % 2 == 0 %}</tr><tr>{% endif %}
+		{% endfor %}
+		{% if doc.comments|length % 2 == 1 %}<td class="pis-comment-card empty">&nbsp;</td>{% endif %}
+		</tr>
+	</table>
+	{% else %}
+	<div class="pis-block">—</div>
+	{% endif %}
+
+	<div class="pis-section-title">Packing information</div>
+	<table class="pis-table">
+		{{ row1("Packing method:", doc.packing_method) }}
+		<tr>
+			<td class="lbl">Inner box size:</td>
+			<td class="val" colspan="3">
+				{{ v(doc.inner_box_length_cm) }} cm x {{ v(doc.inner_box_width_cm) }} cm x {{ v(doc.inner_box_height_cm) }} cm
+				&nbsp;&nbsp;{{ v(doc.inner_box_volume_m3) }} m3
+			</td>
+		</tr>
+		<tr>
+			<td class="lbl">Middle box size:</td>
+			<td class="val" colspan="3">
+				{{ v(doc.middle_box_length_cm) }} cm x {{ v(doc.middle_box_width_cm) }} cm x {{ v(doc.middle_box_height_cm) }} cm
+				&nbsp;&nbsp;{{ v(doc.middle_box_volume_m3) }} m3
+			</td>
+		</tr>
+		<tr>
+			<td class="lbl">Outer carton size:</td>
+			<td class="val" colspan="3">
+				{{ v(doc.outer_carton_length_cm) }} cm x {{ v(doc.outer_carton_width_cm) }} cm x {{ v(doc.outer_carton_height_cm) }} cm
+				&nbsp;&nbsp;{{ v(doc.outer_carton_volume_m3) }} m3
+			</td>
+		</tr>
+		{{ row2("Net weight:", (doc.net_weight_kg|string + ' KG') if doc.net_weight_kg not in (None, '') else '', "EAN:", doc.ean) }}
+		{{ row2("Inner box gross weight:", (doc.inner_box_gross_weight_kg|string + ' KG') if doc.inner_box_gross_weight_kg not in (None, '') else '', "Quantity/inner box:", (doc.quantity_inner_box|string + ' PCS') if doc.quantity_inner_box not in (None, '') else '') }}
+		{{ row2("Middle box gross weight:", (doc.middle_box_gross_weight_kg|string + ' KG') if doc.middle_box_gross_weight_kg not in (None, '') else '', "Quantity/middle box:", (doc.quantity_middle_box|string + ' PCS') if doc.quantity_middle_box not in (None, '') else '') }}
+		{{ row2("Outer carton gross weight:", (doc.outer_carton_gross_weight_kg|string + ' KG') if doc.outer_carton_gross_weight_kg not in (None, '') else '', "Quantity/outer carton:", (doc.quantity_outer_carton|string + ' PCS') if doc.quantity_outer_carton not in (None, '') else '') }}
+		{{ row2("Qty/20':", (doc.qty_20|string + ' PCS') if doc.qty_20 not in (None, '') else '', "Show BY RYDENS on shipping mark:", doc.show_by_rydens_on_shipping_mark) }}
+	</table>
+
+	<div class="pis-section-title">Other information</div>
+	<table class="pis-table">
+		{{ row2("Recommended bulb:", doc.recommended_bulb, "Recommended lumen:", doc.recommended_lumen) }}
+		{{ row2("Special Production Method:", doc.special_production_method, "Designer:", doc.designer) }}
+		{{ row2("Wire:", doc.wire, "Temperatures:", doc.temperatures) }}
+		{{ row2("Insulation:", doc.insulation, "Strain relief:", doc.strain_relief) }}
+		{{ row2("Cert. lampholder:", doc.cert_lampholder, "Cert. Switch:", doc.cert_switch) }}
+		{{ row2("Cert. plug:", doc.cert_plug, "Cert. term. Block:", doc.cert_term_block) }}
+	</table>
+
+	{% if doc.support_files %}
+	<div class="pis-section-title">Additional support files</div>
+	<table class="pis-table">
+		<tr><td class="lbl">Description</td><td class="lbl" colspan="3">File</td></tr>
+		{% for f in doc.support_files %}
+		<tr>
+			<td class="val">{{ v(f.description) }}</td>
+			<td class="val" colspan="3">{{ v(f.attach_file) }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endif %}
+
+	<div class="pis-footer-note">(All revised information mark in red wording)</div>
+</div>
