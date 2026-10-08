@@ -75,6 +75,10 @@
   "comments",
   "packing_section",
   "packing_method",
+  "packing_method_custom",
+  "hangtag",
+  "hangtag_custom",
+  "droptest",
   "inner_box_length_cm",
   "inner_box_width_cm",
   "inner_box_height_cm",
@@ -101,40 +105,33 @@
   "quantity_outer_carton",
   "qty_20",
   "show_by_rydens_on_shipping_mark",
-  "other_section",
-  "recommended_bulb",
-  "special_production_method",
-  "wire",
-  "insulation",
-  "column_break_other",
-  "recommended_lumen",
-  "designer",
-  "temperatures",
-  "strain_relief",
-  "column_break_other_2",
-  "cert_lampholder",
-  "cert_switch",
-  "cert_plug",
-  "cert_term_block",
   "labels_tab",
   "product_label_section",
   "product_label_image",
   "product_label_position",
+  "product_label_size",
+  "product_label_color",
   "column_break_product_label",
   "product_label_preview",
   "wattage_label_section",
   "wattage_label_image",
   "wattage_label_position",
-  "column_break_wattage_label",
+  "wattage_label_size",
+  "wattage_label_color",
+  "column_break_jtnh",
   "wattage_label_preview",
   "other_labels_section",
   "designer_label_image",
   "designer_label_position",
+  "designer_label_size",
+  "designer_label_color",
   "column_break_other_labels",
   "designer_label_preview",
   "energy_label_section",
   "energy_label_image",
   "energy_label_position",
+  "energy_label_size",
+  "energy_label_color",
   "column_break_energy_label",
   "energy_label_preview",
   "photos_tab",
@@ -531,6 +528,7 @@
    "fieldname": "rohs_document_relevant_code",
    "fieldtype": "Link",
    "label": "RoHS Document Relevant Code",
+   "length": 10,
    "options": "Article Master"
   },
   {
@@ -553,7 +551,33 @@
    "fieldname": "packing_method",
    "fieldtype": "Select",
    "label": "Packing Method",
-   "options": "None\nblack color box, By Rydens hangtag with item name and greetings text, Thank card included\nblack color box, By Rydens hangtag with item name and designer text, Thank card included\nblack color box, By Rydens hangtag with item name and handmade text, Thank card included\nnormal white box, By Rydens hangtag, Thank card included\nwhite box, By Rydens hangtag with item name and designer text, Thank card included\nwhite box, By Rydens hangtag with item name and handmade text, Thank card included\nwhite box packing with line drawing, handmade hangtag included, thank card included\nblack color box, By Rydens hangtag w/o item name and  w/o greetings text, Thank card included\nMail box, JOTEX hangtag included, thank card not included, droptest required\nbrown box, hangtag not included, thank card not included\nshrink pack, hangtag not included, thank card not included\npolybag, hangtag not included, thank card not included\npolybag w header, hangtag not included, thank card not included\nOP, no hangtag, thank card not included\nPET box, By Rydens hangtag with item name and greetings text, Thank card included\nPET box, By Rydens hangtag with item name and greetings text, Thank card not included\nPET box, hangtag not included, thank card not included\nother"
+   "options": "Light Box\nStandard Box\nGrand Box\nColor Box\nMailbox\nShrink pack\nOPP\nOthers"
+  },
+  {
+   "depends_on": "eval:doc.packing_method==\"Others\"",
+   "fieldname": "packing_method_custom",
+   "fieldtype": "Small Text",
+   "label": "Custom Packing Method",
+   "mandatory_depends_on": "eval:doc.packing_method==\"Others\""
+  },
+  {
+   "fieldname": "hangtag",
+   "fieldtype": "Select",
+   "label": "Hangtag",
+   "options": "N/A\nBY RYDENS hangtag\nBY RYDENS handmade hangtag\nOthers"
+  },
+  {
+   "depends_on": "eval:doc.hangtag==\"Others\"",
+   "fieldname": "hangtag_custom",
+   "fieldtype": "Small Text",
+   "label": "Custom Hangtag",
+   "mandatory_depends_on": "eval:doc.hangtag==\"Others\""
+  },
+  {
+   "fieldname": "droptest",
+   "fieldtype": "Select",
+   "label": "Droptest",
+   "options": "N/A\nISTA 1"
   },
   {
    "fieldname": "inner_box_length_cm",
@@ -696,101 +720,6 @@
    "label": "Show BY RYDENS on Shipping Mark"
   },
   {
-   "fieldname": "other_section",
-   "fieldtype": "Section Break",
-   "label": "Other Information"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "recommended_bulb",
-   "fieldtype": "Select",
-   "label": "Recommended Bulb",
-   "options": "N/A\nHalogen ball\nHalogen classic\nHalogen globe\nHalogen candle\nHalogen\nLED classic\nGU10 LED L60mm\nLED Filament\nLED Filament Globe\nLED Filament ball\nLED Filament candle\nFixed LED"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "special_production_method",
-   "fieldtype": "Select",
-   "label": "Special Production Method",
-   "options": "N/A\nLaser Cut\nHandicraft\nGlass blown by mouth\nMetal spinning\nStamp pressing\nHand Made"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "wire",
-   "fieldtype": "Select",
-   "label": "Wire",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "insulation",
-   "fieldtype": "Select",
-   "label": "Insulation",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "fieldname": "column_break_other",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "recommended_lumen",
-   "fieldtype": "Select",
-   "label": "Recommended Lumen",
-   "options": "\n100-200\n200-300\n300-500\n400-600\n500-700\n600-800\n700-900\n800-1000\nN/A"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "designer",
-   "fieldtype": "Data",
-   "label": "Designer"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "temperatures",
-   "fieldtype": "Select",
-   "label": "Temperatures",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "strain_relief",
-   "fieldtype": "Select",
-   "label": "Strain Relief",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "fieldname": "column_break_other_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "cert_lampholder",
-   "fieldtype": "Select",
-   "label": "Cert. Lampholder",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "cert_switch",
-   "fieldtype": "Select",
-   "label": "Cert. Switch",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "cert_plug",
-   "fieldtype": "Select",
-   "label": "Cert. Plug",
-   "options": "N/A\nPass\nFail"
-  },
-  {
-   "default": "N/A",
-   "fieldname": "cert_term_block",
-   "fieldtype": "Select",
-   "label": "Cert. Term. Block",
-   "options": "N/A\nPass\nFail"
-  },
-  {
    "fieldname": "labels_tab",
    "fieldtype": "Tab Break",
    "label": "Label Information"
@@ -836,10 +765,6 @@
    "label": "Position"
   },
   {
-   "fieldname": "column_break_wattage_label",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "wattage_label_preview",
    "fieldtype": "Image",
    "label": "Wattage Label Preview",
@@ -874,7 +799,7 @@
   {
    "fieldname": "energy_label_section",
    "fieldtype": "Section Break",
-   "label": "Enerygy Label"
+   "label": "Energy Label"
   },
   {
    "fieldname": "energy_label_image",
@@ -927,12 +852,56 @@
    "fieldtype": "Table",
    "label": "Support Files",
    "options": "Product Attachment Item"
+  },
+  {
+   "fieldname": "product_label_size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "product_label_color",
+   "fieldtype": "Data",
+   "label": "Color"
+  },
+  {
+   "fieldname": "wattage_label_size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "wattage_label_color",
+   "fieldtype": "Data",
+   "label": "Color"
+  },
+  {
+   "fieldname": "column_break_jtnh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "designer_label_size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "designer_label_color",
+   "fieldtype": "Data",
+   "label": "Color"
+  },
+  {
+   "fieldname": "energy_label_size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "energy_label_color",
+   "fieldtype": "Data",
+   "label": "Color"
   }
  ],
  "image_field": "product_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-26 02:57:10.136666",
+ "modified": "2026-10-08 10:47:54.716303",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product Sheet",

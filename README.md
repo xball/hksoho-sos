@@ -94,6 +94,16 @@ Declared in `hksoho/modules.txt`.
 - Manual **Share** still available; unticking Read/Write removes share access
 - Roles with share on Product Sheet: System Manager, Co-operator, Purchase Manager, Accounts Manager
 
+### Product Sheet fields and print
+
+- **Packing Information** is three fields: **Packing Method**, **Hangtag**, and **Droptest**
+  - Packing Method: Light Box, Standard Box, Grand Box, Color Box, Mailbox, Shrink pack, OPP, Others
+  - Hangtag: N/A, BY RYDENS hangtag, BY RYDENS handmade hangtag, Others
+  - Droptest: N/A, ISTA 1
+  - **Others** opens a required custom text box; the PDF prints that text
+- **Label Information** covers Product, Wattage, Designer, and Energy labels. Each has a file, position, size, color, and preview
+- The **Product Information Sheet** PDF names those label rows by group (for example Product position, Designer size, Wattage color, Energy color). It does not print the removed Other information block
+
 ### Partners & Master Data
 
 - Unified **Partner** DocType: Supplier, Buyer, Customer, Agent/Buyer, Transporter

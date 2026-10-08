@@ -148,7 +148,7 @@ flowchart TD
 | Product Attachment Item | Child | Files in a set |
 | Product Attachment Link | Child | Link set ↔ products |
 | Article Master | Doc | Lighting / article technical specs; Attachments tab includes `product_image` and `files` (`Product Attachment Item`) |
-| Product Sheet | Doc | Supplier product information sheet; autoname = `rydens_model_no`; sections: general, LED, RoHS (Link → Article Master), comments child, packing, labels (attach/preview), photos, support files |
+| Product Sheet | Doc | Supplier product information sheet; autoname = `rydens_model_no`; sections: general, LED, RoHS (Link → Article Master), comments child, packing (Packing Method / Hangtag / Droptest; **Others** shows a custom text field), labels (Product, Wattage, Designer, Energy — each with file, position, size, color, preview), photos, support files |
 | Product Sheet Comment | Child | Comment rows on Product Sheet |
 | Customer Quotation | Doc | Customer-facing cost / price worksheet; links Article Master via `articale_master`; **Print Attachments** tab (`print_files`) |
 | Customer Quotation File | Child | Selectable print rows: `print`, `description`, `attach_file`, `file_type` |
@@ -267,11 +267,14 @@ When `doctype == Customer Quotation` and `format == Quo-Report`, the override me
 
 | Format | Path | Notes |
 |--------|------|-------|
-| Product Information Sheet | `byrydens/print_format/product_information_sheet/` | Default print for Product Sheet via Property Setter `product_sheet_default_print_format.json`; table-based layout for wkhtmltopdf |
+| Product Information Sheet | `byrydens/print_format/product_information_sheet/` | Default print for Product Sheet via Property Setter `product_sheet_default_print_format.json`; table-based layout for wkhtmltopdf. Prints packing as Packing method, Hangtag, and Droptest (custom text when the choice is Others). Label rows are named per group (Product / Designer / Wattage / Energy position, size, and color). The removed Other information block is not printed |
 
 ### Patches / fixtures
 
-- `hksoho/patches.txt` — post-model-sync: `hksoho.patches.v1_0.update_po_workflow_sample_qc_approve` (Sample PO QC Approve condition)
+- `hksoho/patches.txt` — post-model-sync:
+  - `hksoho.patches.v1_0.update_po_workflow_sample_qc_approve` (Sample PO QC Approve condition)
+  - `hksoho.patches.v1_0.split_product_sheet_packing_method` (keep old Product Sheet packing text that is not in the new option list, under Others)
+  - `hksoho.patches.v1_0.rename_product_sheet_others` (rename the free-text option from 空白自填 to Others)
 - `hooks.py` has **no `fixtures`** — Workflows, Notification live event, and web-form publish flags are site DB state
 - Property Setter JSON under `byrydens/property_setter/` for Product Sheet default print format
 

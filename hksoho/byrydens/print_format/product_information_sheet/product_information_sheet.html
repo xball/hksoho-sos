@@ -124,16 +124,14 @@
 			</td>
 			<td class="lbl">Designer label:</td>
 			<td class="val">
-				{{ v(doc.designer_label) }}
 				{% if doc.designer_label_image %}
-				<br><img class="pis-label-img" src="{{ abs_img(doc.designer_label_image) }}" alt="Designer label">
+				<img class="pis-label-img" src="{{ abs_img(doc.designer_label_image) }}" alt="Designer label">
 				{% endif %}
 			</td>
 		</tr>
-		<tr>
-			<td class="lbl">Position:</td>
-			<td class="val" colspan="3">{{ v(doc.product_label_position) }}</td>
-		</tr>
+		{{ row2("Product position:", doc.product_label_position, "Designer position:", doc.designer_label_position) }}
+		{{ row2("Product size:", doc.product_label_size, "Designer size:", doc.designer_label_size) }}
+		{{ row2("Product color:", doc.product_label_color, "Designer color:", doc.designer_label_color) }}
 		<tr>
 			<td class="lbl">Wattage label:</td>
 			<td class="val">
@@ -143,22 +141,14 @@
 			</td>
 			<td class="lbl">Energy label:</td>
 			<td class="val">
-				{{ v(doc.energy_label) }}
 				{% if doc.energy_label_image %}
-				<br><img class="pis-label-img" src="{{ abs_img(doc.energy_label_image) }}" alt="Energy label">
+				<img class="pis-label-img" src="{{ abs_img(doc.energy_label_image) }}" alt="Energy label">
 				{% endif %}
 			</td>
 		</tr>
-		<tr>
-			<td class="lbl">Position:</td>
-			<td class="val" colspan="3">{{ v(doc.wattage_label_position) }}</td>
-		</tr>
-		<tr>
-			<td class="lbl">Designer label position:</td>
-			<td class="val">{{ v(doc.designer_label_position) }}</td>
-			<td class="lbl">Energy label position:</td>
-			<td class="val">{{ v(doc.energy_label_position) }}</td>
-		</tr>
+		{{ row2("Wattage position:", doc.wattage_label_position, "Energy position:", doc.energy_label_position) }}
+		{{ row2("Wattage size:", doc.wattage_label_size, "Energy size:", doc.energy_label_size) }}
+		{{ row2("Wattage color:", doc.wattage_label_color, "Energy color:", doc.energy_label_color) }}
 	</table>
 
 	<div class="pis-section-title">Comment for the product</div>
@@ -189,7 +179,11 @@
 
 	<div class="pis-section-title">Packing information</div>
 	<table class="pis-table">
-		{{ row1("Packing method:", doc.packing_method) }}
+		{% set packing_method_display = doc.packing_method_custom if doc.packing_method == 'Others' else doc.packing_method %}
+		{% set hangtag_display = doc.hangtag_custom if doc.hangtag == 'Others' else doc.hangtag %}
+		{{ row1("Packing method:", packing_method_display) }}
+		{{ row1("Hangtag:", hangtag_display) }}
+		{{ row1("Droptest:", doc.droptest) }}
 		<tr>
 			<td class="lbl">Inner box size:</td>
 			<td class="val" colspan="3">
@@ -216,16 +210,6 @@
 		{{ row2("Middle box gross weight:", (doc.middle_box_gross_weight_kg|string + ' KG') if doc.middle_box_gross_weight_kg not in (None, '') else '', "Quantity/middle box:", (doc.quantity_middle_box|string + ' PCS') if doc.quantity_middle_box not in (None, '') else '') }}
 		{{ row2("Outer carton gross weight:", (doc.outer_carton_gross_weight_kg|string + ' KG') if doc.outer_carton_gross_weight_kg not in (None, '') else '', "Quantity/outer carton:", (doc.quantity_outer_carton|string + ' PCS') if doc.quantity_outer_carton not in (None, '') else '') }}
 		{{ row2("Qty/20':", (doc.qty_20|string + ' PCS') if doc.qty_20 not in (None, '') else '', "Show BY RYDENS on shipping mark:", doc.show_by_rydens_on_shipping_mark) }}
-	</table>
-
-	<div class="pis-section-title">Other information</div>
-	<table class="pis-table">
-		{{ row2("Recommended bulb:", doc.recommended_bulb, "Recommended lumen:", doc.recommended_lumen) }}
-		{{ row2("Special Production Method:", doc.special_production_method, "Designer:", doc.designer) }}
-		{{ row2("Wire:", doc.wire, "Temperatures:", doc.temperatures) }}
-		{{ row2("Insulation:", doc.insulation, "Strain relief:", doc.strain_relief) }}
-		{{ row2("Cert. lampholder:", doc.cert_lampholder, "Cert. Switch:", doc.cert_switch) }}
-		{{ row2("Cert. plug:", doc.cert_plug, "Cert. term. Block:", doc.cert_term_block) }}
 	</table>
 
 	{% if doc.support_files %}

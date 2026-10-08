@@ -5,3 +5,5 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 hksoho.patches.v1_0.update_po_workflow_sample_qc_approve
+hksoho.patches.v1_0.split_product_sheet_packing_method
+hksoho.patches.v1_0.rename_product_sheet_others
