@@ -65,6 +65,7 @@
   "packing_method",
   "section_break_gqwl",
   "remark",
+  "section_break_remark",
   "attachments_tab",
   "product_image",
   "files",
@@ -353,8 +354,12 @@
   },
   {
    "fieldname": "remark",
-   "fieldtype": "Small Text",
+   "fieldtype": "Text",
    "label": "Remarks"
+  },
+  {
+   "fieldname": "section_break_remark",
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "attachments_tab",

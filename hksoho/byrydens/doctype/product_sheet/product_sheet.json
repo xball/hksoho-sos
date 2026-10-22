@@ -11,14 +11,19 @@
   "general_section",
   "rydens_model_no",
   "rydens_model_name",
+  "supplier",
   "supplier_item_no",
   "sample_item_no",
   "column_break_header",
   "customer",
+  "version",
+  "last_update",
+  "status",
   "description_section",
   "description",
   "size",
   "material_and_finish",
+  "column_break_jvgf",
   "shade_size",
   "shade_material_and_finish",
   "sewed_label_on_shade",
@@ -52,8 +57,9 @@
   "fuse",
   "canopy_color",
   "classification",
-  "led_section",
+  "led_information_section",
   "model_use_led",
+  "led_section",
   "number_of_led_module",
   "number_of_led_in_each_module",
   "color_temperature_kelvin",
@@ -70,25 +76,31 @@
   "beam_angle",
   "sdcm",
   "rohs_section",
-  "rohs_document_relevant_code",
+  "rohs",
+  "column_break_olji",
+  "additional_information",
   "comments_section",
   "comments",
+  "packing_tab",
   "packing_section",
   "packing_method",
   "packing_method_custom",
+  "column_break_packing_1",
   "hangtag",
   "hangtag_custom",
+  "column_break_packing_2",
   "droptest",
-  "inner_box_length_cm",
+  "section_break_xsqn",
   "inner_box_width_cm",
+  "inner_box_length_cm",
   "inner_box_height_cm",
   "inner_box_volume_m3",
-  "column_break_packing_1",
-  "middle_box_length_cm",
+  "column_break_hueh",
   "middle_box_width_cm",
+  "middle_box_length_cm",
   "middle_box_height_cm",
   "middle_box_volume_m3",
-  "column_break_packing_2",
+  "column_break_agty",
   "outer_carton_length_cm",
   "outer_carton_width_cm",
   "outer_carton_height_cm",
@@ -98,13 +110,13 @@
   "inner_box_gross_weight_kg",
   "middle_box_gross_weight_kg",
   "outer_carton_gross_weight_kg",
+  "show_by_rydens_on_shipping_mark",
   "column_break_packing_3",
   "ean",
   "quantity_inner_box",
   "quantity_middle_box",
   "quantity_outer_carton",
   "qty_20",
-  "show_by_rydens_on_shipping_mark",
   "labels_tab",
   "product_label_section",
   "product_label_image",
@@ -139,13 +151,43 @@
   "column_break_photo",
   "product_image_view",
   "support_files_section",
-  "support_files"
+  "support_files",
+  "version_tab",
+  "version_control"
  ],
  "fields": [
   {
    "fieldname": "general_section",
    "fieldtype": "Section Break",
    "label": "General Information"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier",
+   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Supplier\"]]",
+   "options": "Partner"
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "Version"
+  },
+  {
+   "fieldname": "last_update",
+   "fieldtype": "Date",
+   "label": "Last Update"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nWaiting for supplier reply\nConfirmed"
   },
   {
    "bold": 1,
@@ -186,12 +228,10 @@
   },
   {
    "fieldname": "customer",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Customer",
-   "link_filters": "[[\"Partner\",\"partner_type\",\"=\",\"Customer\"]]",
-   "options": "Partner",
    "reqd": 1
   },
   {
@@ -269,25 +309,32 @@
    "label": "Ceiling Hook System"
   },
   {
+   "default": "N/A",
    "fieldname": "visible_cable_length",
-   "fieldtype": "Data",
-   "label": "Visible Cable Length"
+   "fieldtype": "Select",
+   "label": "Visible Cable Length",
+   "options": "N/A\n1m L\n1.2m L\n1.4m L\n1.5m L\n1.8m L\n2m L\n2.5m L\n3m L\n3.5m L\n4m L\n4.5m L\n5m L\nothers"
   },
   {
+   "default": "N/A",
    "fieldname": "visible_suspension_length",
-   "fieldtype": "Data",
-   "label": "Visible Suspension Length"
+   "fieldtype": "Select",
+   "label": "Visible Suspension Length",
+   "options": "N/A\n1m L\n1.2m L\n1.4m L\n1.5m L\n1.8m L\n2m L\n2.5m L\n3m L\n3.5m L\n4m L\n4.5m L\n5m L\nothers"
   },
   {
+   "default": "N/A",
    "fieldname": "cable_color",
-   "fieldtype": "Data",
-   "label": "Cable Color"
+   "fieldtype": "Select",
+   "label": "Cable Color",
+   "options": "N/A\nclear\nwhite\nblack\nsame as metal color\ngold\nbrown\nred\nothers"
   },
   {
    "default": "N/A",
    "fieldname": "switch_dimmer_color",
-   "fieldtype": "Data",
-   "label": "Switch/Dimmer Color"
+   "fieldtype": "Select",
+   "label": "Switch/Dimmer Color",
+   "options": "N/A\nclear\nwhite\nblack\nsame as metal color\ngold\nbrown\nred\nothers"
   },
   {
    "default": "N/A",
@@ -368,17 +415,21 @@
    "fieldname": "bulb_voltage",
    "fieldtype": "Select",
    "label": "Bulb Voltage",
-   "options": "230VAC\n12V\n24VDC\n24V\n110VAC"
+   "options": "N/A\n230VAC\n12V\n24VDC\n24V\n110VAC"
   },
   {
+   "default": "N/A",
    "fieldname": "cable_type",
-   "fieldtype": "Data",
-   "label": "Cable Type"
+   "fieldtype": "Select",
+   "label": "Cable Type",
+   "options": "N/A\nVDE, 2-wire, flat\nVDE, 2-wire, round\nVDE, 3-wire, round\ntextile, 2-wire, flat\ntextile, 2-wire, round\ntextile, 2-wire, twist\ntextile, 3-wire, round\ntwist textile, 2-wire\ntwist textile, 3-wire\nrubber, 2-wire, round\nrubber, 3-wire, round"
   },
   {
+   "default": "N/A",
    "fieldname": "switch_type",
-   "fieldtype": "Data",
-   "label": "Switch Type"
+   "fieldtype": "Select",
+   "label": "Switch Type",
+   "options": "N/A\non-off switch\nfoot dimmer\nrotary dimmer\nmemory dimmer\npush dimmer\n3-step dimmer"
   },
   {
    "default": "N/A",
@@ -417,8 +468,7 @@
   },
   {
    "fieldname": "led_section",
-   "fieldtype": "Section Break",
-   "label": "LED Information"
+   "fieldtype": "Section Break"
   },
   {
    "default": "No",
@@ -503,9 +553,8 @@
    "default": "N/A",
    "depends_on": "eval:doc.model_use_led==\"Yes\"",
    "fieldname": "energy_class",
-   "fieldtype": "Select",
-   "label": "Energy Class",
-   "options": "N/A\nA++\nA+\nA\nB\nC\nD\nE"
+   "fieldtype": "Data",
+   "label": "Energy Class"
   },
   {
    "depends_on": "eval:doc.model_use_led==\"Yes\"",
@@ -525,11 +574,10 @@
    "label": "RoHS"
   },
   {
-   "fieldname": "rohs_document_relevant_code",
-   "fieldtype": "Link",
+   "fieldname": "rohs",
+   "fieldtype": "Table",
    "label": "RoHS Document Relevant Code",
-   "length": 10,
-   "options": "Article Master"
+   "options": "Product Sheet RoHS"
   },
   {
    "fieldname": "comments_section",
@@ -710,9 +758,12 @@
    "label": "Quantity / Outer Carton (PCS)"
   },
   {
+   "default": "0",
+   "description": "28 / (outer carton volume x quantity / outer carton)",
    "fieldname": "qty_20",
    "fieldtype": "Int",
-   "label": "Q'ty / 20' (PCS)"
+   "label": "Q'ty / 20' (PCS)",
+   "read_only": 1
   },
   {
    "fieldname": "show_by_rydens_on_shipping_mark",
@@ -722,7 +773,7 @@
   {
    "fieldname": "labels_tab",
    "fieldtype": "Tab Break",
-   "label": "Label Information"
+   "label": "Label Info."
   },
   {
    "fieldname": "product_label_section",
@@ -854,6 +905,17 @@
    "options": "Product Attachment Item"
   },
   {
+   "fieldname": "version_tab",
+   "fieldtype": "Tab Break",
+   "label": "Version"
+  },
+  {
+   "fieldname": "version_control",
+   "fieldtype": "Table",
+   "label": "Version Control",
+   "options": "Product Sheet Version Control"
+  },
+  {
    "fieldname": "product_label_size",
    "fieldtype": "Data",
    "label": "Size"
@@ -896,12 +958,47 @@
    "fieldname": "energy_label_color",
    "fieldtype": "Data",
    "label": "Color"
+  },
+  {
+   "fieldname": "additional_information",
+   "fieldtype": "Small Text",
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "section_break_xsqn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_hueh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_agty",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "packing_tab",
+   "fieldtype": "Tab Break",
+   "label": "Packing Info."
+  },
+  {
+   "fieldname": "column_break_jvgf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "led_information_section",
+   "fieldtype": "Section Break",
+   "label": "LED Information"
+  },
+  {
+   "fieldname": "column_break_olji",
+   "fieldtype": "Column Break"
   }
  ],
  "image_field": "product_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-08 10:47:54.716303",
+ "modified": "2026-10-22 05:36:20.370335",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product Sheet",
@@ -956,7 +1053,7 @@
   }
  ],
  "row_format": "Dynamic",
- "search_fields": "rydens_model_no,rydens_model_name,supplier_item_no,customer",
+ "search_fields": "rydens_model_no,rydens_model_name,supplier_item_no,customer,supplier,status,version",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

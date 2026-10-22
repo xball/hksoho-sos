@@ -5,6 +5,7 @@ frappe.ui.form.on("Product Sheet", {
 	refresh(frm) {
 		if (frm.is_new()) return;
 		frm.add_custom_button(__("Download PDF"), () => download_product_sheet_pdf(frm), __("Print"));
+		calc_qty_20(frm);
 	},
 	inner_box_length_cm(frm) {
 		calc_volume(frm, "inner_box");
@@ -33,6 +34,37 @@ frappe.ui.form.on("Product Sheet", {
 	outer_carton_height_cm(frm) {
 		calc_volume(frm, "outer_carton");
 	},
+	quantity_outer_carton(frm) {
+		calc_qty_20(frm);
+	},
+	outer_carton_volume_m3(frm) {
+		calc_qty_20(frm);
+	},
+	validate(frm) {
+		const seen = {};
+		for (const row of frm.doc.rohs || []) {
+			const code = (row.rohs_document_relevant_code || "").trim();
+			if (!code) continue;
+			if (seen[code]) {
+				frappe.throw(__("RoHS Document Relevant Code {0} is duplicated", [code]));
+			}
+			seen[code] = true;
+		}
+	},
+});
+
+frappe.ui.form.on("Product Sheet RoHS", {
+	rohs_document_relevant_code(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		const code = (row.rohs_document_relevant_code || "").trim();
+		if (!code) return;
+		const duplicate = (frm.doc.rohs || []).some(
+			(other) => other.name !== row.name && (other.rohs_document_relevant_code || "").trim() === code
+		);
+		if (!duplicate) return;
+		frappe.model.set_value(cdt, cdn, "rohs_document_relevant_code", "");
+		frappe.msgprint(__("RoHS Document Relevant Code {0} is already in the table", [code]));
+	},
 });
 
 frappe.ui.form.on("Product Sheet Comment", {
@@ -42,12 +74,30 @@ frappe.ui.form.on("Product Sheet Comment", {
 	},
 });
 
+frappe.ui.form.on("Product Sheet Version Control", {
+	version_control_add(frm, cdt, cdn) {
+		frappe.model.set_value(cdt, cdn, "date", frappe.datetime.get_today());
+		if (frm.doc.version) {
+			frappe.model.set_value(cdt, cdn, "version", frm.doc.version);
+		}
+	},
+});
+
 function calc_volume(frm, prefix) {
 	const l = flt(frm.doc[`${prefix}_length_cm`]);
 	const w = flt(frm.doc[`${prefix}_width_cm`]);
 	const h = flt(frm.doc[`${prefix}_height_cm`]);
 	const volume = l && w && h ? (l * w * h) / 1000000 : 0;
 	frm.set_value(`${prefix}_volume_m3`, volume);
+}
+
+function calc_qty_20(frm) {
+	const volume = flt(frm.doc.outer_carton_volume_m3);
+	const qty = flt(frm.doc.quantity_outer_carton);
+	const value = volume && qty ? Math.round(28 / (volume * qty)) : 0;
+	if (cint(frm.doc.qty_20) !== value) {
+		frm.set_value("qty_20", value);
+	}
 }
 
 function download_product_sheet_pdf(frm) {

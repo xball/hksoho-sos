@@ -5,40 +5,42 @@
 	color: #000;
 	line-height: 1.25;
 	width: 100%;
+	margin: 0;
+	text-align: left;
+}
+.pis, .pis * {
+	overflow-wrap: break-word;
+	word-break: normal;
 }
 .pis-header-table {
 	width: 100%;
 	border-collapse: collapse;
 	margin-bottom: 6px;
 }
-.pis-header-table td {
-	border: none;
-	vertical-align: top;
-	padding: 0;
+.print-format .pis-header-table td {
+	border: none !important;
+	vertical-align: middle;
+	padding: 0 !important;
 }
 .pis-company {
 	font-weight: bold;
 	font-size: 12pt;
 }
-.pis-logo-cell {
-	width: 90px;
-	padding-right: 8px !important;
+.print-format td.pis-logo-cell {
+	width: 78px !important;
+	max-width: 78px !important;
+	padding: 0 8px 0 0 !important;
+	vertical-align: middle !important;
 }
-.pis-logo {
-	height: 70px;
-	max-width: 90px;
+.print-format td.pis-logo-cell img.pis-logo {
+	width: 70px !important;
+	height: 70px !important;
+	max-width: 70px !important;
+	max-height: 70px !important;
 }
 .pis-brand {
-	width: 55%;
+	width: auto;
 	font-size: 8pt;
-}
-.pis-docmeta {
-	width: 30%;
-	text-align: right;
-	font-size: 9pt;
-}
-.pis-doccode {
-	font-weight: bold;
 }
 .pis-title {
 	text-align: center;
@@ -57,6 +59,7 @@
 	margin-top: 10px;
 	margin-bottom: 4px;
 	border: 1px solid #000;
+	text-align: left;
 }
 .pis-led-flag {
 	float: right;
@@ -66,43 +69,80 @@
 	width: 100%;
 	border-collapse: collapse;
 	table-layout: fixed;
+	margin: 0;
+	text-align: left;
 }
-.pis-table td {
+.print-format .pis-table td {
 	border: 1px solid #666;
-	padding: 2px 5px;
+	padding: 2px 5px !important;
 	vertical-align: top;
-	word-wrap: break-word;
+	text-align: left;
+	word-break: normal;
+	overflow-wrap: break-word;
 }
 .pis-table .lbl {
 	width: 22%;
 	background: #f3f3f3;
 	font-weight: bold;
+	text-align: left;
 }
 .pis-table .val {
 	width: 28%;
+	text-align: left;
 }
-.pis-outer {
+.print-format {
+	padding: 8mm !important;
+}
+.pis-top {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	table-layout: fixed;
+	margin: 0;
+}
+.print-format td.pis-flush,
+.print-format td.pis-fields-cell {
+	border: none !important;
+	vertical-align: top;
+	padding: 0 !important;
+}
+.pis-gi-split {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+	margin: 0;
+}
+.pis-gi-title {
+	margin-top: 8px;
+	margin-bottom: 0;
+	border-bottom: none;
+}
+.print-format .pis-gi-split td.pis-photo-cell {
+	width: 24% !important;
+	border: 1px solid #666 !important;
+	padding: 6px !important;
+	text-align: center;
+	vertical-align: middle;
+	background: #fff;
+	box-sizing: border-box;
+}
+.print-format .pis-gi-rest {
+	margin-top: -1px;
+}
+.print-format .pis-photo-box {
 	width: 100%;
 	border-collapse: collapse;
 }
-.pis-outer > tbody > tr > td {
-	border: none;
-	vertical-align: top;
-	padding: 0;
-}
-.pis-fields-cell {
-	width: 78%;
-	padding-right: 6px !important;
-}
-.pis-photo-cell {
-	width: 22%;
-	border: 1px solid #666 !important;
-	padding: 4px !important;
+.print-format .pis-photo-box td {
+	border: none !important;
+	padding: 0 !important;
 	text-align: center;
+	vertical-align: middle;
 }
 .pis-photo {
-	max-width: 150px;
-	max-height: 220px;
+	width: 100%;
+	max-width: 100%;
+	height: auto;
 }
 .pis-photo-placeholder {
 	color: #999;
@@ -120,28 +160,53 @@
 	max-width: 150px;
 	max-height: 90px;
 }
-.pis-comments-table {
-	width: 100%;
-	border-collapse: collapse;
-	table-layout: fixed;
+.pis-comments-page {
+	page-break-before: always;
 }
-.pis-comments-table td.pis-comment-card {
-	width: 50%;
+.pis-comments-page-last {
+	page-break-after: always;
+}
+.pis-comments-page .pis-section-title {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.pis-comment-card {
 	border: 1px solid #666;
-	padding: 5px;
-	vertical-align: top;
+	margin: 0 !important;
+	padding: 8px;
+	height: 112mm;
+	overflow: hidden;
+	page-break-inside: avoid;
+	page-break-after: avoid;
+	box-sizing: border-box;
 }
-.pis-comments-table td.empty {
-	border: none;
+.pis-comments-page .pis-section-title + .pis-comment-card {
+	border-top: none;
+}
+.pis-comments-page .pis-comment-card:last-child {
+	page-break-after: auto;
 }
 .pis-comment-no {
 	font-weight: bold;
-	margin-bottom: 3px;
+	margin-bottom: 4px;
+}
+.pis-comment-img-box {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 6px;
+}
+.print-format .pis-comment-img-box td {
+	border: none !important;
+	padding: 0 !important;
+	height: 78mm;
+	text-align: center;
+	vertical-align: top;
+	overflow: hidden;
 }
 .pis-comment-img {
 	max-width: 100%;
-	max-height: 90px;
-	margin-bottom: 4px;
+	height: 78mm;
+	width: auto;
 }
 .pis-date {
 	color: #555;

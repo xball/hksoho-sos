@@ -116,7 +116,7 @@ flowchart TD
 2. **PO lifecycle** — import or create PO → workflow transitions → line qty progression (PO is **not** submittable)
 3. **Inspection** — Inspection Event schedules lines → Inspection records results → accepted qty written back to PO lines
 4. **Transport** — pick Ready-to-Ship / Partial Shipout PO lines onto Transport Order → vessel ETD/ETA → shipment reports
-5. **Product Sheet** — create/update information sheet → Assign To for verify → auto Share Read+Write → print **Product Information Sheet** PDF
+5. **Product Sheet** — create/update information sheet (status, packing, RoHS child, comments, version control) → Assign To for verify → auto Share Read+Write → print **Product Information Sheet** PDF
 6. **Legacy** — XPIN DocTypes remain queryable for product PO history
 
 ---
@@ -147,9 +147,11 @@ flowchart TD
 | Product Attachment | Doc | Multi-file attachment set |
 | Product Attachment Item | Child | Files in a set |
 | Product Attachment Link | Child | Link set ↔ products |
-| Article Master | Doc | Lighting / article technical specs; Attachments tab includes `product_image` and `files` (`Product Attachment Item`) |
-| Product Sheet | Doc | Supplier product information sheet; autoname = `rydens_model_no`; sections: general, LED, RoHS (Link → Article Master), comments child, packing (Packing Method / Hangtag / Droptest; **Others** shows a custom text field), labels (Product, Wattage, Designer, Energy — each with file, position, size, color, preview), photos, support files |
-| Product Sheet Comment | Child | Comment rows on Product Sheet |
+| Article Master | Doc | Lighting / article technical specs; Attachments tab includes `product_image` and `files` (`Product Attachment Item`); **Remarks** is Text |
+| Product Sheet | Doc | Supplier product information sheet; autoname = `rydens_model_no`; header includes supplier, customer (Data name), version, last_update, status; sections: general, LED, RoHS child + additional_information, comments child, packing (Packing Method / Hangtag / Droptest; **Others** shows a custom text field), labels (Product, Wattage, Designer, Energy — each with file, position, size, color, preview), photos, support files, Version tab (`version_control`) |
+| Product Sheet Comment | Child | Comment rows on Product Sheet (text, dates, optional photo) |
+| Product Sheet RoHS | Child | RoHS Document Relevant Code (Link → Article Master); unique per parent |
+| Product Sheet Version Control | Child | Version / comment / date history rows |
 | Customer Quotation | Doc | Customer-facing cost / price worksheet; links Article Master via `articale_master`; **Print Attachments** tab (`print_files`) |
 | Customer Quotation File | Child | Selectable print rows: `print`, `description`, `attach_file`, `file_type` |
 | Internal Evaluation | Doc | Internal cost build-up |
@@ -267,14 +269,25 @@ When `doctype == Customer Quotation` and `format == Quo-Report`, the override me
 
 | Format | Path | Notes |
 |--------|------|-------|
-| Product Information Sheet | `byrydens/print_format/product_information_sheet/` | Default print for Product Sheet via Property Setter `product_sheet_default_print_format.json`; table-based layout for wkhtmltopdf. Prints packing as Packing method, Hangtag, and Droptest (custom text when the choice is Others). Label rows are named per group (Product / Designer / Wattage / Energy position, size, and color). The removed Other information block is not printed |
+| Product Information Sheet | `byrydens/print_format/product_information_sheet/` | Default print for Product Sheet via Property Setter `product_sheet_default_print_format.json`. Table-based layout for wkhtmltopdf (nested 100% tables; no flex/grid). Version + Last update sit above General information only. Product photo is a 24% right column covering Supplier–Sewed label; Shade Pantone onward is full width under the photo, with the photo right edge aligned to the GI header. RoHS child codes print as a list; Additional information follows. Comments: two stacked cards per page, text above image. Packing prints Packing method, Hangtag, and Droptest (custom text when Others). Label rows are named per group (Product / Designer / Wattage / Energy position, size, and color). Version control table at the end. The removed Other information block is not printed |
+
+### Product Sheet controller
+
+- `product_sheet.py`: `validate_unique_rohs`; `calculate_qty_20` → `qty_20 = round(28 / (outer_carton_volume_m3 * quantity_outer_carton))` or `0`
+- `product_sheet.js`: carton volume = L × W × H / 1_000_000; same qty/20 formula on refresh, volume, and outer-carton qty; client duplicate RoHS check; comment_no on add; version_control date/version defaults
+- Select option lists copied from Article Master for: `visible_cable_length`, `visible_suspension_length` (AM `maximum_visible_cable_length`); `cable_color`, `switch_dimmer_color` (AM `cable_color`); `cable_type`; `switch_type`
 
 ### Patches / fixtures
 
+- `hksoho/patches.txt` — pre-model-sync:
+  - `hksoho.patches.v1_0.stash_product_sheet_rohs` (stash old single RoHS link before the field becomes a child table)
 - `hksoho/patches.txt` — post-model-sync:
   - `hksoho.patches.v1_0.update_po_workflow_sample_qc_approve` (Sample PO QC Approve condition)
   - `hksoho.patches.v1_0.split_product_sheet_packing_method` (keep old Product Sheet packing text that is not in the new option list, under Others)
   - `hksoho.patches.v1_0.rename_product_sheet_others` (rename the free-text option from 空白自填 to Others)
+  - `hksoho.patches.v1_0.load_product_sheet_rohs` (restore stashed RoHS codes onto `Product Sheet RoHS`)
+  - `hksoho.patches.v1_0.set_product_sheet_status_draft` (empty status → Draft)
+  - `hksoho.patches.v1_0.product_sheet_customer_to_name` (replace Partner IDs with partner names after Customer became Data)
 - `hooks.py` has **no `fixtures`** — Workflows, Notification live event, and web-form publish flags are site DB state
 - Property Setter JSON under `byrydens/property_setter/` for Product Sheet default print format
 

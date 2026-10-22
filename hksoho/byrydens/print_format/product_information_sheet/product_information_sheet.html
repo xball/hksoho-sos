@@ -27,7 +27,7 @@
 	<table class="pis-header-table">
 		<tr>
 			<td class="pis-logo-cell">
-				<img class="pis-logo" src="{{ abs_img(company_logo) }}" alt="Company Logo">
+				<img class="pis-logo" src="{{ abs_img(company_logo) }}" alt="Company Logo" width="70" height="70">
 			</td>
 			<td class="pis-brand">
 				<div class="pis-company">AB Rydéns</div>
@@ -35,39 +35,67 @@
 				<div>S-335 23 Gnosjö, Sweden</div>
 				<div>Fax +46 370 33 30 50, Tel +46 370 33 30 40</div>
 			</td>
-			<td class="pis-docmeta">
-				<div class="pis-doccode">BYHCDOC-00003</div>
-				<div>Version: 1.0</div>
-			</td>
 		</tr>
 	</table>
 
 	<div class="pis-title">PRODUCT INFORMATION SHEET</div>
 
-	<table class="pis-table">
+	<table class="pis-top" width="100%">
 		<tr>
-			<td class="lbl">Supplier item no:</td>
-			<td class="val">{{ v(doc.supplier_item_no) }}</td>
-			<td class="lbl">Customer:</td>
-			<td class="val">{{ v(doc.customer) }}</td>
-		</tr>
-	</table>
-
-	<div class="pis-section-title">General information</div>
-	<table class="pis-outer">
-		<tr>
-			<td class="pis-fields-cell">
+			<td class="pis-flush">
 				<table class="pis-table">
-					{{ row2("RYDENS model no.", doc.rydens_model_no, "Customer:", doc.customer) }}
-					{{ row1("RYDENS model name:", doc.rydens_model_name) }}
-					{{ row1("Supplier item no:", doc.supplier_item_no) }}
-					{{ row1("Sample Item no:", doc.sample_item_no) }}
-					{{ row1("Description:", doc.description) }}
-					{{ row1("Size:", doc.size) }}
-					{{ row1("Material and finish:", doc.material_and_finish) }}
-					{{ row1("Shade size:", doc.shade_size) }}
-					{{ row1("Shade material and finish:", doc.shade_material_and_finish) }}
-					{{ row1("Sewed label on shade:", doc.sewed_label_on_shade) }}
+					{{ row2("Version:", doc.version, "Last update:", frappe.format(doc.last_update, {'fieldtype':'Date'}) if doc.last_update else '') }}
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="pis-flush">
+				<div class="pis-section-title pis-gi-title">General information</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="pis-flush">
+				<table class="pis-gi-split" width="100%">
+					<colgroup>
+						<col width="76%">
+						<col width="24%">
+					</colgroup>
+					<tr>
+						<td class="pis-fields-cell" width="76%">
+							<table class="pis-table">
+								{% set supplier_name = frappe.db.get_value("Partner", doc.supplier, "partner_name") if doc.supplier else "" %}
+								{{ row1("Supplier:", supplier_name or doc.supplier) }}
+								{{ row2("RYDENS model no.", doc.rydens_model_no, "Customer:", doc.customer) }}
+								{{ row1("RYDENS model name:", doc.rydens_model_name) }}
+								{{ row2("Supplier item no:", doc.supplier_item_no, "Sample Item no:", doc.sample_item_no) }}
+								{{ row1("Description:", doc.description) }}
+								{{ row1("Size:", doc.size) }}
+								{{ row1("Material and finish:", doc.material_and_finish) }}
+								{{ row1("Shade size:", doc.shade_size) }}
+								{{ row1("Shade material and finish:", doc.shade_material_and_finish) }}
+								{{ row1("Sewed label on shade:", doc.sewed_label_on_shade) }}
+							</table>
+						</td>
+						<td class="pis-photo-cell" width="24%">
+							{% if doc.product_image %}
+							<table class="pis-photo-box" width="100%">
+								<tr>
+									<td>
+										<img class="pis-photo" src="{{ abs_img(doc.product_image) }}" alt="Product">
+									</td>
+								</tr>
+							</table>
+							{% else %}
+							<div class="pis-photo-placeholder">Product photo</div>
+							{% endif %}
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="pis-flush">
+				<table class="pis-table pis-gi-rest">
 					{{ row2("Shade Pantone:", doc.shade_pantone, "Shade inside color:", doc.shade_inside_color) }}
 					{{ row2("No. of lampholder:", doc.no_of_lampholder, "Socket type:", doc.socket_type) }}
 					{{ row2("Lampholder cup:", doc.lampholder_cup, "Lampholder type:", doc.lampholder_type) }}
@@ -83,13 +111,6 @@
 					{{ row2("Suspension method:", doc.suspension_method, "Canopy color:", doc.canopy_color) }}
 					{{ row2("Instruction manual:", doc.instruction_manual, "Classification:", doc.classification) }}
 				</table>
-			</td>
-			<td class="pis-photo-cell">
-				{% if doc.product_image %}
-				<img class="pis-photo" src="{{ abs_img(doc.product_image) }}" alt="Product">
-				{% else %}
-				<div class="pis-photo-placeholder">Product photo</div>
-				{% endif %}
 			</td>
 		</tr>
 	</table>
@@ -111,7 +132,26 @@
 	{% endif %}
 
 	<div class="pis-section-title">RoHS document relevant code</div>
-	<div class="pis-block">{{ v(doc.rohs_document_relevant_code) }}</div>
+	<table class="pis-table">
+		{% set printed = [] %}
+		{% for row in doc.rohs or [] %}
+		{% set code = row.rohs_document_relevant_code %}
+		{% if code and code not in printed %}
+		<tr>
+			<td class="val" colspan="4">{{ v(code) }}</td>
+		</tr>
+		{% set _ = printed.append(code) %}
+		{% endif %}
+		{% endfor %}
+		{% if not printed %}
+		<tr>
+			<td class="val" colspan="4">&nbsp;</td>
+		</tr>
+		{% endif %}
+	</table>
+
+	<div class="pis-section-title">Additional information</div>
+	<div class="pis-block">{{ v(doc.additional_information) or '—' }}</div>
 
 	<div class="pis-section-title">Label information</div>
 	<table class="pis-table">
@@ -151,29 +191,34 @@
 		{{ row2("Wattage color:", doc.wattage_label_color, "Energy color:", doc.energy_label_color) }}
 	</table>
 
-	<div class="pis-section-title">Comment for the product</div>
 	{% if doc.comments %}
-	<table class="pis-comments-table">
-		<tr>
-		{% for c in doc.comments %}
-			<td class="pis-comment-card">
-				<div class="pis-comment-no">{{ c.comment_no or loop.index }}</div>
-				{% if c.attachment %}
-				<img class="pis-comment-img" src="{{ abs_img(c.attachment) }}" alt="Comment photo">
-				{% endif %}
-				<div><b>Comment:</b> {{ v(c.comment) }}
-					{% if c.comment_date %}<span class="pis-date">({{ frappe.format(c.comment_date, {'fieldtype':'Date'}) }})</span>{% endif %}
-				</div>
-				<div><b>Supplier reply:</b> {{ v(c.supplier_reply) }}
-					{% if c.supplier_reply_date %}<span class="pis-date">({{ frappe.format(c.supplier_reply_date, {'fieldtype':'Date'}) }})</span>{% endif %}
-				</div>
-			</td>
-			{% if loop.index % 2 == 0 %}</tr><tr>{% endif %}
+	{% for page_start in range(0, doc.comments|length, 2) %}
+	<div class="pis-comments-page{% if page_start + 2 >= doc.comments|length %} pis-comments-page-last{% endif %}">
+		<div class="pis-section-title">Comment for the product</div>
+		{% for c in doc.comments[page_start:page_start + 2] %}
+		<div class="pis-comment-card">
+			<div class="pis-comment-no">{{ c.comment_no or (page_start + loop.index) }}</div>
+			<div><b>Comment:</b> {{ v(c.comment) }}
+				{% if c.comment_date %}<span class="pis-date">({{ frappe.format(c.comment_date, {'fieldtype':'Date'}) }})</span>{% endif %}
+			</div>
+			<div><b>Supplier reply:</b> {{ v(c.supplier_reply) }}
+				{% if c.supplier_reply_date %}<span class="pis-date">({{ frappe.format(c.supplier_reply_date, {'fieldtype':'Date'}) }})</span>{% endif %}
+			</div>
+			{% if c.attachment %}
+			<table class="pis-comment-img-box">
+				<tr>
+					<td>
+						<img class="pis-comment-img" src="{{ abs_img(c.attachment) }}" alt="Comment photo">
+					</td>
+				</tr>
+			</table>
+			{% endif %}
+		</div>
 		{% endfor %}
-		{% if doc.comments|length % 2 == 1 %}<td class="pis-comment-card empty">&nbsp;</td>{% endif %}
-		</tr>
-	</table>
+	</div>
+	{% endfor %}
 	{% else %}
+	<div class="pis-section-title">Comment for the product</div>
 	<div class="pis-block">—</div>
 	{% endif %}
 
@@ -224,6 +269,30 @@
 		{% endfor %}
 	</table>
 	{% endif %}
+
+	<div class="pis-section-title">Version control</div>
+	<table class="pis-table">
+		<tr>
+			<td class="lbl">Version</td>
+			<td class="lbl" colspan="2">Comment</td>
+			<td class="lbl">Date</td>
+		</tr>
+		{% if doc.version_control %}
+		{% for r in doc.version_control %}
+		<tr>
+			<td class="val">{{ v(r.version) }}</td>
+			<td class="val" colspan="2">{{ v(r.comment) }}</td>
+			<td class="val">{{ frappe.format(r.date, {'fieldtype':'Date'}) if r.date else '' }}</td>
+		</tr>
+		{% endfor %}
+		{% else %}
+		<tr>
+			<td class="val">&nbsp;</td>
+			<td class="val" colspan="2">&nbsp;</td>
+			<td class="val">&nbsp;</td>
+		</tr>
+		{% endif %}
+	</table>
 
 	<div class="pis-footer-note">(All revised information mark in red wording)</div>
 </div>

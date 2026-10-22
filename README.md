@@ -76,7 +76,7 @@ Declared in `hksoho/modules.txt`.
 - **Product** catalog with dimensions, packaging, tariff codes, supplier, and primary image
 - **Product Attachment** — multi-file attachments linkable to multiple products
 - **Article Master** — detailed lighting specifications (lampholder, bulb, cable, shade, certifications); files live in child table `files` (`Product Attachment Item`)
-- **Product Sheet** — supplier/product information sheet (general → LED → RoHS → labels → packing → photos/support files); named by **Rydéns Model No**; default print format **Product Information Sheet** (PDF-friendly tables)
+- **Product Sheet** — supplier/product information sheet (general → LED → RoHS + additional information → comments → labels → packing → photos/support files → version control); named by **Rydéns Model No**; default print format **Product Information Sheet** (PDF-friendly tables)
 - **Customer Quotation** and **Internal Evaluation** — cost build-up worksheets (freight, customs, royalty, selling price)
 - **Quo-Report print attachments** — on Customer Quotation, **Print Attachments** tab (`print_files` / `Customer Quotation File`) lets users fetch Article Master files (PDF/image), tick **Print**, then append those pages after the **Quo-Report** PDF (Print Designer format)
 - Sync product images, CBM, weight, and HS code from Product to PO lines
@@ -96,13 +96,23 @@ Declared in `hksoho/modules.txt`.
 
 ### Product Sheet fields and print
 
+- Header fields include **Supplier** (Partner), **Customer** (free-text name), **Version**, **Last Update**, and **Status** (`Draft` / `Waiting for supplier reply` / `Confirmed`)
+- Six lighting fields are **Select** lists with the same options as **Article Master**: Visible Cable Length, Visible Suspension Length, Cable Color, Switch/Dimmer Color (AM cable colors), Cable Type, Switch Type
+- **RoHS** is a child table of Article Master links (`Product Sheet RoHS`); duplicate codes are blocked on the form and on validate
+- **Additional Information** sits next to RoHS on the form and prints immediately after the RoHS block
+- **Comment for the Product** is a child table. The PDF prints **two stacked comments per page**, with text above the photo
+- **Version** tab holds **Version Control** rows (version, comment, date); the PDF prints that table at the end
+- **Q'ty / 20'** is read-only. Formula: `round(28 / (outer carton volume × quantity / outer carton))`. The same formula is shown as the field description. Recalculated when packing volume or outer-carton qty changes, and again on save
 - **Packing Information** is three fields: **Packing Method**, **Hangtag**, and **Droptest**
   - Packing Method: Light Box, Standard Box, Grand Box, Color Box, Mailbox, Shrink pack, OPP, Others
   - Hangtag: N/A, BY RYDENS hangtag, BY RYDENS handmade hangtag, Others
   - Droptest: N/A, ISTA 1
   - **Others** opens a required custom text box; the PDF prints that text
 - **Label Information** covers Product, Wattage, Designer, and Energy labels. Each has a file, position, size, color, and preview
-- The **Product Information Sheet** PDF names those label rows by group (for example Product position, Designer size, Wattage color, Energy color). It does not print the removed Other information block
+- The **Product Information Sheet** PDF:
+  - Prints **Version** and **Last update** once, above General information (not repeated as the first GI row)
+  - Places the product photo to the right of Supplier through Sewed label (~24% column); Shade Pantone onward is full width under the photo. Nested 100% tables keep the photo’s right edge lined up with the General information header
+  - Names label rows by group (for example Product position, Designer size, Wattage color, Energy color). It does not print the removed Other information block
 
 ### Partners & Master Data
 
