@@ -87,7 +87,7 @@ doctype_list_js = {
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/hksoho/css/hksoho.css"
-# app_include_js = "/assets/hksoho/js/hksoho.js"
+app_include_js = ["/assets/hksoho/js/product_sheet_print.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/hksoho/css/hksoho.css"
@@ -101,7 +101,7 @@ doctype_list_js = {
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
-# page_js = {"page" : "public/js/file.js"}
+page_js = {"print": "public/js/product_sheet_print.js"}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -141,8 +141,13 @@ doctype_list_js = {
 # }
 
 jinja = {
+    "methods": [
+        "hksoho.byrydens.utils.get_image_datauri",
+        "hksoho.byrydens.doctype.product_sheet.product_sheet.fit_print_image",
+    ],
     "globals": {
-        "get_image_datauri": "hksoho.byrydens.utils.get_image_datauri"
+        "get_image_datauri": "hksoho.byrydens.utils.get_image_datauri",
+        "fit_print_image": "hksoho.byrydens.doctype.product_sheet.product_sheet.fit_print_image",
     }
 }
 # Installation

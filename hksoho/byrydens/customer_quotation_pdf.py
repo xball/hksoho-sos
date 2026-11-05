@@ -10,7 +10,10 @@ import os
 from typing import Literal
 
 import frappe
+from frappe.translate import print_language
 from frappe.utils.print_format import download_pdf as _download_pdf
+from frappe.utils.print_utils import get_print
+from frappe.www.printview import validate_print_permission
 from pypdf import PdfReader, PdfWriter
 
 from hksoho.byrydens.doctype.customer_quotation.customer_quotation import (
@@ -20,6 +23,18 @@ from hksoho.byrydens.doctype.customer_quotation.customer_quotation import (
 )
 
 QUO_REPORT_FORMAT = "Quo-Report"
+
+# Match /printview paper inset (8mm CSS padding). wkhtmltopdf otherwise adds
+# 15mm left/right on top of that, so desk PDF looks tighter than printview.
+PRODUCT_SHEET_PDF_MARGINS = {
+	"margin-top": "10mm",
+	"margin-bottom": "12mm",
+	"margin-left": "0mm",
+	"margin-right": "0mm",
+	"footer-center": "Page [page] of [topage]",
+	"footer-font-size": "9",
+	"footer-spacing": "3",
+}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -33,6 +48,28 @@ def download_pdf(
 	letterhead=None,
 	pdf_generator: Literal["wkhtmltopdf", "chrome"] | None = None,
 ):
+	if doctype == "Product Sheet":
+		doc = doc or frappe.get_doc(doctype, name)
+		validate_print_permission(doc)
+		with print_language(language):
+			pdf_file = get_print(
+				doctype,
+				name,
+				format,
+				doc=doc,
+				as_pdf=True,
+				letterhead=None,
+				no_letterhead=1,
+				pdf_generator=pdf_generator,
+				pdf_options=dict(PRODUCT_SHEET_PDF_MARGINS),
+			)
+		frappe.local.response.filename = "{name}.pdf".format(
+			name=name.replace(" ", "-").replace("/", "-")
+		)
+		frappe.local.response.filecontent = pdf_file
+		frappe.local.response.type = "pdf"
+		return
+
 	_download_pdf(
 		doctype=doctype,
 		name=name,

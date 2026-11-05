@@ -61,10 +61,6 @@
 	border: 1px solid #000;
 	text-align: left;
 }
-.pis-led-flag {
-	float: right;
-	font-weight: bold;
-}
 .pis-table {
 	width: 100%;
 	border-collapse: collapse;
@@ -90,8 +86,24 @@
 	width: 28%;
 	text-align: left;
 }
+.print-format .pis-grid col.c1 { width: 26% !important; }
+.print-format .pis-grid col.c2 { width: 25% !important; }
+.print-format .pis-grid col.c3 { width: 26% !important; }
+.print-format .pis-grid col.c4 { width: 23% !important; }
+.print-format .pis-gi-block col.c1 { width: 26% !important; }
+.print-format .pis-gi-block col.c2 { width: 50% !important; }
+.print-format .pis-gi-block col.c3 { width: 24% !important; }
+.print-format .pis-grid td.lbl,
+.print-format .pis-grid td.val,
+.print-format .pis-gi-block td.lbl,
+.print-format .pis-gi-block td.val {
+	width: auto;
+}
 .print-format {
-	padding: 8mm !important;
+	/* Top padding only affects page 1. wkhtmltopdf margin-top applies to every page. */
+	padding: 0 8mm 8mm 8mm !important;
+	display: block !important;
+	margin-top: 10mm;
 }
 .pis-top {
 	width: 100%;
@@ -100,49 +112,29 @@
 	table-layout: fixed;
 	margin: 0;
 }
-.print-format td.pis-flush,
-.print-format td.pis-fields-cell {
+.print-format td.pis-flush {
 	border: none !important;
 	vertical-align: top;
 	padding: 0 !important;
 }
-.pis-gi-split {
-	width: 100%;
-	border-collapse: collapse;
-	table-layout: fixed;
-	margin: 0;
-}
 .pis-gi-title {
-	margin-top: 8px;
-	margin-bottom: 0;
-	border-bottom: none;
+	margin-top: 10px;
+	margin-bottom: 4px;
 }
-.print-format .pis-gi-split td.pis-photo-cell {
+.print-format .pis-gi-block td.pis-photo-cell {
 	width: 24% !important;
 	border: 1px solid #666 !important;
-	padding: 6px !important;
+	padding: 3px !important;
 	text-align: center;
-	vertical-align: middle;
+	vertical-align: middle !important;
 	background: #fff;
 	box-sizing: border-box;
 }
-.print-format .pis-gi-rest {
-	margin-top: -1px;
-}
-.print-format .pis-photo-box {
-	width: 100%;
-	border-collapse: collapse;
-}
-.print-format .pis-photo-box td {
-	border: none !important;
-	padding: 0 !important;
-	text-align: center;
-	vertical-align: middle;
-}
-.pis-photo {
-	width: 100%;
-	max-width: 100%;
-	height: auto;
+.print-format img.pis-photo,
+.print-format td img.pis-photo,
+body:last-child .print-format td img.pis-photo {
+	max-width: none !important;
+	max-height: none !important;
 }
 .pis-photo-placeholder {
 	color: #999;
@@ -160,11 +152,26 @@
 	max-width: 150px;
 	max-height: 90px;
 }
+.pis-packing {
+	page-break-inside: avoid !important;
+	break-inside: avoid !important;
+	display: block;
+	width: 100%;
+}
+.pis-packing table,
+.pis-packing tr {
+	page-break-inside: avoid !important;
+	break-inside: avoid !important;
+}
 .pis-comments-page {
 	page-break-before: always;
 }
 .pis-comments-page-last {
-	page-break-after: always;
+	page-break-after: auto;
+}
+.pis-comments-page-last .pis-comment-card {
+	height: auto;
+	min-height: 0;
 }
 .pis-comments-page .pis-section-title {
 	margin-top: 0;
@@ -212,8 +219,10 @@
 	color: #555;
 	font-size: 8pt;
 }
-.pis-footer-note {
-	margin-top: 12px;
-	font-size: 8pt;
-	font-style: italic;
+.pis-page-number {
+	text-align: center;
+	font-size: 9pt;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333;
+	padding: 2px 0 0;
 }

@@ -9,18 +9,18 @@
  "engine": "InnoDB",
  "field_order": [
   "general_section",
+  "supplier",
   "rydens_model_no",
   "rydens_model_name",
-  "supplier",
   "supplier_item_no",
   "sample_item_no",
+  "description",
   "column_break_header",
   "customer",
   "version",
   "last_update",
   "status",
   "description_section",
-  "description",
   "size",
   "material_and_finish",
   "column_break_jvgf",
@@ -195,7 +195,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "RYDENS Model No.",
+   "label": "Article No.",
    "reqd": 1,
    "unique": 1
   },
@@ -204,8 +204,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "RYDENS Model Name",
-   "unique": 1
+   "label": "Article Name"
   },
   {
    "fieldname": "supplier_item_no",
@@ -213,14 +212,12 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Supplier Item No.",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "sample_item_no",
    "fieldtype": "Data",
-   "label": "Sample Item No.",
-   "unique": 1
+   "label": "Sample Item No."
   },
   {
    "fieldname": "column_break_header",
@@ -237,14 +234,13 @@
   {
    "fieldname": "description_section",
    "fieldtype": "Section Break",
-   "label": "Product Description"
+   "label": "Specification"
   },
   {
    "fieldname": "description",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Description",
-   "unique": 1
+   "label": "Category"
   },
   {
    "fieldname": "size",
@@ -275,7 +271,7 @@
   {
    "fieldname": "details_section",
    "fieldtype": "Section Break",
-   "label": "Technical Details"
+   "hide_border": 1
   },
   {
    "default": "N/A",
@@ -380,9 +376,11 @@
    "label": "Shade Inside Color"
   },
   {
+   "default": "N/A",
    "fieldname": "socket_type",
-   "fieldtype": "Data",
-   "label": "Socket Type"
+   "fieldtype": "Select",
+   "label": "Socket Type",
+   "options": "N/A\nAR111\nE10\nE14\nE27\nE5\nG4\nG6.35\nG9\nGU10\nLED\nMR11\nMR16\nothers"
   },
   {
    "default": "N/A",
@@ -396,7 +394,7 @@
    "fieldname": "lampholdercup_color",
    "fieldtype": "Select",
    "label": "Lampholdercup Color",
-   "options": "N/A\nmatt white\nshiny white\nmatt black\nshiny black\nChrome\nPB\nCopper\nsame as lamp"
+   "options": "N/A\nmatt white\nshiny white\nmatt black\nshiny black\nChrome\nPB\nCopper\nsame as lamp\nOther"
   },
   {
    "fieldname": "max_wattage",
@@ -422,21 +420,21 @@
    "fieldname": "cable_type",
    "fieldtype": "Select",
    "label": "Cable Type",
-   "options": "N/A\nVDE, 2-wire, flat\nVDE, 2-wire, round\nVDE, 3-wire, round\ntextile, 2-wire, flat\ntextile, 2-wire, round\ntextile, 2-wire, twist\ntextile, 3-wire, round\ntwist textile, 2-wire\ntwist textile, 3-wire\nrubber, 2-wire, round\nrubber, 3-wire, round"
+   "options": "N/A\nVDE, 2-wire, flat\nVDE, 2-wire, round\nVDE, 3-wire, round\ntextile, 2-wire, flat\ntextile, 2-wire, round\ntextile, 2-wire, twist\ntextile, 3-wire, round\ntwist textile, 2-wire\ntwist textile, 3-wire\nrubber, 2-wire, round\nrubber, 3-wire, round\nOther"
   },
   {
    "default": "N/A",
    "fieldname": "switch_type",
    "fieldtype": "Select",
    "label": "Switch Type",
-   "options": "N/A\non-off switch\nfoot dimmer\nrotary dimmer\nmemory dimmer\npush dimmer\n3-step dimmer"
+   "options": "N/A\non-off switch\nfoot dimmer\nrotary dimmer\nmemory dimmer\npush dimmer\n3-step dimmer\nOther"
   },
   {
    "default": "N/A",
    "fieldname": "plug_type",
    "fieldtype": "Select",
    "label": "Plug Type",
-   "options": "N/A\nEUR plug\nUK plug\nUL plug\nIP44 EUR round plug\nTerminal block"
+   "options": "N/A\nEUR plug\nUK plug\nUL plug\nIP44 EUR round plug\nTerminal block\nOther"
   },
   {
    "default": "N/A",
@@ -457,7 +455,7 @@
    "fieldname": "canopy_color",
    "fieldtype": "Select",
    "label": "Canopy Color",
-   "options": "N/A\nwhite\nblack\nchrome\ncopper\nPB\nsame as lamp"
+   "options": "N/A\nwhite\nblack\nchrome\ncopper\nPB\nsame as lamp\nOther"
   },
   {
    "default": "N/A",
@@ -992,13 +990,14 @@
   },
   {
    "fieldname": "column_break_olji",
-   "fieldtype": "Column Break"
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
   }
  ],
  "image_field": "product_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-22 05:36:20.370335",
+ "modified": "2026-11-03 03:44:38.710729",
  "modified_by": "Administrator",
  "module": "byrydens",
  "name": "Product Sheet",
