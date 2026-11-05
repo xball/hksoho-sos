@@ -114,6 +114,22 @@ Declared in `hksoho/modules.txt`.
   - Places the product photo to the right of Supplier through Sewed label (~24% column); Shade Pantone onward is full width under the photo. Nested 100% tables keep the photo’s right edge lined up with the General information header
   - Names label rows by group (for example Product position, Designer size, Wattage color, Energy color). It does not print the removed Other information block
 
+### Note sharing & login popups
+
+Core Frappe `Note` ignores the Share dialog: it only ever allows `owner = me` or `public = 1`. On this site the Share dialog is the single source of truth instead.
+
+- **Share dialog drives access** — Read / Write / Share are the rights ticked per user (`DocShare`); no tick, no access. Note role permissions stay as core (`Desk User`, `System Manager`); **delete is never granted by sharing** (owner/roles only)
+- **Owner** keeps full access; **legacy `public = 1`** is still honoured so restored backups never lock anybody out
+- **Public checkbox is hidden** on the form (Property Setter); the Share dialog is used instead. **Notify users with a popup when they log in** is kept and no longer cleared on save
+- **Status pill** in list and form views comes from the hidden `Note.share_status` field, kept in sync on every share change and by a daily reconcile job:
+  - **Private** (gray) — no shares at all
+  - **Shared** (blue) — shared with at least one specific user
+  - **Public** (green) — shared with **Everyone** (or legacy `public = 1`)
+- **Login popups are permission-scoped** — a note with *Notify users with a popup when they log in* pops up **only** for the owner and the users it is shared with (or everyone, when shared with Everyone). The core implementation showed it to every user on the site
+- Filtering uses one extra query per boot, so **share changes (grant or revoke) apply on the next page load**; closing a popup marks it seen per user (`Note Seen By`)
+- Existing `public = 1` notes were converted to an **Everyone** share and set back to `public = 0`; `share_status` was backfilled for all notes
+- Implementation: `hksoho/byrydens/note_permissions.py`, `hksoho/public/js/note_override.js`, `hksoho/public/js/note_list_override.js`, patches `add_note_share_status_field` / `migrate_note_public_to_share` / `hide_note_public_field`
+
 ### Partners & Master Data
 
 - Unified **Partner** DocType: Supplier, Buyer, Customer, Agent/Buyer, Transporter
@@ -198,6 +214,7 @@ Configured in `hksoho/hooks.py`:
 | Hourly | `import_csv2po.execute` |
 | Hourly | `utils.send_daily_inspection_reminders` |
 | Daily | `inspection_check.execute` (Inspection Event line completion sync) |
+| Daily | `note_permissions.reconcile_share_status` (repair drifted Note status pills) |
 
 ## Custom APIs
 
@@ -229,6 +246,7 @@ Folder name `transport-order-detial` is a historical typo.
 
 - CSS: `/assets/hksoho/css/custom2.css` (included via `app_include_css` in `hooks.py`)
 - JS: `hksoho/public/js/hksoho.js`
+- Note form / list overrides: `hksoho/public/js/note_override.js` (form status pill, public share awareness, refresh hooks) and `hksoho/public/js/note_list_override.js` (`Private` / `Shared` / `Public` indicator with a `share_status` filter route), registered via `doctype_js` / `doctype_list_js`
 
 ## Installation
 
@@ -291,6 +309,7 @@ Medium (documented; code fix only if approved):
 - PO FTP import skips states beyond `Draft`/`Submitted`
 - Pyramid export paths hardcoded; product import reuses `partner_import_*` key names
 - Workflows / notification publish state not fixture-exported; app git may be dirty vs `upstream/main`
+- Note permissions depend on the `before_request` / `before_job` runtime patch in `hksoho/byrydens/note_permissions.py`. If those hooks are removed, Frappe core's owner-or-public rule applies again (Share dialog silently stops working)
 
 ## Contributing
 

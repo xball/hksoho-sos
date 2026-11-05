@@ -32,7 +32,8 @@ scheduler_events = {
         "hksoho.byrydens.utils.send_daily_inspection_reminders"
     ],
 	"daily": [
-		"hksoho.byrydens.inspection_check.execute"
+		"hksoho.byrydens.inspection_check.execute",
+		"hksoho.byrydens.note_permissions.reconcile_share_status"
 	]
 }
 
@@ -43,6 +44,31 @@ doc_events = {
     "ToDo": {
         "after_insert": "hksoho.byrydens.assignment.share_on_todo_assign"
     },
+    # Note sharing: the Share dialog (DocShare) drives Note visibility, and
+    # Note.share_status is kept in sync for the Private / Shared / Public pill.
+    "DocShare": {
+        "after_insert": "hksoho.byrydens.note_permissions.sync_note_share_status",
+        "on_update": "hksoho.byrydens.note_permissions.sync_note_share_status",
+        "on_trash": "hksoho.byrydens.note_permissions.sync_note_share_status",
+        "after_delete": "hksoho.byrydens.note_permissions.sync_note_share_status",
+    },
+    "Note": {
+        "after_insert": "hksoho.byrydens.note_permissions.set_status_on_note_insert",
+        "on_update": "hksoho.byrydens.note_permissions.on_note_update",
+    },
+}
+
+# Note permissions are resolved with frappe.get_attr() on every call, so
+# swapping the module attributes is enough to replace the core implementation.
+before_request = ["hksoho.byrydens.note_permissions.apply"]
+before_job = ["hksoho.byrydens.note_permissions.apply"]
+
+doctype_js = {
+    "Note": "public/js/note_override.js",
+}
+
+doctype_list_js = {
+    "Note": "public/js/note_list_override.js",
 }
 
 

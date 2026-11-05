@@ -184,6 +184,15 @@ flowchart TD
 |---------|------|
 | test_html | Shell / leftover test DocType |
 
+### 5.4 Core DocType customizations
+
+| DocType | Artifact | Purpose |
+|---------|----------|---------|
+| Note | Custom Field `share_status` (Select: Private / Shared / Public) | List/form status pill, filterable; written by `note_permissions`, never by the user |
+| Note | Property Setter `public.hidden = 1` | Hides the Public checkbox; the Share dialog replaces it |
+| Note | Property Setter `notify_on_login.depends_on = eval:1`, `expire_notification_on.depends_on = eval:doc.notify_on_login` | Keeps the popup option visible and the expiry field tied to it |
+| Note | Client scripts `note_override.js`, `note_list_override.js` | Form status pill / share refresh and the Private / Shared / Public list indicator |
+
 ---
 
 ## 6. Reports
@@ -240,6 +249,7 @@ From `hksoho/hooks.py`:
 | Hourly | `hksoho.byrydens.importing.import_csv2po.execute` |
 | Hourly | `hksoho.byrydens.utils.send_daily_inspection_reminders` |
 | Daily | `hksoho.byrydens.inspection_check.execute` |
+| Daily | `hksoho.byrydens.note_permissions.reconcile_share_status` |
 
 ### Document events
 
@@ -247,8 +257,29 @@ From `hksoho/hooks.py`:
 |---------|-------|---------|
 | Purchase Order | `after_save` | `hksoho.byrydens.doctype.purchase_order.purchase_order.after_save` |
 | ToDo | `after_insert` | `hksoho.byrydens.assignment.share_on_todo_assign` |
+| DocShare | `after_insert`, `on_update`, `on_trash`, `after_delete` | `hksoho.byrydens.note_permissions.sync_note_share_status` |
+| Note | `after_insert` | `hksoho.byrydens.note_permissions.set_status_on_note_insert` |
+| Note | `on_update` | `hksoho.byrydens.note_permissions.on_note_update` |
 
 **Assign → Share (Product Sheet):** when a ToDo is created with `reference_type = Product Sheet`, the assignee is automatically DocShared with **read=1, write=1** (`notify=0` so assignment notification is not duplicated). Controlled by `SHARE_ON_ASSIGN_DOCTYPES` in `assignment.py`. Frappe core still shares Read-only only when the user has no permission; this hook always ensures Read+Write for Product Sheet.
+
+### Note permissions (runtime patch)
+
+Core `Note` is hardcoded to `owner = me or public = 1` in `frappe/desk/doctype/note/note.py` and never consults `DocShare`, so the Share dialog has no effect. `hksoho/byrydens/note_permissions.py` **replaces the core functions at runtime** instead of editing core or adding a second `permission_query_conditions` hook (two dict hooks are combined with `AND`, which would collapse back to the core rule):
+
+| Core target | Replacement | Behaviour |
+|-------------|-------------|-----------|
+| `note.get_permission_query_conditions` | `note_permissions.get_permission_query_conditions` | `owner = me` OR `public = 1` OR `exists(DocShare read=1 for me / everyone)` (Guest never matches `everyone`) |
+| `note.has_permission` | `note_permissions.has_permission` | Owner → allow; read-like → public or shared read; `write`/`share`/`submit` → the exact ticked right; other ptypes defer to roles (`None`) |
+| `Note.validate` | `patched_note_validate` | Keeps `notify_on_login` when `public = 0` (core wipes it) |
+| `note._get_unseen_notes` (on_login cache) | `patched_get_unseen_notes` | Filters cached popups through the permission condition |
+| `frappe.boot.get_unseen_notes` (actual `bootinfo.notes`) | `patched_boot_get_unseen_notes` | Filters the per-boot query; this is the function `sessions.get()` and `desk.js` render |
+
+`apply()` is wired to `before_request` and `before_job`, is idempotent, and never raises (failures are logged, not propagated). Both popup paths matter: `frappe.sessions.get()` calls `frappe.boot.get_unseen_notes()` (a fresh query), while `on_login` fills only the `unseen_notes::<user>` cache — filtering one alone leaves the other leaking. `_readable_note_names()` resolves the whole batch in a single SQL statement and **fails closed** (empty set) on error.
+
+**Status field:** hidden Custom Field `Note.share_status` (`Private` / `Shared` / `Public`) maintained by `compute_share_status` → `set_share_status` (written with `update_modified=False`), the `DocShare` events above, and the daily `reconcile_share_status` job. `Public` = an `everyone = 1` share or legacy `public = 1`; `Shared` = at least one named user; `Private` = no shares. `public` is hidden by Property Setter but still honoured by the permission code so old backups stay readable.
+
+**Popup invalidation:** `sync_note_share_status` also calls `clear_unseen_notes_cache` (per user, or globally for an `everyone` share); `on_note_update` clears the current user's cache when `notify_on_login` / `notify_on_every_login` / `content` / `title` changes. `bootinfo.notes` is queried at boot, so grants and revocations apply on the next page load.
 
 ### Assets / Jinja
 
@@ -288,6 +319,10 @@ When `doctype == Customer Quotation` and `format == Quo-Report`, the override me
   - `hksoho.patches.v1_0.load_product_sheet_rohs` (restore stashed RoHS codes onto `Product Sheet RoHS`)
   - `hksoho.patches.v1_0.set_product_sheet_status_draft` (empty status → Draft)
   - `hksoho.patches.v1_0.product_sheet_customer_to_name` (replace Partner IDs with partner names after Customer became Data)
+- Note sharing patches (post-model-sync, order matters):
+  - `hksoho.patches.v1_0.add_note_share_status_field` (create Custom Field `Note.share_status`, backfill existing notes)
+  - `hksoho.patches.v1_0.migrate_note_public_to_share` (convert `public = 1` notes to `DocShare(everyone=1, read=1)` then set `public = 0`)
+  - `hksoho.patches.v1_0.hide_note_public_field` (Property Setters hiding `public` and pinning the `notify_on_login` / `expire_notification_on` dependencies)
 - `hooks.py` has **no `fixtures`** — Workflows, Notification live event, and web-form publish flags are site DB state
 - Property Setter JSON under `byrydens/property_setter/` for Product Sheet default print format
 
@@ -437,6 +472,8 @@ Unconfirmed → Empty TO Head → Confirmed → Shipped → ETA Passed → Arriv
 4. Prefer `developer_mode: 0` on production unless actively customizing.
 5. Whitelisted maintenance APIs (`fix_po_item_order_status_*`) can mutate many rows — run dry-run first; note unsafe default on `fix_po_item_order_status_for_shipped_to`.
 6. Scheduler can be paused via site `pause_scheduler`; confirm before debugging “missing imports”.
+7. Note access is enforced by a **runtime monkey patch** (`before_request` / `before_job` → `note_permissions.apply`) because core `Note` ignores `DocShare`. Removing those hooks silently reverts Note permissions to `owner = me or public = 1`. Verify with `frappe.get_attr("frappe.desk.doctype.note.note.has_permission")` after deploys.
+8. Note login popups are filtered per user (`owner` + shared). A note shared with **Everyone** pops up for the whole site by design — do not tick Everyone on content that is not intended to be site-wide.
 
 ---
 
@@ -469,11 +506,12 @@ Unconfirmed → Empty TO Head → Confirmed → Shipped → ETA Passed → Arriv
 
 | Field | Value |
 |-------|--------|
-| Spec version | 1.2 |
+| Spec version | 1.3 |
 | Source of truth | Code under `apps/hksoho` + live site DocTypes/Workflows |
 | Last full scan | 2026-09-08 |
 | Docs aligned to audit | 2026-09-11 |
 | Quo-Report print attachments | 2026-09-11 |
+| Note sharing & permission-scoped popups | 2026-11-05 |
 | Maintainer | HKSoHo (`paul@hksoho.net`) |
 
 When DocTypes, hooks, or integrations change, update this SPEC and the README feature tables in the same change set.

@@ -11,3 +11,6 @@ hksoho.patches.v1_0.rename_product_sheet_others
 hksoho.patches.v1_0.load_product_sheet_rohs
 hksoho.patches.v1_0.set_product_sheet_status_draft
 hksoho.patches.v1_0.product_sheet_customer_to_name
+hksoho.patches.v1_0.add_note_share_status_field
+hksoho.patches.v1_0.migrate_note_public_to_share
+hksoho.patches.v1_0.hide_note_public_field
