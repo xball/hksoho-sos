@@ -6,6 +6,8 @@ import os
 import frappe
 from frappe.model.document import Document
 
+from hksoho.byrydens.permissions import require_internal
+
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 PDF_EXTENSIONS = {".pdf"}
@@ -29,6 +31,7 @@ class CustomerQuotation(Document):
 @frappe.whitelist()
 def get_article_master_files(article_master: str) -> list[dict]:
 	"""Return printable files from linked Article Master (files table + product_image)."""
+	require_internal()
 	if not article_master:
 		frappe.throw(frappe._("Article Master is required"))
 

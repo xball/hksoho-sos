@@ -3,6 +3,8 @@ import time
 import pandas as pd
 import frappe
 
+from hksoho.byrydens.permissions import require_system_manager
+
 # ===== 基本設定：請改成實際路徑 =====
 BASE_PATH = "/home/frappe/frappe-bench/temp/xpin_import"
 HEADER_FILE = os.path.join(BASE_PATH, "PO_Header.xlsx")
@@ -16,6 +18,8 @@ def import_xpin_po_from_xlsx():
     """
     從三個 XLSX 檔匯入 / 更新 xpin_po + child tables
     """
+    # Bulk import from fixed paths; administrators only.
+    require_system_manager()
     # 1. 讀 Excel
     print("Reading Excel files...")
     header_df = pd.read_excel(HEADER_FILE)

@@ -1,8 +1,21 @@
 import frappe
 from frappe import _
 
+from hksoho.byrydens.permissions import (
+    allowed_partner_ids,
+    check_doctype_permission,
+    is_internal_user,
+    require_internal,
+    require_partner_scope,
+    scoped_supplier_clause,
+    xpin_supplier_names,
+)
+
+
 @frappe.whitelist()
 def get_product_attachments(product_name):
+    # Returns file URLs, so it must not be reachable by supplier accounts.
+    require_internal()
     try:
         # Debug: Log input
         frappe.log_error(message=f"Fetching attachments for product: {product_name}", title="Product Attachment Debug")
@@ -54,6 +67,9 @@ def get_product_attachments(product_name):
 
 @frappe.whitelist()
 def link_attachments_to_products(file_docs, products):
+    # Writes to Product records with ignore_permissions=True below, so the
+    # caller must be trusted staff with write access to every target product.
+    require_internal()
     try:
         # 驗證 file_docs
         if not file_docs:
@@ -102,6 +118,7 @@ def link_attachments_to_products(file_docs, products):
             for product in products:
                 if not frappe.db.exists("Product", product):
                     frappe.throw(_('產品 {} 不存在').format(product))
+                check_doctype_permission("Product", "write", product)
                 product_doc = frappe.get_doc("Product", product)
                 product_doc.append("attachments", {
                     "product": product,
@@ -131,8 +148,12 @@ def get_po_items_for_product(article_number):
     if not article_number:
         return []
 
+    # Supplier accounts must only see their own purchase orders.
+    partners = [] if is_internal_user() else require_partner_scope()
+    clause, extra = scoped_supplier_clause(partners)
+
     # Query Purchase Order Items
-    items = frappe.db.sql("""
+    items = frappe.db.sql(f"""
         SELECT 
             poi.name,
             poi.po_number,
@@ -151,9 +172,9 @@ def get_po_items_for_product(article_number):
             po.qc_status
         FROM `tabPurchase Order Item` poi
         LEFT JOIN `tabPurchase Order` po ON poi.po_number = po.po_number
-        WHERE poi.article_number = %(article_number)s
+        WHERE poi.article_number = %(article_number)s{clause}
         ORDER BY poi.po_number DESC, poi.line ASC
-    """, {"article_number": article_number}, as_dict=True)
+    """, {"article_number": article_number, **extra}, as_dict=True)
 
     return items
 
@@ -167,7 +188,10 @@ def get_purchase_order_items_for_product(article_number):
     if not article_number:
         return []
 
-    items = frappe.db.sql("""
+    partners = [] if is_internal_user() else require_partner_scope()
+    clause, extra = scoped_supplier_clause(partners)
+
+    items = frappe.db.sql(f"""
         SELECT 
             poi.name,
             poi.po_number,
@@ -185,9 +209,9 @@ def get_purchase_order_items_for_product(article_number):
             po.qc_status
         FROM `tabPurchase Order Item` poi
         LEFT JOIN `tabPurchase Order` po ON poi.po_number = po.po_number
-        WHERE poi.article_number = %(article_number)s
+        WHERE poi.article_number = %(article_number)s{clause}
         ORDER BY poi.po_number DESC, poi.line ASC
-    """, {"article_number": article_number}, as_dict=True)
+    """, {"article_number": article_number, **extra}, as_dict=True)
 
     return items
 
@@ -200,7 +224,12 @@ def get_xpin_po_items_for_product_old(article_number):
     if not article_number:
         return []
 
-    items = frappe.db.sql("""
+    partners = [] if is_internal_user() else require_partner_scope()
+    clause, extra = scoped_supplier_clause(xpin_supplier_names(partners))
+    if partners and not extra:
+        return []
+
+    items = frappe.db.sql(f"""
         SELECT 
             poi.name,
             poi.po_number,
@@ -222,9 +251,9 @@ def get_xpin_po_items_for_product_old(article_number):
             po.qc_status
         FROM `tabxpin_po_items` poi
         LEFT JOIN `tabxpin_po` po ON poi.po_number = po.po_number
-        WHERE poi.art_nr = %(article_number)s
+        WHERE poi.art_nr = %(article_number)s{clause}
         ORDER BY poi.po_number DESC, poi.line ASC
-    """, {"article_number": article_number}, as_dict=True)
+    """, {"article_number": article_number, **extra}, as_dict=True)
 
     return items
 
@@ -239,17 +268,10 @@ def get_xpin_po_items_for_product_old2(article_number):
 
     user = frappe.session.user
 
-    # 取得該使用者的 Partner User Permission
-    permissions = frappe.get_all("User Permission",
-        filters={"user": user, "allow": "Partner"},
-        fields=["for_value"])
-    
-    allowed_suppliers = [p.for_value for p in permissions]
-
-    supplier_condition = ""
-    if allowed_suppliers:
-        supplier_list = ','.join([frappe.db.escape(s) for s in allowed_suppliers])
-        supplier_condition = f"AND po.supplier IN ({supplier_list})"
+    # Restricted users are scoped to their own partners; a supplier without a
+    # Partner User Permission is denied instead of seeing every PO.
+    partners = [] if is_internal_user() else require_partner_scope()
+    supplier_condition, extra = scoped_supplier_clause(partners)
 
     items = frappe.db.sql(f"""
         SELECT 
@@ -276,7 +298,7 @@ def get_xpin_po_items_for_product_old2(article_number):
         WHERE poi.art_nr = %(article_number)s
           {supplier_condition}
         ORDER BY poi.po_number DESC, poi.line ASC
-    """, {"article_number": article_number}, as_dict=True)
+    """, {"article_number": article_number, **extra}, as_dict=True)
 
     return items
 
@@ -288,15 +310,8 @@ def get_xpin_po_items_for_product(article_number):
 
     user = frappe.session.user
 
-    # 取得 User Permission (For Value = Partner ID)
-    permissions = frappe.get_all("User Permission",
-        filters={"user": user, "allow": "Partner"},
-        fields=["for_value"])
-    
-    partner_ids = [p.for_value for p in permissions]
-    
-    frappe.log(f"DEBUG User: {user}")
-    frappe.log(f"DEBUG Partner IDs: {partner_ids}")
+    # Restricted users are scoped to their partners and denied if none is set.
+    partner_ids = [] if is_internal_user() else require_partner_scope()
 
     # 從 Partner Doctype 取出真正的 Partner Name
     if partner_ids:
@@ -307,8 +322,6 @@ def get_xpin_po_items_for_product(article_number):
     else:
         allowed_supplier_names = []
     
-    frappe.log(f"DEBUG Allowed Partner Names: {allowed_supplier_names}")
-
     supplier_condition = ""
     if allowed_supplier_names:
         conditions = [f"po.supplier = {frappe.db.escape(name)}" for name in allowed_supplier_names]
@@ -333,7 +346,6 @@ def get_xpin_po_items_for_product(article_number):
         ORDER BY poi.po_number DESC, poi.line ASC
     """, {"article_number": article_number}, as_dict=True)
 
-    frappe.log(f"DEBUG Found {len(items)} records")
     return items
 
 
@@ -366,20 +378,27 @@ def get_supplier_allowed_articles():
 @frappe.whitelist()
 def get_supplier_product_query(doctype, txt, searchfield, start, page_len, filters):
     """Supplier Only Role 的 Server Side 過濾"""
+    from frappe.utils import cint
+
     user = frappe.session.user
-    
+
     # 取得 User Permission 中的 Partner
     perm = frappe.get_all("User Permission",
         filters={"user": user, "allow": "Partner"},
         fields=["for_value"])
-    
+
     if not perm:
         return [[" "]]  # 故意返回空結果
-    
+
     allowed_suppliers = [p.for_value for p in perm]
-    
+
     supplier_list = ','.join([frappe.db.escape(s) for s in allowed_suppliers])
-    
+
+    # ``start`` and ``page_len`` arrive from the HTTP request: coerce them to
+    # integers so they can never be used to break out of the LIMIT clause.
+    start = cint(start)
+    page_len = cint(page_len)
+
     return frappe.db.sql(f"""
         SELECT p.name, p.article_name, p.category
         FROM `tabProduct` p
@@ -396,48 +415,33 @@ def get_supplier_product_query(doctype, txt, searchfield, start, page_len, filte
 def check_product_supplier_permission(article_number):
     """檢查是否有權限查看此 Product"""
     try:
-        user = frappe.session.user
-        print(f"DEBUG check_permission - User: {user}, Article: {article_number}")
-
         if not article_number:
             return True
 
-        # 取得 User Permission
-        permissions = frappe.get_all("User Permission",
-            filters={"user": user, "allow": "Partner"},
-            fields=["for_value"])
-        
-        allowed_suppliers = [p.for_value for p in permissions]
-        print(f"DEBUG Allowed Suppliers: {allowed_suppliers}")
+        allowed_suppliers = allowed_partner_ids()
 
-        # 沒有 User Permission → 無限制
+        # Internal staff are not partner scoped; a restricted user without a
+        # Partner User Permission must be denied, not granted everything.
         if not allowed_suppliers:
-            print("DEBUG: No User Permission → Allow All")
-            return True
+            return is_internal_user()
 
         # 條件1: Product.supplier 欄位匹配
         product_supplier = frappe.db.get_value("Product", article_number, "supplier")
-        print(f"DEBUG Product Supplier: {product_supplier}")
 
         if product_supplier and product_supplier in allowed_suppliers:
-            print("DEBUG: Allowed by Product.supplier")
             return True
 
         # 條件2: 出現在 PO 中
-        po_list = frappe.db.get_all("Purchase Order", 
-            filters={"supplier": ["in", allowed_suppliers]}, 
+        po_list = frappe.db.get_all("Purchase Order",
+            filters={"supplier": ["in", allowed_suppliers]},
             pluck="name")
-        
+
         if po_list:
-            exists = frappe.db.exists("Purchase Order Item", {
+            return bool(frappe.db.exists("Purchase Order Item", {
                 "article_number": article_number,
                 "parent": ["in", po_list]
-            })
-            print(f"DEBUG Exists in PO: {exists}")
-            return bool(exists)
-        else:
-            print("DEBUG: No PO for this supplier → Deny")
-            return False
+            }))
+        return False
 
     except Exception as e:
         print(f"ERROR in check_product_supplier_permission: {str(e)}")

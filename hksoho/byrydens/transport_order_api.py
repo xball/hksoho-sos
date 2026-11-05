@@ -2,11 +2,16 @@ import frappe
 from frappe import _
 import json
 
+from hksoho.byrydens.permissions import check_doctype_permission, require_internal, require_system_manager
+
 @frappe.whitelist()
 def get_po_items(po_name, filters=None):
     """Return all items for the specified Purchase Order where workflow_state is 'Ready to Ship' and qty > 0"""
+    require_internal()
     if not po_name:
         frappe.throw("Please provide a valid Purchase Order number")
+
+    check_doctype_permission("Purchase Order", "read", po_name)
 
     try:
         # Check if the Purchase Order has workflow_state = 'Ready to Ship'
@@ -77,6 +82,9 @@ def update_to_line_invoice(to_name, po_number, invoice_data):
     Returns:
         dict: Result message indicating success or failure
     """
+    require_internal()
+    if not frappe.has_permission("Transport Order", "write", to_name):
+        frappe.throw(_("您沒有足夠的權限更新此運輸單。"), frappe.PermissionError)
     try:
         # Parse invoice_data if it's a string
         if isinstance(invoice_data, str):
@@ -165,6 +173,9 @@ if not logger.handlers:
 @frappe.whitelist()
 def update_vessel_dates(vessel_name, cfs_close=None, etd_date=None, eta_date=None,
                         dest_port_free_days=0, to_name=None):
+    require_internal()
+    if not frappe.has_permission("Vessels Time Table", "write", vessel_name):
+        frappe.throw(_("您沒有足夠的權限更新此船期。"), frappe.PermissionError)
     logger.debug("=== update_vessel_dates 開始執行 ===")
     logger.debug(f"Vessel: {vessel_name} | TO: {to_name} | ETA Date: {eta_date}")
 
@@ -300,6 +311,7 @@ def fix_po_item_order_status_for_shipped_to(dry_run=False, reset_status_to=""):
     :param dry_run: True = 只列出會被更新的資料，不真的寫入 DB
     :param reset_status_to: 要改回的值，例如 "" 或 "Pending"
     """
+    require_system_manager()
     logger = frappe.logger("to_po_fix")
 
     # 1. 找出所有 workflow_state = 'Shipped' 的 Transport Order
@@ -378,6 +390,7 @@ def fix_po_item_order_status_and_trigger_before_save(dry_run=True, reset_status_
     3) 其他多餘的改回 reset_status_to
     4) 對受影響的 Purchase Order 呼叫 save()，觸發 before_save
     """
+    require_system_manager()
     logger = frappe.logger("to_po_fix")
 
     # -------------------------------

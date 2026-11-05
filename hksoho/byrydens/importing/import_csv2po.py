@@ -10,6 +10,8 @@ from io import StringIO
 from contextlib import redirect_stdout, redirect_stderr
 from datetime import datetime, timedelta 
 
+from hksoho.byrydens.permissions import require_system_manager
+
 # DocType 定義
 PO_DOCTYPE = "Purchase Order"
 PO_ITEM_DOCTYPE = "Purchase Order Item"
@@ -481,6 +483,8 @@ def reload_single_po_from_txt(po_number):
     從 INPUT_DIR 找出含有此 po_number 的 po*.txt，重新載入該 PO。
     po_number 由前端 (PO 表單) 傳入。
     """
+    # Rewrites purchase orders from files on disk; administrators only.
+    require_system_manager()
     po_number = (po_number or "").strip()
     if not po_number:
         frappe.throw("PO Number is empty.")

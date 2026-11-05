@@ -8,29 +8,39 @@ from icalendar import Calendar, Event
 from datetime import datetime
 import io
 
+from hksoho.byrydens.permissions import check_doctype_permission, require_internal
+
 
 @frappe.whitelist()
 def get_suppliers():
+    require_internal()
     return frappe.get_list('Partner', filters={'partner_type': 'Supplier', 'status': 'Active'}, fields=['name', 'partner_name'])
 
 @frappe.whitelist()
 def get_sales_orders(supplier):
+    require_internal()
     return frappe.get_list('Purchase Order', filters={'supplier': supplier}, fields=['name'])
 
 @frappe.whitelist()
 def get_order_items(order):
+    require_internal()
+    check_doctype_permission("Purchase Order", "read", order)
     return frappe.get_doc('Purchase Order', order).order_items
 
 @frappe.whitelist()
 def get_inspection_items(template_name):
+    require_internal()
     template = frappe.get_doc('Inspection Template', template_name)
     return template.inspection_items
 
 @frappe.whitelist()
 def get_po_items(po_name):
     """回傳指定 Purchase Order 的所有明細"""
+    require_internal()
     if not po_name:
         frappe.throw("請提供有效的採購訂單編號")
+
+    check_doctype_permission("Purchase Order", "read", po_name)
     
     items = frappe.get_all(
         "Purchase Order Item",
@@ -56,6 +66,8 @@ def get_po_items_qcstatus(po_name):
     if not po_name:
         frappe.throw(_("請提供有效的採購訂單編號"))
 
+    require_internal()
+
     # 檢查用戶對 Purchase Order 的讀取權限
     if not frappe.has_permission("Purchase Order", "read", po_name):
         frappe.log_error(
@@ -76,7 +88,6 @@ def get_po_items_qcstatus(po_name):
         },
         fields=["name", "line", "confirmed_qty", "article_number", "article_name"],
         order_by="line asc",
-        ignore_permissions=True  # 僅限測試，生產環境應移除
     )
 
     # 記錄查詢結果
@@ -100,6 +111,7 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
         dict: 包含操作狀態和訊息
     """
     # 檢查用戶是否有寫入 Inspection Event 的權限
+    require_internal()
     if not frappe.has_permission("Inspection Event", "write", inspection_event_name):
         frappe.throw(
             _("You do not have enough permissions to access this resource. Please contact your manager to get access."),
@@ -187,6 +199,9 @@ def add_po_items_to_inspection_event(inspection_event_name, selected_items):
 
 @frappe.whitelist()
 def send_inspection_invitation(inspection_event_name):
+    require_internal()
+    if not frappe.has_permission("Inspection Event", "read", inspection_event_name):
+        frappe.throw(_("您沒有足夠的權限訪問此檢驗事件。"), frappe.PermissionError)
     doc = frappe.get_doc("Inspection Event", inspection_event_name)
     
     if not doc.inspector:
@@ -246,11 +261,21 @@ def send_inspection_invitation(inspection_event_name):
 
 @frappe.whitelist()
 def update_qc_accepted_qty(purchase_order, line_number, aql_qty):
+    # Writes to a Purchase Order Item with ignore_permissions=True below, so the
+    # caller must hold write access on the parent purchase order.
+    require_internal()
+    if not frappe.has_permission("Purchase Order", "write", purchase_order):
+        frappe.throw(
+            _("您沒有足夠的權限更新此採購訂單。"),
+            frappe.PermissionError,
+        )
     try:
         po_item = frappe.get_doc("Purchase Order Item", {
             "parent": purchase_order,
             "line": line_number
         })
+        if not po_item:
+            frappe.throw(_("找不到對應的採購訂單明細。"))
         po_item.qc_accepted_qty = cint(po_item.qc_accepted_qty) + cint(aql_qty)
         po_item.save(ignore_permissions=True)
         frappe.db.commit()

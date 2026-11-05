@@ -4,6 +4,8 @@ import mimetypes
 
 from frappe import _
 
+from hksoho.byrydens.permissions import check_doctype_permission, require_internal, require_system_manager
+
 from frappe.utils.data import now_datetime, get_system_timezone, format_date, format_time  # 修正匯入為 get_system_timezone
 from datetime import date
 import pytz
@@ -227,8 +229,10 @@ def load_product_images_to_po_items(po_name):
     • Customs tariff code (HS Origin)
     Only updates fields that are blank or different.
     """
+    require_internal()
     if not po_name:
         frappe.throw("PO name is required")
+    check_doctype_permission("Purchase Order", "write", po_name)
 
     # Query child table directly to avoid cache issues
     items = frappe.get_all(
@@ -326,6 +330,9 @@ def make_product_images_public():
     終極容錯版：把所有 Product 用的 Private 圖強制轉 Public
     即使實體檔案不見了也強制成功！
     """
+    # Bulk-publishes private Files via db_set, bypassing validation. Restricted
+    # to administrators by design; never expose this to business users.
+    require_system_manager()
     count_fixed = 0
     count_skipped = 0
     count_error = 0
@@ -397,6 +404,7 @@ from frappe import _
 
 @frappe.whitelist()
 def get_due_po_details(year, month_name):
+    require_internal()
     month_map = {
         "January": "01", "February": "02", "March": "03", "April": "04",
         "May": "05", "June": "06", "July": "07", "August": "08",
